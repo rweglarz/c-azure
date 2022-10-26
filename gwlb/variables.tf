@@ -37,3 +37,7 @@ variable "username" {
 variable "password" {
   type = string
 }
+
+variable "pl-mgmt-csp_nat_ips" {
+  type = string
+}
