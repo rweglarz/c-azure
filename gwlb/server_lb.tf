@@ -66,4 +66,6 @@ resource "azurerm_lb_backend_address_pool" "srv" {
   loadbalancer_id = azurerm_lb.srv.id
 }
 
-
+output "server_lb" {
+  value = azurerm_public_ip.srv.ip_address
+}

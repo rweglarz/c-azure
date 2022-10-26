@@ -1,5 +1,5 @@
 resource "azurerm_linux_virtual_machine_scale_set" "this" {
-  name                = "${var.name}-vm"
+  name                = "${var.name}-fw"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   sku                 = var.instance_type
