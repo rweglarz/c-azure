@@ -20,6 +20,7 @@ variable "tmp_ips" {
 
 variable "fw_ver" {
   type = string
+  default = "10.1.7"
 }
 
 variable "instance_type" {
@@ -44,5 +45,5 @@ variable "pl-mgmt-csp_nat_ips" {
 
 variable "use_fake_gw" {
   type = number
-  default = 1
+  default = 0
 }
