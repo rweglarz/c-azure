@@ -41,3 +41,8 @@ variable "password" {
 variable "pl-mgmt-csp_nat_ips" {
   type = string
 }
+
+variable "use_fake_gw" {
+  type = number
+  default = 1
+}
