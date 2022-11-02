@@ -34,26 +34,34 @@ resource "panos_panorama_tunnel_interface" "aws_tun10" {
   template   = panos_panorama_template.aws.name
   name       = "tunnel.10"
   vsys       = "vsys1"
-  static_ips = ["169.254.21.2/30"]
 }
 resource "panos_panorama_tunnel_interface" "aws_tun11" {
   template   = panos_panorama_template.aws.name
   name       = "tunnel.11"
   vsys       = "vsys1"
-  static_ips = ["169.254.28.6/30"]
 }
 resource "panos_panorama_tunnel_interface" "aws_tun20" {
   template   = panos_panorama_template.aws.name
   name       = "tunnel.20"
   vsys       = "vsys1"
-  static_ips = ["169.254.22.2/30"]
 }
 resource "panos_panorama_tunnel_interface" "aws_tun21" {
   template   = panos_panorama_template.aws.name
   name       = "tunnel.21"
   vsys       = "vsys1"
-  static_ips = ["169.254.22.6/30"]
 }
+
+resource "panos_panorama_loopback_interface" "aws_isp1" {
+  name       = "loopback.1"
+  template   = panos_panorama_template.aws.name
+  static_ips = ["169.254.21.2/32"]
+}
+resource "panos_panorama_loopback_interface" "aws_isp2" {
+  name       = "loopback.2"
+  template   = panos_panorama_template.aws.name
+  static_ips = ["169.254.22.6/32"]
+}
+
 
 resource "panos_virtual_router" "aws-vr1" {
   template = panos_panorama_template.aws.name
@@ -70,7 +78,41 @@ resource "panos_virtual_router" "aws-vr1" {
     panos_panorama_tunnel_interface.aws_tun11.name,
     panos_panorama_tunnel_interface.aws_tun20.name,
     panos_panorama_tunnel_interface.aws_tun21.name,
+    panos_panorama_loopback_interface.aws_isp1.name,
+    panos_panorama_loopback_interface.aws_isp2.name,
   ]
+}
+resource "panos_panorama_static_route_ipv4" "aws-vr1-tun10" {
+  template       = panos_panorama_template.aws.name
+  virtual_router = panos_virtual_router.aws-vr1.name
+  name           = "isp1-i0"
+  destination    = "169.254.21.1/32"
+  interface      = panos_panorama_tunnel_interface.aws_tun10.name
+  type           = ""
+}
+resource "panos_panorama_static_route_ipv4" "aws-vr1-tun11" {
+  template       = panos_panorama_template.aws.name
+  virtual_router = panos_virtual_router.aws-vr1.name
+  name           = "isp1-i1"
+  destination    = "169.254.21.5/32"
+  interface      = panos_panorama_tunnel_interface.aws_tun11.name
+  type           = ""
+}
+resource "panos_panorama_static_route_ipv4" "aws-vr1-tun20" {
+  template       = panos_panorama_template.aws.name
+  virtual_router = panos_virtual_router.aws-vr1.name
+  name           = "isp2-i0"
+  destination    = "169.254.22.1/32"
+  interface      = panos_panorama_tunnel_interface.aws_tun20.name
+  type           = ""
+}
+resource "panos_panorama_static_route_ipv4" "aws-vr1-tun21" {
+  template       = panos_panorama_template.aws.name
+  virtual_router = panos_virtual_router.aws-vr1.name
+  name           = "isp2-i1"
+  destination    = "169.254.22.5/32"
+  interface      = panos_panorama_tunnel_interface.aws_tun21.name
+  type           = ""
 }
 
 resource "panos_panorama_static_route_ipv4" "aws-vr1-eth1_1-dg" {
@@ -242,6 +284,8 @@ resource "panos_zone" "vpn" {
     panos_panorama_tunnel_interface.aws_tun11.name,
     panos_panorama_tunnel_interface.aws_tun20.name,
     panos_panorama_tunnel_interface.aws_tun21.name,
+    panos_panorama_loopback_interface.aws_isp1.name,
+    panos_panorama_loopback_interface.aws_isp2.name,
   ]
 }
 
@@ -274,9 +318,33 @@ resource "panos_panorama_bgp_peer" "tun10" {
   virtual_router          = panos_virtual_router.aws-vr1.name
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
   peer_as                 = 65515
-  local_address_interface = panos_panorama_tunnel_interface.aws_tun10.name
-  local_address_ip        = panos_panorama_tunnel_interface.aws_tun10.static_ips[0]
+  local_address_interface = panos_panorama_loopback_interface.aws_isp1.name
+  local_address_ip        = panos_panorama_loopback_interface.aws_isp1.static_ips[0]
   peer_address_ip         = "169.254.21.1"
+  max_prefixes            = "unlimited"
+  multi_hop               = 1
+}
+resource "panos_panorama_bgp_peer" "tun11" {
+  template                = panos_panorama_template.aws.name
+  name                    = "tun11"
+  virtual_router          = panos_virtual_router.aws-vr1.name
+  bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
+  peer_as                 = 65515
+  local_address_interface = panos_panorama_loopback_interface.aws_isp1.name
+  local_address_ip        = panos_panorama_loopback_interface.aws_isp1.static_ips[0]
+  peer_address_ip         = "169.254.21.5"
+  max_prefixes            = "unlimited"
+  multi_hop               = 1
+}
+resource "panos_panorama_bgp_peer" "tun20" {
+  template                = panos_panorama_template.aws.name
+  name                    = "tun20"
+  virtual_router          = panos_virtual_router.aws-vr1.name
+  bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
+  peer_as                 = 65515
+  local_address_interface = panos_panorama_loopback_interface.aws_isp2.name
+  local_address_ip        = panos_panorama_loopback_interface.aws_isp2.static_ips[0]
+  peer_address_ip         = "169.254.22.1"
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
@@ -286,8 +354,8 @@ resource "panos_panorama_bgp_peer" "tun21" {
   virtual_router          = panos_virtual_router.aws-vr1.name
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
   peer_as                 = 65515
-  local_address_interface = panos_panorama_tunnel_interface.aws_tun21.name
-  local_address_ip        = panos_panorama_tunnel_interface.aws_tun21.static_ips[0]
+  local_address_interface = panos_panorama_loopback_interface.aws_isp2.name
+  local_address_ip        = panos_panorama_loopback_interface.aws_isp2.static_ips[0]
   peer_address_ip         = "169.254.22.5"
   max_prefixes            = "unlimited"
   multi_hop               = 1
