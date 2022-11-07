@@ -64,3 +64,32 @@ variable "aws_availability_zones" {
     "eu-central-1a"
   ]
 }
+
+variable "psk" {
+  type = string
+}
+
+variable "asn" {
+  default = {
+    aws_fw1   = 65516
+    hub1_vpn1 = 65515
+  }
+}
+
+variable "peering_address" {
+  default = {
+    aws_fw1 = [
+      "169.254.21.11",
+      "169.254.21.12",
+    ],
+    hub1_vpn1_i0 = [
+      "169.254.21.1",
+      "169.254.21.2",
+    ],
+    hub1_vpn1_i1 = [
+      "169.254.21.3",
+      "169.254.21.4",
+    ],
+  }
+}
+

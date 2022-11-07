@@ -54,12 +54,12 @@ resource "panos_panorama_tunnel_interface" "aws_tun21" {
 resource "panos_panorama_loopback_interface" "aws_isp1" {
   name       = "loopback.1"
   template   = panos_panorama_template.aws.name
-  static_ips = ["169.254.21.2/32"]
+  static_ips = ["${var.peering_address.aws_fw1[0]}/32"]
 }
 resource "panos_panorama_loopback_interface" "aws_isp2" {
   name       = "loopback.2"
   template   = panos_panorama_template.aws.name
-  static_ips = ["169.254.22.6/32"]
+  static_ips = ["${var.peering_address.aws_fw1[1]}/32"]
 }
 
 
@@ -86,7 +86,7 @@ resource "panos_panorama_static_route_ipv4" "aws-vr1-tun10" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
   name           = "isp1-i0"
-  destination    = "169.254.21.1/32"
+  destination    = "${var.peering_address.hub1_vpn1_i0[0]}/32"
   interface      = panos_panorama_tunnel_interface.aws_tun10.name
   type           = ""
 }
@@ -94,7 +94,7 @@ resource "panos_panorama_static_route_ipv4" "aws-vr1-tun11" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
   name           = "isp1-i1"
-  destination    = "169.254.21.5/32"
+  destination    = "${var.peering_address.hub1_vpn1_i0[1]}/32"
   interface      = panos_panorama_tunnel_interface.aws_tun11.name
   type           = ""
 }
@@ -102,7 +102,7 @@ resource "panos_panorama_static_route_ipv4" "aws-vr1-tun20" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
   name           = "isp2-i0"
-  destination    = "169.254.22.1/32"
+  destination    = "${var.peering_address.hub1_vpn1_i1[0]}/32"
   interface      = panos_panorama_tunnel_interface.aws_tun20.name
   type           = ""
 }
@@ -110,7 +110,7 @@ resource "panos_panorama_static_route_ipv4" "aws-vr1-tun21" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
   name           = "isp2-i1"
-  destination    = "169.254.22.5/32"
+  destination    = "${var.peering_address.hub1_vpn1_i1[1]}/32"
   interface      = panos_panorama_tunnel_interface.aws_tun21.name
   type           = ""
 }
@@ -132,51 +132,23 @@ resource "panos_panorama_static_route_ipv4" "aws-vr1-eth1_2-dg" {
   interface      = panos_panorama_ethernet_interface.aws_eth1_2.name
 }
 
-locals {
-  aws_isp1 = one([for k, v in module.vm-fw-1.public_ips : v if length(regexall("isp1", k)) > 0])
-  aws_isp2 = one([for k, v in module.vm-fw-1.public_ips : v if length(regexall("isp2", k)) > 0])
-  azure_i0 = tolist(azurerm_vpn_gateway.hub1-vpn1.bgp_settings[0].instance_0_bgp_peering_address[0].tunnel_ips)[1]
-  azure_i1 = tolist(azurerm_vpn_gateway.hub1-vpn1.bgp_settings[0].instance_1_bgp_peering_address[0].tunnel_ips)[1]
-}
 
-resource "panos_panorama_ike_gateway" "aws_tun10" {
+resource "panos_panorama_ike_gateway" "aws_fw1-hub1_vpn1" {
+  for_each  = local.tunnel-aws_fw1-hub1_vpn1
+
   template      = panos_panorama_template.aws.name
-  name          = "tun10"
+  name          = each.key
   peer_ip_type  = "ip"
-  peer_ip_value = local.azure_i0
+  peer_ip_value = each.value.peer_ip
 
-  interface      = "ethernet1/1"
-  pre_shared_key = local.psk
+  interface      = each.value.interface
+  pre_shared_key = var.psk
   version        = "ikev2"
 
   local_id_type  = "ipaddr"
-  local_id_value = local.aws_isp1
+  local_id_value = each.value.local_ip
   peer_id_type   = "ipaddr"
-  peer_id_value  = local.azure_i0
-
-
-  enable_nat_traversal              = true
-  nat_traversal_keep_alive          = 10
-  nat_traversal_enable_udp_checksum = true
-
-  enable_dead_peer_detection   = true
-  dead_peer_detection_interval = 2
-  dead_peer_detection_retry    = 5
-}
-resource "panos_panorama_ike_gateway" "aws_tun11" {
-  template      = panos_panorama_template.aws.name
-  name          = "tun11"
-  peer_ip_type  = "ip"
-  peer_ip_value = local.azure_i1
-
-  interface      = "ethernet1/1"
-  pre_shared_key = local.psk
-  version        = "ikev2"
-
-  local_id_type  = "ipaddr"
-  local_id_value = local.aws_isp1
-  peer_id_type   = "ipaddr"
-  peer_id_value  = local.azure_i1
+  peer_id_value  = each.value.peer_ip
 
 
   enable_nat_traversal              = true
@@ -188,82 +160,15 @@ resource "panos_panorama_ike_gateway" "aws_tun11" {
   dead_peer_detection_retry    = 5
 }
 
-resource "panos_panorama_ike_gateway" "aws_tun20" {
-  template      = panos_panorama_template.aws.name
-  name          = "tun20"
-  peer_ip_type  = "ip"
-  peer_ip_value = local.azure_i0
+resource "panos_panorama_ipsec_tunnel" "aws_fw1-hub1_vpn1" {
+  for_each  = local.tunnel-aws_fw1-hub1_vpn1
 
-  interface      = "ethernet1/2"
-  pre_shared_key = local.psk
-  version        = "ikev2"
-
-  local_id_type  = "ipaddr"
-  local_id_value = local.aws_isp2
-  peer_id_type   = "ipaddr"
-  peer_id_value  = local.azure_i0
-
-  enable_nat_traversal              = true
-  nat_traversal_keep_alive          = 10
-  nat_traversal_enable_udp_checksum = true
-
-  enable_dead_peer_detection   = true
-  dead_peer_detection_interval = 2
-  dead_peer_detection_retry    = 5
-}
-resource "panos_panorama_ike_gateway" "aws_tun21" {
-  template      = panos_panorama_template.aws.name
-  name          = "tun21"
-  peer_ip_type  = "ip"
-  peer_ip_value = local.azure_i1
-
-  interface      = "ethernet1/2"
-  pre_shared_key = local.psk
-  version        = "ikev2"
-
-  local_id_type  = "ipaddr"
-  local_id_value = local.aws_isp2
-  peer_id_type   = "ipaddr"
-  peer_id_value  = local.azure_i1
-
-  enable_nat_traversal              = true
-  nat_traversal_keep_alive          = 10
-  nat_traversal_enable_udp_checksum = true
-
-  enable_dead_peer_detection   = true
-  dead_peer_detection_interval = 2
-  dead_peer_detection_retry    = 5
-}
-
-resource "panos_panorama_ipsec_tunnel" "aws_tun10" {
-  name             = "tun10"
+  name             = each.key
   template         = panos_panorama_template.aws.name
-  tunnel_interface = panos_panorama_tunnel_interface.aws_tun10.name
+  tunnel_interface = each.value.tunnel_interface
   anti_replay      = false
-  ak_ike_gateway   = panos_panorama_ike_gateway.aws_tun10.name
+  ak_ike_gateway   = each.key
 }
-resource "panos_panorama_ipsec_tunnel" "aws_tun11" {
-  name             = "tun11"
-  template         = panos_panorama_template.aws.name
-  tunnel_interface = panos_panorama_tunnel_interface.aws_tun11.name
-  anti_replay      = false
-  ak_ike_gateway   = panos_panorama_ike_gateway.aws_tun11.name
-}
-resource "panos_panorama_ipsec_tunnel" "aws_tun20" {
-  name             = "tun20"
-  template         = panos_panorama_template.aws.name
-  tunnel_interface = panos_panorama_tunnel_interface.aws_tun20.name
-  anti_replay      = false
-  ak_ike_gateway   = panos_panorama_ike_gateway.aws_tun20.name
-}
-resource "panos_panorama_ipsec_tunnel" "aws_tun21" {
-  name             = "tun21"
-  template         = panos_panorama_template.aws.name
-  tunnel_interface = panos_panorama_tunnel_interface.aws_tun21.name
-  anti_replay      = false
-  ak_ike_gateway   = panos_panorama_ike_gateway.aws_tun21.name
-}
-
 
 
 resource "panos_zone" "internet" {
@@ -297,7 +202,7 @@ resource "panos_panorama_bgp" "aws-vr1_bgp" {
   install_route  = true
 
   router_id = "169.254.21.2"
-  as_number = 65516
+  as_number = var.asn["aws_fw1"]
 }
 resource "panos_panorama_bgp_redist_rule" "aws-lo99" {
   template       = panos_panorama_template.aws.name
@@ -317,10 +222,10 @@ resource "panos_panorama_bgp_peer" "tun10" {
   name                    = "tun10"
   virtual_router          = panos_virtual_router.aws-vr1.name
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
-  peer_as                 = 65515
+  peer_as                 = var.asn["hub1_vpn1"]
   local_address_interface = panos_panorama_loopback_interface.aws_isp1.name
   local_address_ip        = panos_panorama_loopback_interface.aws_isp1.static_ips[0]
-  peer_address_ip         = "169.254.21.1"
+  peer_address_ip         = var.peering_address.hub1_vpn1_i0[0]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
@@ -329,10 +234,10 @@ resource "panos_panorama_bgp_peer" "tun11" {
   name                    = "tun11"
   virtual_router          = panos_virtual_router.aws-vr1.name
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
-  peer_as                 = 65515
+  peer_as                 = var.asn["hub1_vpn1"]
   local_address_interface = panos_panorama_loopback_interface.aws_isp1.name
   local_address_ip        = panos_panorama_loopback_interface.aws_isp1.static_ips[0]
-  peer_address_ip         = "169.254.21.5"
+  peer_address_ip         = var.peering_address.hub1_vpn1_i0[1]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
@@ -341,10 +246,10 @@ resource "panos_panorama_bgp_peer" "tun20" {
   name                    = "tun20"
   virtual_router          = panos_virtual_router.aws-vr1.name
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
-  peer_as                 = 65515
+  peer_as                 = var.asn["hub1_vpn1"]
   local_address_interface = panos_panorama_loopback_interface.aws_isp2.name
   local_address_ip        = panos_panorama_loopback_interface.aws_isp2.static_ips[0]
-  peer_address_ip         = "169.254.22.1"
+  peer_address_ip         = var.peering_address.hub1_vpn1_i1[0]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
@@ -353,10 +258,10 @@ resource "panos_panorama_bgp_peer" "tun21" {
   name                    = "tun21"
   virtual_router          = panos_virtual_router.aws-vr1.name
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
-  peer_as                 = 65515
+  peer_as                 = var.asn["hub1_vpn1"]
   local_address_interface = panos_panorama_loopback_interface.aws_isp2.name
   local_address_ip        = panos_panorama_loopback_interface.aws_isp2.static_ips[0]
-  peer_address_ip         = "169.254.22.5"
+  peer_address_ip         = var.peering_address.hub1_vpn1_i1[1]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
