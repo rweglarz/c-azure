@@ -210,12 +210,18 @@ resource "panos_panorama_bgp_redist_rule" "aws-lo99" {
   route_table    = "unicast"
   name           = "192.168.99.1/32"
   set_med        = "20"
+  depends_on = [
+    panos_panorama_bgp.aws-vr1_bgp
+  ]
 }
 resource "panos_panorama_bgp_peer_group" "aws-vr1-g1" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
   name           = "azure"
   type           = "ebgp"
+  depends_on = [
+    panos_panorama_bgp.aws-vr1_bgp
+  ]
 }
 resource "panos_panorama_bgp_peer" "tun10" {
   template                = panos_panorama_template.aws.name
