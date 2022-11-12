@@ -33,7 +33,7 @@ resource "panos_panorama_ethernet_interface" "azure_ha2_eth1_2" {
   vsys     = "vsys1"
   mode     = "layer3"
   static_ips = [
-    "${azurerm_network_interface.data[1].ip_configuration[1].private_ip_address}/26",
+    "${azurerm_network_interface.data[1].ip_configuration[1].private_ip_address}/28"
   ]
   enable_dhcp = false
 
@@ -48,13 +48,14 @@ resource "panos_arp" "azure_ha2_eth1_2_dg" {
   mac_address    = "12:34:56:78:9a:bc"
 }
 */
-resource "panos_panorama_loopback_interface" "azure_ha2_lo1" {
+resource "panos_panorama_loopback_interface" "azure_ha2_lo2" {
   template = panos_panorama_template.azure_ha2.name
-  name     = "loopback.1"
+  name     = "loopback.2"
   static_ips = [
     "${azurerm_network_interface.data[1].ip_configuration[0].private_ip_address}/32",
     "${azurerm_network_interface.data[4].ip_configuration[0].private_ip_address}/32",
   ]
+  management_profile = panos_panorama_management_profile.azure_ha2_ping.name
 }
 
 
@@ -63,17 +64,31 @@ resource "panos_panorama_ethernet_interface" "azure_ha2_eth1_3" {
   name        = "ethernet1/3"
   vsys        = "vsys1"
   mode        = "layer3"
-  static_ips  = ["${azurerm_network_interface.data[2].ip_configuration[1].private_ip_address}/26"]
+  static_ips  = [
+    "${azurerm_network_interface.data[2].ip_configuration[1].private_ip_address}/28",
+  ]
   enable_dhcp = false
 
   management_profile = panos_panorama_management_profile.azure_ha2_ping.name
 }
+
+resource "panos_panorama_loopback_interface" "azure_ha2_lo3" {
+  template = panos_panorama_template.azure_ha2.name
+  name     = "loopback.3"
+  static_ips = [
+    "${azurerm_network_interface.data[2].ip_configuration[0].private_ip_address}/32",
+    "${azurerm_network_interface.data[5].ip_configuration[0].private_ip_address}/32",
+  ]
+  management_profile = panos_panorama_management_profile.azure_ha2_ping.name
+}
+
 resource "panos_zone" "azure_ha2_internet" {
   template = panos_panorama_template.azure_ha2.name
   name     = "internet"
   mode     = "layer3"
   interfaces = [
     panos_panorama_ethernet_interface.azure_ha2_eth1_2.name,
+    panos_panorama_loopback_interface.azure_ha2_lo2.name,
   ]
 }
 resource "panos_zone" "azure_ha2_servers" {
@@ -82,6 +97,7 @@ resource "panos_zone" "azure_ha2_servers" {
   mode     = "layer3"
   interfaces = [
     panos_panorama_ethernet_interface.azure_ha2_eth1_3.name,
+    panos_panorama_loopback_interface.azure_ha2_lo3.name,
   ]
 }
 resource "panos_virtual_router" "ha2_vr1" {
@@ -90,7 +106,8 @@ resource "panos_virtual_router" "ha2_vr1" {
   interfaces = [
     panos_panorama_ethernet_interface.azure_ha2_eth1_2.name,
     panos_panorama_ethernet_interface.azure_ha2_eth1_3.name,
-    panos_panorama_loopback_interface.azure_ha2_lo1.name,
+    panos_panorama_loopback_interface.azure_ha2_lo2.name,
+    panos_panorama_loopback_interface.azure_ha2_lo3.name,
   ]
 }
 resource "panos_panorama_static_route_ipv4" "ha2_vr1_dg" {
@@ -150,63 +167,12 @@ resource "panos_panorama_template_variable" "ha1-ha2_gw" {
 }
 
 /*
-
-resource "panos_panorama_template_variable" "1-ha1_peer_ip" {
-  template_stack = panos_panorama_template_stack.azure_ha2_1.name
-  name           = "$ha1-peer-ip"
-  type           = "ip-netmask"
-  value          = module.fw-ha1z_a.private_ip_list["mgmt"][0]
-}
-resource "panos_panorama_template_variable" "1-ha2_local_ip" {
-  template_stack = panos_panorama_template_stack.azure_ha2_1.name
-  name           = "$ha2-local-ip"
-  type           = "ip-netmask"
-  value          = module.fw-ha1z_b.private_ip_list["ha2"][0]
-}
-resource "panos_panorama_template_variable" "1-ha2_gw" {
-  template_stack = panos_panorama_template_stack.azure_ha2_1.name
-  name           = "$ha2-gw"
-  type           = "ip-netmask"
-  value          = cidrhost(azure_subnet.ha1z_a["ha2"].cidr_block, 1)
-}
-*/
-
-/*
 resource "panos_panorama_tunnel_interface" "ha1z_tun11" {
   template           = panos_panorama_template.ha1z.name
   name               = "tunnel.11"
   vsys               = "vsys1"
   static_ips         = ["169.254.12.1/30"]
   management_profile = "ping"
-}
-
-
-
-
-resource "panos_virtual_router" "ha1z_vr1" {
-  name     = "vr1"
-  template = panos_panorama_template.ha1z.name
-  interfaces = [
-    panos_panorama_ethernet_interface.ha1z_eth1_2.name,
-    panos_panorama_ethernet_interface.ha1z_eth1_3.name,
-    panos_panorama_tunnel_interface.ha1z_tun11.name,
-  ]
-}
-resource "panos_panorama_static_route_ipv4" "ha1z_vr1_dg" {
-  template       = panos_panorama_template.ha1z.name
-  virtual_router = panos_virtual_router.ha1z_vr1.name
-  name           = "internet"
-  destination    = "0.0.0.0/0"
-  next_hop       = cidrhost(azure_subnet.ha1z_a["internet"].cidr_block, 1)
-  interface      = panos_panorama_ethernet_interface.ha1z_eth1_2.name
-}
-resource "panos_panorama_static_route_ipv4" "ha1z_vr1_private" {
-  template       = panos_panorama_template.ha1z.name
-  virtual_router = panos_virtual_router.ha1z_vr1.name
-  name           = "private"
-  destination    = "172.16.0.0/12"
-  next_hop       = cidrhost(azure_subnet.ha1z_a["prv"].cidr_block, 1)
-  interface      = panos_panorama_ethernet_interface.ha1z_eth1_3.name
 }
 resource "panos_panorama_static_route_ipv4" "ha1z_vr1_vpn" {
   template       = panos_panorama_template.ha1z.name
@@ -286,5 +252,4 @@ resource "panos_security_rule_group" "ha1z_ipsec" {
     action     = "allow"
   }
 }
-
 */

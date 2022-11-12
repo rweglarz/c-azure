@@ -1,105 +1,129 @@
-resource "azurerm_virtual_network" "srv" {
-  name                = "${var.name}-srv"
+resource "azurerm_route_table" "via-fw" {
+  name                = "${var.name}-via-fw"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  address_space       = [var.srv_vpc_cidr]
+}
+resource "azurerm_route" "dg-via-floating" {
+  name                   = "dg_floating"
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.via-fw.name
+  address_prefix         = "0.0.0.0/0"
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = replace(panos_panorama_ethernet_interface.azure_ha2_eth1_3.static_ips[0], "/\\/../", "")
+}
+resource "azurerm_route" "ew-via-fw" {
+  name                   = "ew_fw"
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.via-fw.name
+  address_prefix         = "172.16.0.0/12"
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = replace(panos_panorama_loopback_interface.azure_ha2_lo3.static_ips[0], "/\\/../", "")
+}
+resource "azurerm_route" "mgmt-via-ig" {
+  for_each               = {for e in var.mgmt_ips: e.cidr => e.description}
+  name                   = replace("mgmt-${each.key}", "/[ \\/]/", "_")
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.via-fw.name
+  address_prefix         = each.key
+  next_hop_type          = "Internet"
 }
 
-resource "azurerm_subnet" "s1" {
-  name                 = "${var.name}-srv-s1"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.srv.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.srv.address_space[0], 8, 0)]
-}
-resource "azurerm_subnet" "s2" {
-  name                 = "${var.name}-srv-s2"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.srv.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.srv.address_space[0], 8, 1)]
+resource "azurerm_virtual_network" "srv0" {
+  name                = "${var.name}-srv0"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  address_space       = [cidrsubnet(var.cidr, 2, 1)]
 }
 
-resource "azurerm_virtual_network_peering" "srv-fw" {
-  name                      = "${var.name}-srv-fw"
+resource "azurerm_subnet" "srv0-s1" {
+  name                 = "${var.name}-srv0-s1"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.srv0.name
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.srv0.address_space[0], 2, 0)]
+}
+
+resource "azurerm_virtual_network_peering" "srv0-fw" {
+  name                      = "${var.name}-srv0-fw"
   resource_group_name       = azurerm_resource_group.rg.name
-  virtual_network_name      = azurerm_virtual_network.srv.name
+  virtual_network_name      = azurerm_virtual_network.srv0.name
   remote_virtual_network_id = azurerm_virtual_network.sec.id
   allow_forwarded_traffic   = true
 }
 
-resource "azurerm_virtual_network_peering" "fw-srv" {
-  name                      = "${var.name}-fw-srv"
+resource "azurerm_virtual_network_peering" "fw-srv0" {
+  name                      = "${var.name}-fw-srv0"
   resource_group_name       = azurerm_resource_group.rg.name
   virtual_network_name      = azurerm_virtual_network.sec.name
-  remote_virtual_network_id = azurerm_virtual_network.srv.id
+  remote_virtual_network_id = azurerm_virtual_network.srv0.id
+}
+
+resource "azurerm_subnet_route_table_association" "srv0" {
+  subnet_id      = azurerm_subnet.srv0-s1.id
+  route_table_id = azurerm_route_table.via-fw.id
 }
 
 
-resource "azurerm_route_table" "srv" {
-  name                = "${var.name}-srv"
+
+
+
+
+resource "azurerm_virtual_network" "srv1" {
+  name                = "${var.name}-srv1"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
+  address_space       = [cidrsubnet(var.cidr, 2, 2)]
 }
 
-resource "azurerm_route" "srv-dg-fw" {
-  name                   = "dg_fw"
-  resource_group_name    = azurerm_resource_group.rg.name
-  route_table_name       = azurerm_route_table.srv.name
-  address_prefix         = "0.0.0.0/0"
-  next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = "172.29.254.198"
+resource "azurerm_subnet" "srv1-s1" {
+  name                 = "${var.name}-srv1-s1"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.srv1.name
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.srv1.address_space[0], 2, 0)]
 }
 
-resource "azurerm_subnet_route_table_association" "srv" {
-  subnet_id      = azurerm_subnet.s1.id
-  route_table_id = azurerm_route_table.srv.id
+resource "azurerm_virtual_network_peering" "srv1-fw" {
+  name                      = "${var.name}-srv1-fw"
+  resource_group_name       = azurerm_resource_group.rg.name
+  virtual_network_name      = azurerm_virtual_network.srv1.name
+  remote_virtual_network_id = azurerm_virtual_network.sec.id
+  allow_forwarded_traffic   = true
+}
+
+resource "azurerm_virtual_network_peering" "fw-srv1" {
+  name                      = "${var.name}-fw-srv1"
+  resource_group_name       = azurerm_resource_group.rg.name
+  virtual_network_name      = azurerm_virtual_network.sec.name
+  remote_virtual_network_id = azurerm_virtual_network.srv1.id
+}
+
+resource "azurerm_subnet_route_table_association" "srv1" {
+  subnet_id      = azurerm_subnet.srv1-s1.id
+  route_table_id = azurerm_route_table.via-fw.id
 }
 
 
+module "srv0" {
+  source = "../modules/linux"
 
-
-
-
-resource "azurerm_network_interface" "srv1" {
-  name                = "${var.name}-srv-0"
+  name                = "${var.name}-linux0"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-
-  ip_configuration {
-    name                          = "internal"
-    subnet_id                     = azurerm_subnet.s1.id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = cidrhost(azurerm_subnet.s1.address_prefixes[0], 5)
-  }
+  subnet_id           = azurerm_subnet.srv0-s1.id
+  private_ip_address  = cidrhost(azurerm_subnet.srv0-s1.address_prefixes[0], 5)
+  password            = var.password
+  public_key          = azurerm_ssh_public_key.rwe.public_key
+  security_group      = azurerm_network_security_group.mgmt.id
 }
 
+module "srv1" {
+  source = "../modules/linux"
 
-resource "azurerm_linux_virtual_machine" "myterraformvm" {
-  name                  = "${var.name}-srv-0"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.srv1.id]
-  size                  = "Standard_DS1_v2"
-
-  os_disk {
-    name                 = "${var.name}-srv-0"
-    caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"
-  }
-
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-focal"
-    sku       = "20_04-lts-gen2"
-    version   = "latest"
-  }
-
-  admin_username                  = "ubuntu"
-  disable_password_authentication = true
-
-  admin_ssh_key {
-    username   = "ubuntu"
-    public_key = azurerm_ssh_public_key.rwe.public_key
-  }
+  name                = "${var.name}-linux1"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  subnet_id           = azurerm_subnet.srv1-s1.id
+  private_ip_address  = cidrhost(azurerm_subnet.srv1-s1.address_prefixes[0], 5)
+  password            = var.password
+  public_key          = azurerm_ssh_public_key.rwe.public_key
+  security_group      = azurerm_network_security_group.mgmt.id
 }
-
-

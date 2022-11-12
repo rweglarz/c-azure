@@ -2,13 +2,10 @@ variable "name" {
   description = "Name/Prefix of the deployment"
   type = string
 }
-variable "vpc_cidr" {
+variable "cidr" {
   description = "vpc cidr"
   type = string
-}
-variable "srv_vpc_cidr" {
-  description = "vpc cidr"
-  type = string
+  default   = "172.29.0.0/24"
 }
 
 variable "mgmt_ips" {
@@ -45,3 +42,11 @@ variable "pl-mgmt-csp_nat_ips" {
   type = string
   default = "pl-029b5d80e69d9bc9e"
 }
+
+variable dns_zone_rg {
+  type = string
+}
+variable dns_zone_name {
+  type = string
+}
+
