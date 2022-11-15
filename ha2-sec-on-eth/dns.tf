@@ -28,4 +28,22 @@ resource "azurerm_dns_a_record" "srv1" {
   ]
 }
 
+resource "azurerm_dns_a_record" "srv5" {
+  name                = "${var.name}-srv5"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.srv5.public_ip
+  ]
+}
+resource "azurerm_dns_a_record" "srv6" {
+  name                = "${var.name}-srv6"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.srv6.public_ip
+  ]
+}
 

@@ -5,7 +5,7 @@ variable "name" {
 variable "cidr" {
   description = "vpc cidr"
   type = string
-  default   = "172.29.0.0/24"
+  default   = "172.29.0.0/23"
 }
 
 variable "mgmt_ips" {

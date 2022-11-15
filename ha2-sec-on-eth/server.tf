@@ -11,13 +11,13 @@ resource "azurerm_route" "dg-via-floating" {
   next_hop_type          = "VirtualAppliance"
   next_hop_in_ip_address = replace(panos_panorama_ethernet_interface.azure_ha2_eth1_3.static_ips[0], "/\\/../", "")
 }
-resource "azurerm_route" "ew-via-fw" {
+resource "azurerm_route" "ew-via-floating" {
   name                   = "ew_fw"
   resource_group_name    = azurerm_resource_group.rg.name
   route_table_name       = azurerm_route_table.via-fw.name
   address_prefix         = "172.16.0.0/12"
   next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = replace(panos_panorama_loopback_interface.azure_ha2_lo3.static_ips[0], "/\\/../", "")
+  next_hop_in_ip_address = replace(panos_panorama_ethernet_interface.azure_ha2_eth1_3.static_ips[0], "/\\/../", "")
 }
 resource "azurerm_route" "mgmt-via-ig" {
   for_each               = {for e in var.mgmt_ips: e.cidr => e.description}
@@ -39,7 +39,7 @@ resource "azurerm_subnet" "srv0-s1" {
   name                 = "${var.name}-srv0-s1"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.srv0.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.srv0.address_space[0], 2, 0)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.srv0.address_space[0], 3, 0)]
 }
 
 resource "azurerm_virtual_network_peering" "srv0-fw" {
@@ -78,7 +78,7 @@ resource "azurerm_subnet" "srv1-s1" {
   name                 = "${var.name}-srv1-s1"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.srv1.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.srv1.address_space[0], 2, 0)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.srv1.address_space[0], 3, 0)]
 }
 
 resource "azurerm_virtual_network_peering" "srv1-fw" {
@@ -123,6 +123,32 @@ module "srv1" {
   resource_group_name = azurerm_resource_group.rg.name
   subnet_id           = azurerm_subnet.srv1-s1.id
   private_ip_address  = cidrhost(azurerm_subnet.srv1-s1.address_prefixes[0], 5)
+  password            = var.password
+  public_key          = azurerm_ssh_public_key.rwe.public_key
+  security_group      = azurerm_network_security_group.mgmt.id
+}
+
+module "srv5" {
+  source = "../modules/linux"
+
+  name                = "${var.name}-srv5"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  subnet_id           = azurerm_subnet.sec_srv5.id
+  private_ip_address  = cidrhost(azurerm_subnet.sec_srv5.address_prefixes[0], 5)
+  password            = var.password
+  public_key          = azurerm_ssh_public_key.rwe.public_key
+  security_group      = azurerm_network_security_group.mgmt.id
+}
+
+module "srv6" {
+  source = "../modules/linux"
+
+  name                = "${var.name}-srv6"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  subnet_id           = azurerm_subnet.sec_srv6.id
+  private_ip_address  = cidrhost(azurerm_subnet.sec_srv6.address_prefixes[0], 5)
   password            = var.password
   public_key          = azurerm_ssh_public_key.rwe.public_key
   security_group      = azurerm_network_security_group.mgmt.id
