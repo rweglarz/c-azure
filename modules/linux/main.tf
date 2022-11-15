@@ -53,8 +53,6 @@ resource "azurerm_linux_virtual_machine" "this" {
 }
 
 resource "azurerm_network_interface_security_group_association" "this" {
-  count = var.security_group != null ? 1 : 0
-
   network_interface_id      = azurerm_network_interface.this.id
   network_security_group_id = var.security_group
 }
