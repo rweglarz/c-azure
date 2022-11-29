@@ -10,6 +10,7 @@ resource "panos_panorama_template_stack" "azure_ha2_0" {
     "vm-ha-ha2-eth1-1",
     "vm common",
   ]
+  description = "pat:acp"
 }
 resource "panos_panorama_template_stack" "azure_ha2_1" {
   name         = "azure-ha2-1"
@@ -20,6 +21,7 @@ resource "panos_panorama_template_stack" "azure_ha2_1" {
     "vm-ha-ha2-eth1-1",
     "vm common",
   ]
+  description = "pat:acp"
 }
 
 resource "panos_panorama_management_profile" "azure_ha2_ping" {
