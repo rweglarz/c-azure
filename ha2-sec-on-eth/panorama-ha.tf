@@ -7,7 +7,7 @@ resource "panos_panorama_template_stack" "azure_ha2_0" {
   templates = [
     panos_panorama_template.azure_ha2.name,
     "azure-ha2-rg",
-    "vm-ha",
+    "vm-ha-ha2-eth1-1",
     "vm common",
   ]
 }
@@ -17,7 +17,7 @@ resource "panos_panorama_template_stack" "azure_ha2_1" {
   templates = [
     panos_panorama_template.azure_ha2.name,
     "azure-ha2-rg",
-    "vm-ha",
+    "vm-ha-ha2-eth1-1",
     "vm common",
   ]
 }
