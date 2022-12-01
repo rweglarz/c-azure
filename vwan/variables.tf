@@ -93,3 +93,10 @@ variable "peering_address" {
   }
 }
 
+variable dns_zone_rg {
+  type = string
+}
+variable dns_zone_name {
+  type = string
+}
+
