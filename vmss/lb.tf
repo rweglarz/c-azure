@@ -68,6 +68,21 @@ resource "azurerm_lb_rule" "ext" {
   frontend_port = 80
   backend_port  = 80
 }
+resource "azurerm_lb_rule" "ext-22" {
+  name = "${var.name}-lb-r-ext-22"
+
+  loadbalancer_id                = azurerm_lb.fw-ext.id
+  frontend_ip_configuration_name = "ilb-ext"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.ext.id]
+  probe_id                       = azurerm_lb_probe.fw-ext.id
+
+  disable_outbound_snat = true
+
+  protocol      = "Tcp"
+  frontend_port = 22
+  backend_port  = 22
+  enable_floating_ip = true
+}
 resource "azurerm_lb_backend_address_pool" "ext" {
   name            = "${var.name}-ext"
   loadbalancer_id = azurerm_lb.fw-ext.id
