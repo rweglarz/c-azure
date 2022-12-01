@@ -3,7 +3,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   dns_prefix          = "k8s1"
-  kubernetes_version  = "1.21.9"
+  kubernetes_version  = var.kubernetes_version
 
   role_based_access_control_enabled = true
 

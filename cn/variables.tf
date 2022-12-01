@@ -40,3 +40,7 @@ variable "pl-mgmt-csp_nat_ips" {
   type = string
 }
 
+variable "kubernetes_version" {
+  type = string
+  default = "1.23.8"
+}
