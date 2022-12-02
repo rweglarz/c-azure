@@ -30,8 +30,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   )
 
   ingress_application_gateway {
-    gateway_name = "${var.name}-k8s-appgw"
-    subnet_id    = azurerm_subnet.appgw.id
+    gateway_id = azurerm_application_gateway.appgw.id
   }
   depends_on = [
     azurerm_subnet_nat_gateway_association.aks,
