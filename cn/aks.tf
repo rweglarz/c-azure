@@ -26,7 +26,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   api_server_authorized_ip_ranges = concat(
     [for r in var.mgmt_ips : "${r.cidr}"],
     ["${azurerm_public_ip.ngw.ip_address}/32"],
-    [var.panorama1_ip, var.panorama2_ip],
+    ["${var.panorama1_ip}/32", "${var.panorama2_ip}/32"],
   )
 
   ingress_application_gateway {
