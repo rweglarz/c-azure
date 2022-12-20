@@ -31,24 +31,24 @@ resource "panos_panorama_ethernet_interface" "aws_eth1_3" {
 }
 
 resource "panos_panorama_tunnel_interface" "aws_tun10" {
-  template   = panos_panorama_template.aws.name
-  name       = "tunnel.10"
-  vsys       = "vsys1"
+  template = panos_panorama_template.aws.name
+  name     = "tunnel.10"
+  vsys     = "vsys1"
 }
 resource "panos_panorama_tunnel_interface" "aws_tun11" {
-  template   = panos_panorama_template.aws.name
-  name       = "tunnel.11"
-  vsys       = "vsys1"
+  template = panos_panorama_template.aws.name
+  name     = "tunnel.11"
+  vsys     = "vsys1"
 }
 resource "panos_panorama_tunnel_interface" "aws_tun20" {
-  template   = panos_panorama_template.aws.name
-  name       = "tunnel.20"
-  vsys       = "vsys1"
+  template = panos_panorama_template.aws.name
+  name     = "tunnel.20"
+  vsys     = "vsys1"
 }
 resource "panos_panorama_tunnel_interface" "aws_tun21" {
-  template   = panos_panorama_template.aws.name
-  name       = "tunnel.21"
-  vsys       = "vsys1"
+  template = panos_panorama_template.aws.name
+  name     = "tunnel.21"
+  vsys     = "vsys1"
 }
 
 resource "panos_panorama_loopback_interface" "aws_isp1" {
@@ -134,7 +134,7 @@ resource "panos_panorama_static_route_ipv4" "aws-vr1-eth1_2-dg" {
 
 
 resource "panos_panorama_ike_gateway" "aws_fw1-hub1_vpn1" {
-  for_each  = local.tunnel-aws_fw1-hub1_vpn1
+  for_each = local.tunnel-aws_fw1-hub1_vpn1
 
   template      = panos_panorama_template.aws.name
   name          = each.key
@@ -161,7 +161,7 @@ resource "panos_panorama_ike_gateway" "aws_fw1-hub1_vpn1" {
 }
 
 resource "panos_panorama_ipsec_tunnel" "aws_fw1-hub1_vpn1" {
-  for_each  = local.tunnel-aws_fw1-hub1_vpn1
+  for_each = local.tunnel-aws_fw1-hub1_vpn1
 
   name             = each.key
   template         = panos_panorama_template.aws.name

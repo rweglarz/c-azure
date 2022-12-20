@@ -93,10 +93,19 @@ variable "peering_address" {
   }
 }
 
-variable dns_zone_rg {
+variable "dns_zone_rg" {
   type = string
 }
-variable dns_zone_name {
+variable "dns_zone_name" {
+  type = string
+}
+
+variable "fw_version" {
+  type    = string
+  default = "10.1.7"
+}
+
+variable "pl-mgmt-csp_nat_ips" {
   type = string
 }
 
