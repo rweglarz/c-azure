@@ -91,6 +91,12 @@ resource "azurerm_virtual_network_peering" "hub2_sec-hub2_sec_spoke1" {
 }
 
 
+resource "azurerm_subnet_network_security_group_association" "hub2_sec_mgmt" {
+  subnet_id                 = azurerm_subnet.hub2_sec_mgmt.id
+  network_security_group_id = azurerm_network_security_group.rg2_mgmt.id
+}
+
+
 module "hub2_sec_fw" {
   source = "github.com/PaloAltoNetworks/terraform-azurerm-vmseries-modules//modules/vmseries"
 
