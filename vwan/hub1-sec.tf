@@ -26,6 +26,26 @@ resource "azurerm_route_table" "hub1_sec_data" {
 }
 
 
+resource "azurerm_route_table" "hub1_sec_spokes" {
+  name                = "${var.name}-sec-spokes"
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
+}
+
+resource "azurerm_route" "hub1_sec_spokes_172" {
+  name                   = "172"
+  resource_group_name    = azurerm_resource_group.rg1.name
+  route_table_name       = azurerm_route_table.hub1_sec_spokes.name
+  address_prefix         = "172.16.0.0/12"
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = cidrhost(azurerm_subnet.hub1_sec_data.address_prefixes[0], 5)
+}
+
+resource "azurerm_subnet_route_table_association" "hub1_sec_spoke1_s1" {
+  subnet_id      = azurerm_subnet.hub1_sec_spoke1_s1.id
+  route_table_id = azurerm_route_table.hub1_sec_spokes.id
+}
+
 
 resource "azurerm_virtual_network" "hub1_sec_spoke1" {
   name                = "${var.name}-hub1-sec-spoke1"
