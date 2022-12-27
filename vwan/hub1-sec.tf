@@ -2,21 +2,21 @@ resource "azurerm_virtual_network" "hub1_sec" {
   name                = "${var.name}-hub1-sec"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
-  address_space       = [cidrsubnet(var.hub1_cidr, 4, 2)]
+  address_space       = [cidrsubnet(var.hub1_cidr, 4, 8)]
 }
 
 resource "azurerm_subnet" "hub1_sec_mgmt" {
   name                 = "${var.name}-hub1-sec-mgmt"
   resource_group_name  = azurerm_resource_group.rg1.name
   virtual_network_name = azurerm_virtual_network.hub1_sec.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub1_sec.address_space[0], 5, 0)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub1_sec.address_space[0], 4, 0)]
 }
 
 resource "azurerm_subnet" "hub1_sec_data" {
   name                 = "${var.name}-hub1-sec-data"
   resource_group_name  = azurerm_resource_group.rg1.name
   virtual_network_name = azurerm_virtual_network.hub1_sec.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub1_sec.address_space[0], 5, 1)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub1_sec.address_space[0], 4, 1)]
 }
 
 resource "azurerm_route_table" "hub1_sec_data" {
@@ -27,7 +27,7 @@ resource "azurerm_route_table" "hub1_sec_data" {
 
 
 resource "azurerm_route_table" "hub1_sec_spokes" {
-  name                = "${var.name}-sec-spokes"
+  name                = "${var.name}-hub1-sec-spokes"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
 }

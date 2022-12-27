@@ -2,21 +2,21 @@ resource "azurerm_virtual_network" "hub2_sec" {
   name                = "${var.name}-hub2-sec"
   resource_group_name = azurerm_resource_group.rg2.name
   location            = azurerm_resource_group.rg2.location
-  address_space       = [cidrsubnet(var.hub2_cidr, 4, 2)]
+  address_space       = [cidrsubnet(var.hub2_cidr, 4, 8)]
 }
 
 resource "azurerm_subnet" "hub2_sec_mgmt" {
   name                 = "${var.name}-hub2-sec-mgmt"
   resource_group_name  = azurerm_resource_group.rg2.name
   virtual_network_name = azurerm_virtual_network.hub2_sec.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub2_sec.address_space[0], 5, 0)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub2_sec.address_space[0], 4, 0)]
 }
 
 resource "azurerm_subnet" "hub2_sec_data" {
   name                 = "${var.name}-hub2-sec-data"
   resource_group_name  = azurerm_resource_group.rg2.name
   virtual_network_name = azurerm_virtual_network.hub2_sec.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub2_sec.address_space[0], 5, 1)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub2_sec.address_space[0], 4, 1)]
 }
 
 resource "azurerm_route_table" "hub2_sec_data" {

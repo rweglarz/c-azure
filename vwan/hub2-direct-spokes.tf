@@ -9,7 +9,7 @@ resource "azurerm_subnet" "hub2_spoke1_s1" {
   name                 = "${var.name}-hub2-spoke1-s1"
   resource_group_name  = azurerm_resource_group.rg2.name
   virtual_network_name = azurerm_virtual_network.hub2_spoke1.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub2_spoke1.address_space[0], 5, 1)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub2_spoke1.address_space[0], 4, 1)]
 }
 
 
@@ -25,5 +25,5 @@ resource "azurerm_subnet" "hub2_spoke2_s1" {
   name                 = "${var.name}-hub2-spoke2-s1"
   resource_group_name  = azurerm_resource_group.rg2.name
   virtual_network_name = azurerm_virtual_network.hub2_spoke2.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub2_spoke2.address_space[0], 5, 1)]
+  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub2_spoke2.address_space[0], 4, 1)]
 }
