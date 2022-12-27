@@ -29,13 +29,25 @@ resource "azurerm_virtual_hub_connection" "hub1-sec" {
   remote_virtual_network_id = azurerm_virtual_network.hub1_sec.id
   routing {
     static_vnet_route {
-      name = "sec spokes via nva"
+      name = "hub1 sec spokes via nva"
       address_prefixes = [
         cidrsubnet(var.hub1_cidr, 1, 1)
       ]
       next_hop_ip_address = cidrhost(azurerm_subnet.hub1_sec_data.address_prefixes[0], 5)
     }
   }
+}
+
+resource "azurerm_virtual_hub_route_table_route" "hub1_sec1_spokes" {
+  route_table_id = azurerm_virtual_hub.hub1.default_route_table_id
+
+  name              = "hub1 sec spokes via nva"
+  destinations_type = "CIDR"
+  destinations = [
+    cidrsubnet(var.hub1_cidr, 1, 1)
+  ]
+  next_hop_type = "ResourceId"
+  next_hop      = azurerm_virtual_hub_connection.hub1-sec.id
 }
 
 resource "azurerm_virtual_hub_connection" "hub1-hub1_spoke1" {
