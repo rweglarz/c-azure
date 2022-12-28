@@ -74,6 +74,7 @@ resource "panos_virtual_router" "aws-vr1" {
   interfaces = [
     panos_panorama_ethernet_interface.aws_eth1_1.name,
     panos_panorama_ethernet_interface.aws_eth1_2.name,
+    panos_panorama_ethernet_interface.aws_eth1_3.name,
     panos_panorama_tunnel_interface.aws_tun10.name,
     panos_panorama_tunnel_interface.aws_tun11.name,
     panos_panorama_tunnel_interface.aws_tun20.name,
@@ -193,6 +194,14 @@ resource "panos_zone" "vpn" {
     panos_panorama_loopback_interface.aws_isp2.name,
   ]
 }
+resource "panos_zone" "data" {
+  template = panos_panorama_template.aws.name
+  name     = "data"
+  mode     = "layer3"
+  interfaces = [
+    panos_panorama_ethernet_interface.aws_eth1_3.name,
+  ]
+}
 
 
 
@@ -204,11 +213,11 @@ resource "panos_panorama_bgp" "aws-vr1_bgp" {
   router_id = "169.254.21.2"
   as_number = var.asn["aws_fw1"]
 }
-resource "panos_panorama_bgp_redist_rule" "aws-lo99" {
+resource "panos_panorama_bgp_redist_rule" "aws-vr1-all" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
   route_table    = "unicast"
-  name           = "192.168.99.1/32"
+  name           = var.aws_cidr
   set_med        = "20"
   depends_on = [
     panos_panorama_bgp.aws-vr1_bgp
