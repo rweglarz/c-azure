@@ -58,6 +58,16 @@ resource "azurerm_dns_a_record" "hub2_sec_fw" {
   ]
 }
 
+resource "azurerm_dns_a_record" "hub2_sec_spoke1_h" {
+  name                = "vwan-hub2-sec-spoke1"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 600
+  records = [
+    module.hub2_sec_spoke1_h.public_ip
+  ]
+}
+
 resource "azurerm_dns_a_record" "hub2_spoke1_h" {
   name                = "vwan-hub2-spoke1"
   resource_group_name = var.dns_zone_rg
