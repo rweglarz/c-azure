@@ -169,6 +169,10 @@ resource "panos_panorama_ipsec_tunnel" "aws_fw1-hub1_vpn1" {
   tunnel_interface = each.value.tunnel_interface
   anti_replay      = false
   ak_ike_gateway   = each.key
+
+  depends_on = [
+    panos_panorama_ike_gateway.aws_fw1-hub1_vpn1
+  ]
 }
 
 
