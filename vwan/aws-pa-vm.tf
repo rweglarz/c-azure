@@ -3,7 +3,7 @@ module "vpc-fw-1" {
 
   name = "${var.name}-fw-1"
 
-  cidr_block              = var.aws_cidr
+  cidr_block              = cidrsubnet(var.ext_spokes_cidr, 4, 0)
   public_mgmt_prefix_list = "pl-0139bb989ef6d1988"
 
   deploy_igw  = true

@@ -11,31 +11,19 @@ variable "region2" {
   default = "North Europe"
 }
 
-variable "hub1_prefix" {
-  description = "vpc cidr"
-  type        = string
-  default     = "172.16.1.0/24"
-}
 variable "hub1_cidr" {
   description = "vpc cidr"
   type        = string
   default     = "172.16.0.0/20"
-}
-variable "hub2_prefix" {
-  description = "vpc cidr"
-  type        = string
-  default     = "172.16.17.0/24"
 }
 variable "hub2_cidr" {
   description = "vpc cidr"
   type        = string
   default     = "172.16.16.0/20"
 }
-
-variable "aws_cidr" {
-  description = "aws vpc cidr"
-  type        = string
-  default     = "172.16.100.0/24"
+variable "ext_spokes_cidr" {
+  type    = string
+  default = "172.16.32.0/20"
 }
 
 variable "mgmt_ips" {

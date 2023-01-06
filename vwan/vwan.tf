@@ -11,7 +11,7 @@ resource "azurerm_virtual_hub" "hub1" {
   resource_group_name = azurerm_resource_group.rg1.name
   location            = var.region1
   virtual_wan_id      = azurerm_virtual_wan.vwan1.id
-  address_prefix      = var.hub1_prefix
+  address_prefix      = cidrsubnet(var.hub1_cidr, 4, 0)
 }
 
 resource "azurerm_virtual_hub" "hub2" {
@@ -19,7 +19,7 @@ resource "azurerm_virtual_hub" "hub2" {
   resource_group_name = azurerm_resource_group.rg2.name
   location            = var.region2
   virtual_wan_id      = azurerm_virtual_wan.vwan1.id
-  address_prefix      = var.hub2_prefix
+  address_prefix      = cidrsubnet(var.hub2_cidr, 4, 0)
 }
 
 

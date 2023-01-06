@@ -221,7 +221,7 @@ resource "panos_panorama_bgp_redist_rule" "aws-vr1-all" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
   route_table    = "unicast"
-  name           = var.aws_cidr
+  name           = module.vpc-fw-1.vpc.cidr_block
   set_med        = "20"
   depends_on = [
     panos_panorama_bgp.aws-vr1_bgp
