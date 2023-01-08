@@ -20,26 +20,33 @@ provider "panos" {
   json_config_file = "panorama_creds.json"
 }
 
+resource "random_id" "did" {
+  byte_length = 3 #to workaround delete recreate cross regions
+}
+locals {
+  dname = "${var.name}-${random_id.did.hex}"
+}
+
 
 
 resource "azurerm_resource_group" "rg1" {
-  name     = "${var.name}-rg1"
+  name     = "${local.dname}-rg1"
   location = var.region1
 }
 resource "azurerm_resource_group" "rg2" {
-  name     = "${var.name}-rg2"
+  name     = "${local.dname}-rg2"
   location = var.region2
 }
 
 
 resource "azurerm_ssh_public_key" "rg1" {
-  name                = "${var.name}-rg1"
+  name                = "${local.dname}-rg1"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
   public_key          = file("~/.ssh/id_rsa.pub")
 }
 resource "azurerm_ssh_public_key" "rg2" {
-  name                = "${var.name}-rg2"
+  name                = "${local.dname}-rg2"
   resource_group_name = azurerm_resource_group.rg2.name
   location            = azurerm_resource_group.rg2.location
   public_key          = file("~/.ssh/id_rsa.pub")
@@ -47,7 +54,7 @@ resource "azurerm_ssh_public_key" "rg2" {
 
 
 resource "azurerm_network_security_group" "rg1_mgmt" {
-  name                = "${var.name}-rg1-mgmt"
+  name                = "${local.dname}-rg1-mgmt"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
 
@@ -93,7 +100,7 @@ resource "azurerm_network_security_group" "rg1_mgmt" {
 }
 
 resource "azurerm_network_security_group" "rg2_mgmt" {
-  name                = "${var.name}-rg2-mgmt"
+  name                = "${local.dname}-rg2-mgmt"
   resource_group_name = azurerm_resource_group.rg2.name
   location            = azurerm_resource_group.rg2.location
 

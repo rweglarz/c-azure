@@ -1,5 +1,5 @@
 resource "azurerm_vpn_gateway" "hub1-vpn1" {
-  name                = "vpn1"
+  name                = "vpn1-${random_id.did.hex}"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   virtual_hub_id      = azurerm_virtual_hub.hub1.id
@@ -17,7 +17,7 @@ resource "azurerm_vpn_gateway" "hub1-vpn1" {
 }
 
 resource "azurerm_vpn_site" "aws1" {
-  name                = "aws1"
+  name                = "aws1-${random_id.did.hex}"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   virtual_wan_id      = azurerm_virtual_wan.vwan1.id
@@ -42,7 +42,7 @@ resource "azurerm_vpn_site" "aws1" {
 
 
 resource "azurerm_vpn_gateway_connection" "aws1-hub1" {
-  name               = "aws1-hub1"
+  name               = "aws1-hub1-${random_id.did.hex}"
   vpn_gateway_id     = azurerm_vpn_gateway.hub1-vpn1.id
   remote_vpn_site_id = azurerm_vpn_site.aws1.id
 

@@ -1,5 +1,5 @@
 resource "azurerm_virtual_wan" "vwan1" {
-  name                = "${var.name}-vwan1"
+  name                = "${local.dname}-vwan1"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = var.region1
   #office365_local_breakout_category = "OptimizeAndAllow"
@@ -7,7 +7,7 @@ resource "azurerm_virtual_wan" "vwan1" {
 
 
 resource "azurerm_virtual_hub" "hub1" {
-  name                = "${var.name}-hub1"
+  name                = "${local.dname}-hub1"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = var.region1
   virtual_wan_id      = azurerm_virtual_wan.vwan1.id
@@ -15,7 +15,7 @@ resource "azurerm_virtual_hub" "hub1" {
 }
 
 resource "azurerm_virtual_hub" "hub2" {
-  name                = "${var.name}-hub2"
+  name                = "${local.dname}-hub2"
   resource_group_name = azurerm_resource_group.rg2.name
   location            = var.region2
   virtual_wan_id      = azurerm_virtual_wan.vwan1.id
@@ -24,7 +24,7 @@ resource "azurerm_virtual_hub" "hub2" {
 
 
 resource "azurerm_virtual_hub_connection" "hub1-hub1_sec" {
-  name                      = "${var.name}-hub1-sec"
+  name                      = "${local.dname}-hub1-sec"
   virtual_hub_id            = azurerm_virtual_hub.hub1.id
   remote_virtual_network_id = azurerm_virtual_network.hub1_sec.id
   routing {
@@ -39,7 +39,7 @@ resource "azurerm_virtual_hub_connection" "hub1-hub1_sec" {
 }
 
 resource "azurerm_virtual_hub_connection" "hub2-hub2_sec" {
-  name                      = "${var.name}-hub2-sec"
+  name                      = "${local.dname}-hub2-sec"
   virtual_hub_id            = azurerm_virtual_hub.hub2.id
   remote_virtual_network_id = azurerm_virtual_network.hub2_sec.id
   routing {
@@ -102,25 +102,25 @@ resource "azurerm_virtual_hub_route_table_route" "hub2-sec2_spokes" {
 }
 
 resource "azurerm_virtual_hub_connection" "hub1-hub1_spoke1" {
-  name                      = "${var.name}-hub1-spoke1"
+  name                      = "${local.dname}-hub1-spoke1"
   virtual_hub_id            = azurerm_virtual_hub.hub1.id
   remote_virtual_network_id = azurerm_virtual_network.hub1_spoke1.id
 }
 
 resource "azurerm_virtual_hub_connection" "hub1-hub1_spoke2" {
-  name                      = "${var.name}-hub1-spoke2"
+  name                      = "${local.dname}-hub1-spoke2"
   virtual_hub_id            = azurerm_virtual_hub.hub1.id
   remote_virtual_network_id = azurerm_virtual_network.hub1_spoke2.id
 }
 
 resource "azurerm_virtual_hub_connection" "hub2-hub2_spoke1" {
-  name                      = "${var.name}-hub2-spoke1"
+  name                      = "${local.dname}-hub2-spoke1"
   virtual_hub_id            = azurerm_virtual_hub.hub2.id
   remote_virtual_network_id = azurerm_virtual_network.hub2_spoke1.id
 }
 
 resource "azurerm_virtual_hub_connection" "hub2-hub2_spoke2" {
-  name                      = "${var.name}-hub2-spoke2"
+  name                      = "${local.dname}-hub2-spoke2"
   virtual_hub_id            = azurerm_virtual_hub.hub2.id
   remote_virtual_network_id = azurerm_virtual_network.hub2_spoke2.id
 }

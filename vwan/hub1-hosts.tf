@@ -1,7 +1,7 @@
 module "hub1_sec_spoke1_h" {
   source = "../modules/linux"
 
-  name                = "${var.name}-hub1-sec-spoke1"
+  name                = "${local.dname}-hub1-sec-spoke1"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   subnet_id           = azurerm_subnet.hub1_sec_spoke1_s1.id
@@ -14,7 +14,7 @@ module "hub1_sec_spoke1_h" {
 module "hub1_spoke1_h" {
   source = "../modules/linux"
 
-  name                = "${var.name}-hub1-spoke1"
+  name                = "${local.dname}-hub1-spoke1"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   subnet_id           = azurerm_subnet.hub1_spoke1_s1.id
@@ -27,7 +27,7 @@ module "hub1_spoke1_h" {
 module "hub1_spoke2_h" {
   source = "../modules/linux"
 
-  name                = "${var.name}-hub1-spoke2"
+  name                = "${local.dname}-hub1-spoke2"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   subnet_id           = azurerm_subnet.hub1_spoke2_s1.id
