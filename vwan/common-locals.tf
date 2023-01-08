@@ -1,4 +1,5 @@
 locals {
+  subnet_prefix_length = 28
   public_ip = {
     aws_fw1 = [
       one([for k, v in module.vm-fw-1.public_ips : v if length(regexall("isp1", k)) > 0]),
