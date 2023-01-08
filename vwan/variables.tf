@@ -11,6 +11,10 @@ variable "region2" {
   default = "North Europe"
 }
 
+variable "subscription" {
+  type = string
+}
+
 variable "hub1_cidr" {
   description = "vpc cidr"
   type        = string

@@ -7,7 +7,7 @@ module "hub1_sec_spoke1_h" {
   subnet_id           = azurerm_subnet.hub1_sec_spoke1_s1.id
   private_ip_address  = cidrhost(azurerm_subnet.hub1_sec_spoke1_s1.address_prefixes[0], 5)
   password            = var.password
-  public_key          = azurerm_ssh_public_key.rg1-rwe.public_key
+  public_key          = azurerm_ssh_public_key.rg1.public_key
   security_group      = azurerm_network_security_group.rg1_mgmt.id
 }
 
@@ -20,7 +20,7 @@ module "hub1_spoke1_h" {
   subnet_id           = azurerm_subnet.hub1_spoke1_s1.id
   private_ip_address  = cidrhost(azurerm_subnet.hub1_spoke1_s1.address_prefixes[0], 5)
   password            = var.password
-  public_key          = azurerm_ssh_public_key.rg1-rwe.public_key
+  public_key          = azurerm_ssh_public_key.rg1.public_key
   security_group      = azurerm_network_security_group.rg1_mgmt.id
 }
 
@@ -33,7 +33,7 @@ module "hub1_spoke2_h" {
   subnet_id           = azurerm_subnet.hub1_spoke2_s1.id
   private_ip_address  = cidrhost(azurerm_subnet.hub1_spoke2_s1.address_prefixes[0], 5)
   password            = var.password
-  public_key          = azurerm_ssh_public_key.rg1-rwe.public_key
+  public_key          = azurerm_ssh_public_key.rg1.public_key
   security_group      = azurerm_network_security_group.rg1_mgmt.id
 }
 

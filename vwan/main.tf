@@ -2,7 +2,7 @@ provider "azurerm" {
   features {}
 }
 data "azurerm_subscriptions" "azsub" {
-  display_name_contains = "AzureSEEMEA"
+  display_name_contains = var.subscription
 }
 
 provider "aws" {
@@ -32,14 +32,14 @@ resource "azurerm_resource_group" "rg2" {
 }
 
 
-resource "azurerm_ssh_public_key" "rg1-rwe" {
-  name                = "rg1-rweglarz"
+resource "azurerm_ssh_public_key" "rg1" {
+  name                = "${var.name}-rg1"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
   public_key          = file("~/.ssh/id_rsa.pub")
 }
-resource "azurerm_ssh_public_key" "rg2-rwe" {
-  name                = "rg2-rweglarz"
+resource "azurerm_ssh_public_key" "rg2" {
+  name                = "${var.name}-rg2"
   resource_group_name = azurerm_resource_group.rg2.name
   location            = azurerm_resource_group.rg2.location
   public_key          = file("~/.ssh/id_rsa.pub")
