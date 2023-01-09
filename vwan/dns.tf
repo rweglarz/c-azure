@@ -87,3 +87,24 @@ resource "azurerm_dns_a_record" "hub2_spoke2_h" {
     module.hub2_spoke2_h.public_ip
   ]
 }
+
+
+resource "azurerm_dns_a_record" "hub2_sdwan_fw1" {
+  name                = "vwan-hub2-sdwan-fw1"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 600
+  records = [
+    module.hub2_sdwan_fw1.mgmt_ip_address
+  ]
+}
+
+resource "azurerm_dns_a_record" "hub2_sdwan_fw2" {
+  name                = "vwan-hub2-sdwan-fw2"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 600
+  records = [
+    module.hub2_sdwan_fw2.mgmt_ip_address
+  ]
+}

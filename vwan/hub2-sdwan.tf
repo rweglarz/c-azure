@@ -38,12 +38,14 @@ locals {
     eth1_1_ip = cidrhost(azurerm_subnet.hub2_sdwan_internet.address_prefixes[0], 5),
     eth1_1_gw = cidrhost(azurerm_subnet.hub2_sdwan_internet.address_prefixes[0], 1),
     eth1_2_ip = cidrhost(azurerm_subnet.hub2_sdwan_private.address_prefixes[0], 5),
+    eth1_2_gw = cidrhost(azurerm_subnet.hub2_sdwan_private.address_prefixes[0], 1),
   }
   hub2_sdwan_fw2 = {
     mgmt_ip   = cidrhost(azurerm_subnet.hub2_sdwan_mgmt.address_prefixes[0], 6),
     eth1_1_ip = cidrhost(azurerm_subnet.hub2_sdwan_internet.address_prefixes[0], 6),
     eth1_1_gw = cidrhost(azurerm_subnet.hub2_sdwan_internet.address_prefixes[0], 1),
     eth1_2_ip = cidrhost(azurerm_subnet.hub2_sdwan_private.address_prefixes[0], 6),
+    eth1_2_gw = cidrhost(azurerm_subnet.hub2_sdwan_private.address_prefixes[0], 1),
   }
 }
 

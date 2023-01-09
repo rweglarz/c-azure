@@ -63,8 +63,10 @@ variable "psk" {
 
 variable "asn" {
   default = {
-    aws_fw1   = 65516
+    aws_fw1   = 65001
     hub1_vpn1 = 65515
+    hub2_sdwan_fw1 = 65021
+    hub2_sdwan_fw2 = 65021
   }
 }
 
