@@ -91,6 +91,3 @@ resource "aws_ec2_managed_prefix_list_entry" "aws-pa-vm" {
   description    = "${var.name}-aws-azure-vwan"
 }
 
-output "vm-fw-1" {
-  value = module.vm-fw-1.public_ips
-}
