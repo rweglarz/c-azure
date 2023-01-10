@@ -108,3 +108,13 @@ resource "azurerm_dns_a_record" "hub2_sdwan_fw2" {
     module.hub2_sdwan_fw2.mgmt_ip_address
   ]
 }
+
+resource "azurerm_dns_a_record" "sdwan_spoke1_fw" {
+  name                = "vwan-sdwan-spoke1-fw"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 600
+  records = [
+    module.sdwan_spoke1_fw.mgmt_ip_address
+  ]
+}
