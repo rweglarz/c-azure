@@ -31,6 +31,11 @@ resource "azurerm_subnet_network_security_group_association" "hub2_sdwan_mgmt" {
   network_security_group_id = azurerm_network_security_group.rg2_mgmt.id
 }
 
+resource "azurerm_subnet_network_security_group_association" "hub2_sdwan_internet" {
+  subnet_id                 = azurerm_subnet.hub2_sdwan_internet.id
+  network_security_group_id = azurerm_network_security_group.rg2_all.id
+}
+
 
 locals {
   hub2_sdwan_fw1 = {
