@@ -47,6 +47,13 @@ resource "panos_panorama_template_variable" "azure_vwan_hub2_sdwan_fw1-eth1_2_ip
   value          = format("%s/%s", local.hub2_sdwan_fw1["eth1_2_ip"], local.subnet_prefix_length)
 }
 
+resource "panos_panorama_template_variable" "azure_vwan_hub2_sdwan_fw1-lo1_ip" {
+  template_stack = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw1.name
+  name           = "$lo1_ip"
+  type           = "ip-netmask"
+  value          = format("%s/32", panos_panorama_bgp.azure_vwan_hub2_sdwan_fw1.router_id)
+}
+
 
 resource "panos_panorama_template_variable" "azure_vwan_hub2_sdwan_fw2-eth1_1_ip" {
   template_stack = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw2.name
@@ -54,6 +61,7 @@ resource "panos_panorama_template_variable" "azure_vwan_hub2_sdwan_fw2-eth1_1_ip
   type           = "ip-netmask"
   value          = format("%s/%s", local.hub2_sdwan_fw2["eth1_1_ip"], local.subnet_prefix_length)
 }
+
 
 resource "panos_panorama_template_variable" "azure_vwan_hub2_sdwan_fw2-eth1_1_gw" {
   template_stack = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw2.name
@@ -68,6 +76,15 @@ resource "panos_panorama_template_variable" "azure_vwan_hub2_sdwan_fw2-eth1_2_ip
   type           = "ip-netmask"
   value          = format("%s/%s", local.hub2_sdwan_fw2["eth1_2_ip"], local.subnet_prefix_length)
 }
+
+resource "panos_panorama_template_variable" "azure_vwan_hub2_sdwan_fw2-lo1_ip" {
+  template_stack = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw2.name
+  name           = "$lo1_ip"
+  type           = "ip-netmask"
+  value          = format("%s/32", panos_panorama_bgp.azure_vwan_hub2_sdwan_fw2.router_id)
+}
+
+
 
 resource "panos_panorama_static_route_ipv4" "azure_vwan_hub2_sdwan_fw1-dg" {
   template_stack = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw1.name
@@ -112,7 +129,7 @@ resource "panos_panorama_bgp" "azure_vwan_hub2_sdwan_fw1" {
   virtual_router = "vr1"
   install_route  = true
 
-  router_id = local.hub2_sdwan_fw1["eth1_2_ip"]
+  router_id = var.router_ids["hub2_sdwan_fw1"]
   as_number = var.asn["hub2_sdwan_fw1"]
 }
 
@@ -121,7 +138,7 @@ resource "panos_panorama_bgp" "azure_vwan_hub2_sdwan_fw2" {
   virtual_router = "vr1"
   install_route  = true
 
-  router_id = local.hub2_sdwan_fw2["eth1_2_ip"]
+  router_id = var.router_ids["hub2_sdwan_fw2"]
   as_number = var.asn["hub2_sdwan_fw2"]
 }
 
