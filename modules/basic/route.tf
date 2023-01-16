@@ -35,8 +35,7 @@ resource "azurerm_route" "split_mgmt-mgmt" {
   resource_group_name    = var.resource_group_name
   route_table_name       = azurerm_route_table.split_mgmt[each.value.rt].name
   address_prefix         = each.value.prefix
-  next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = each.value.nh
+  next_hop_type          = "Internet"
 }
 
 
