@@ -1,5 +1,5 @@
 resource "azurerm_public_ip" "lb_ext" {
-  name                = "PublicIPForLB"
+  name                = "${var.name}-lb-ext"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   allocation_method   = "Static"
@@ -8,7 +8,8 @@ resource "azurerm_public_ip" "lb_ext" {
 }
 
 
-resource "azurerm_lb" "fw-ext" {
+
+resource "azurerm_lb" "fw_ext" {
   name                = "${var.name}-lb-ext"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
@@ -19,48 +20,60 @@ resource "azurerm_lb" "fw-ext" {
     public_ip_address_id = azurerm_public_ip.lb_ext.id
   }
 }
-resource "azurerm_lb" "fw-int" {
+
+resource "azurerm_lb" "fw_int" {
   name                = "${var.name}-lb-int"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   sku                 = "Standard"
 
   frontend_ip_configuration {
-    name                          = "ilb-srv-a"
-    subnet_id                     = azurerm_subnet.data[1].id
-    private_ip_address            = cidrhost(azurerm_subnet.data[1].address_prefixes[0], 5)
+    name                          = "inbound"
+    subnet_id                     = azurerm_subnet.sec_internet.id
+    private_ip_address            = cidrhost(azurerm_subnet.sec_internet.address_prefixes[0], 5)
     private_ip_address_allocation = "Static"
   }
+
   frontend_ip_configuration {
-    name                          = "ilb-srv-b"
-    subnet_id                     = azurerm_subnet.data[2].id
-    private_ip_address            = cidrhost(azurerm_subnet.data[2].address_prefixes[0], 5)
+    name                          = "oew"
+    subnet_id                     = azurerm_subnet.sec_internal.id
+    private_ip_address            = cidrhost(azurerm_subnet.sec_internal.address_prefixes[0], 5)
+    private_ip_address_allocation = "Static"
+  }
+
+  frontend_ip_configuration {
+    name                          = "dmz"
+    subnet_id                     = azurerm_subnet.sec_dmz.id
+    private_ip_address            = cidrhost(azurerm_subnet.sec_dmz.address_prefixes[0], 5)
     private_ip_address_allocation = "Static"
   }
 }
 
 
-resource "azurerm_lb_probe" "fw-ext" {
+
+resource "azurerm_lb_probe" "fw_ext" {
   name            = "tcp-probe"
-  loadbalancer_id = azurerm_lb.fw-ext.id
-  protocol        = "Tcp"
-  port            = 443
-}
-resource "azurerm_lb_probe" "fw-int" {
-  name            = "tcp-probe"
-  loadbalancer_id = azurerm_lb.fw-int.id
+  loadbalancer_id = azurerm_lb.fw_ext.id
   protocol        = "Tcp"
   port            = 443
 }
 
+resource "azurerm_lb_probe" "fw_int" {
+  name            = "tcp-probe"
+  loadbalancer_id = azurerm_lb.fw_int.id
+  protocol        = "Tcp"
+  port            = 443
+}
 
-resource "azurerm_lb_rule" "ext" {
-  name = "${var.name}-lb-r-ext"
 
-  loadbalancer_id                = azurerm_lb.fw-ext.id
+
+resource "azurerm_lb_rule" "fw_ext-80" {
+  name = "ext-80"
+
+  loadbalancer_id                = azurerm_lb.fw_ext.id
   frontend_ip_configuration_name = "ilb-ext"
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.ext.id]
-  probe_id                       = azurerm_lb_probe.fw-ext.id
+  probe_id                       = azurerm_lb_probe.fw_ext.id
 
   disable_outbound_snat = true
 
@@ -68,34 +81,52 @@ resource "azurerm_lb_rule" "ext" {
   frontend_port = 80
   backend_port  = 80
 }
-resource "azurerm_lb_rule" "ext-22" {
-  name = "${var.name}-lb-r-ext-22"
 
-  loadbalancer_id                = azurerm_lb.fw-ext.id
+resource "azurerm_lb_rule" "ext-22" {
+  name = "ext-22"
+
+  loadbalancer_id                = azurerm_lb.fw_ext.id
   frontend_ip_configuration_name = "ilb-ext"
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.ext.id]
-  probe_id                       = azurerm_lb_probe.fw-ext.id
+  probe_id                       = azurerm_lb_probe.fw_ext.id
 
   disable_outbound_snat = true
 
-  protocol      = "Tcp"
-  frontend_port = 22
-  backend_port  = 22
+  protocol           = "Tcp"
+  frontend_port      = 22
+  backend_port       = 22
   enable_floating_ip = true
 }
+
 resource "azurerm_lb_backend_address_pool" "ext" {
   name            = "${var.name}-ext"
-  loadbalancer_id = azurerm_lb.fw-ext.id
+  loadbalancer_id = azurerm_lb.fw_ext.id
+}
+
+resource "azurerm_lb_backend_address_pool" "inbound" {
+  name            = "${var.name}-inbound"
+  loadbalancer_id = azurerm_lb.fw_int.id
+}
+
+resource "azurerm_lb_backend_address_pool" "oew" {
+  name            = "${var.name}-oew"
+  loadbalancer_id = azurerm_lb.fw_int.id
+}
+
+resource "azurerm_lb_backend_address_pool" "dmz" {
+  name            = "${var.name}-dmz"
+  loadbalancer_id = azurerm_lb.fw_int.id
 }
 
 
-resource "azurerm_lb_rule" "srv-a" {
-  name = "${var.name}-lb-r-srv-a"
 
-  loadbalancer_id                = azurerm_lb.fw-int.id
-  frontend_ip_configuration_name = "ilb-srv-a"
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.srv-a.id]
-  probe_id                       = azurerm_lb_probe.fw-int.id
+resource "azurerm_lb_rule" "oew" {
+  name = "oew"
+
+  loadbalancer_id                = azurerm_lb.fw_int.id
+  frontend_ip_configuration_name = "oew"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.oew.id]
+  probe_id                       = azurerm_lb_probe.fw_int.id
 
   disable_outbound_snat = true
 
@@ -103,36 +134,37 @@ resource "azurerm_lb_rule" "srv-a" {
   frontend_port = 0
   backend_port  = 0
 }
-resource "azurerm_lb_rule" "srv-b" {
-  name = "${var.name}-lb-r-srv-b"
 
-  loadbalancer_id                = azurerm_lb.fw-int.id
-  frontend_ip_configuration_name = "ilb-srv-b"
-  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.srv-b.id]
-  probe_id                       = azurerm_lb_probe.fw-int.id
+resource "azurerm_lb_rule" "dmz" {
+  name = "dmz"
+
+  loadbalancer_id                = azurerm_lb.fw_int.id
+  frontend_ip_configuration_name = "dmz"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.dmz.id]
+  probe_id                       = azurerm_lb_probe.fw_int.id
 
   disable_outbound_snat = true
 
   protocol      = "All"
   frontend_port = 0
   backend_port  = 0
-}
-
-resource "azurerm_lb_backend_address_pool" "srv-a" {
-  name            = "${var.name}-srv-a"
-  loadbalancer_id = azurerm_lb.fw-int.id
-}
-resource "azurerm_lb_backend_address_pool" "srv-b" {
-  name            = "${var.name}-srv-b"
-  loadbalancer_id = azurerm_lb.fw-int.id
 }
 
 locals {
-  lbsp = [
-    azurerm_lb_backend_address_pool.ext.id,
-    azurerm_lb_backend_address_pool.srv-a.id,
-    azurerm_lb_backend_address_pool.srv-b.id,
-  ]
+  lbsp = {
+    internet = {
+      subnet   = azurerm_subnet.sec_internet.id
+      backends = [azurerm_lb_backend_address_pool.ext.id, azurerm_lb_backend_address_pool.inbound.id],
+    }
+    internal = {
+      subnet   = azurerm_subnet.sec_internal.id
+      backends = [azurerm_lb_backend_address_pool.oew.id]
+    }
+    dmz = {
+      subnet   = azurerm_subnet.sec_dmz.id
+      backends = [azurerm_lb_backend_address_pool.dmz.id],
+    }
+  }
 }
 
 

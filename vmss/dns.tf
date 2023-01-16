@@ -4,6 +4,6 @@ resource "azurerm_dns_a_record" "jumphost" {
   zone_name           = var.dns_zone_name
   ttl                 = 600
   records = [
-    azurerm_public_ip.jumphost.ip_address
+    module.jumphost.public_ip
   ]
 }
