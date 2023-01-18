@@ -34,4 +34,13 @@ module "appgw" {
       ip_addresses = []
     }
   }
+
+  managed_by_agic = true
+}
+
+output "aks_identities" {
+  value = {
+    aks = module.aks.identity
+    appgw = module.aks.ingress_application_gateway_identity
+  }
 }
