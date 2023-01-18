@@ -30,3 +30,8 @@ variable "virtual_hosts" {
   type    = map(any)
   default = {}
 }
+
+variable "managed_by_agic" {
+  description = "managed by aks / agic"
+  default = false
+}
