@@ -26,12 +26,11 @@ resource "azurerm_kubernetes_cluster" "this" {
   api_server_authorized_ip_ranges = concat(
     [for r in var.mgmt_ips : "${r.cidr}"],
     ["${azurerm_public_ip.ngw.ip_address}/32"],
-    [var.panorama1_ip, var.panorama2_ip],
+    ["${var.panorama1_ip}/32", "${var.panorama2_ip}/32"],
   )
 
   ingress_application_gateway {
-    gateway_name = "${var.name}-k8s-appgw"
-    subnet_id    = azurerm_subnet.appgw.id
+    gateway_id = azurerm_application_gateway.appgw.id
   }
   depends_on = [
     azurerm_subnet_nat_gateway_association.aks,

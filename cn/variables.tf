@@ -44,3 +44,10 @@ variable "kubernetes_version" {
   type = string
   default = "1.23.8"
 }
+
+variable dns_zone_rg {
+  type = string
+}
+variable dns_zone_name {
+  type = string
+}

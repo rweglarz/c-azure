@@ -9,7 +9,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "byol" {
   disable_password_authentication = true
   admin_username                  = var.username
   admin_ssh_key {
-    public_key = azurerm_ssh_public_key.rwe.public_key
+    public_key = azurerm_ssh_public_key.this.public_key
     username   = var.username
   }
 
@@ -22,13 +22,13 @@ resource "azurerm_linux_virtual_machine_scale_set" "byol" {
     ip_configuration {
       name      = "pri"
       primary   = true
-      subnet_id = azurerm_subnet.mgmt.id
+      subnet_id = azurerm_subnet.sec_mgmt.id
     }
   }
   dynamic "network_interface" {
-    for_each = [0, 1, 2]
+    for_each = ["internet", "internal", "dmz"]
     content {
-      name                          = "eth-${network_interface.value + 1}"
+      name                          = "eth-${network_interface.value}"
       primary                       = false
       enable_ip_forwarding          = true
       enable_accelerated_networking = true
@@ -36,15 +36,10 @@ resource "azurerm_linux_virtual_machine_scale_set" "byol" {
       ip_configuration {
         name      = "pri"
         primary   = true
-        subnet_id = azurerm_subnet.data[network_interface.value].id
+        subnet_id = local.lbsp[network_interface.value]["subnet"]
 
-        load_balancer_backend_address_pool_ids = [local.lbsp[network_interface.value]]
+        load_balancer_backend_address_pool_ids = local.lbsp[network_interface.value]["backends"]
       }
-      /*
-      depends_on = [
-        network_interface.value > 0 ? azurerm_lb_backend_address_pool.this[network_interface.value - 1].id : null
-      ]
-      */
     }
   }
 
