@@ -8,6 +8,17 @@ locals {
     ki => formatlist("%s/%s", module.vm-fw-1.private_ip_list[ki], split("/", module.vpc-fw-1.subnets[ki].cidr_block)[1])
   }
 }
+resource "panos_panorama_management_profile" "aws_ping" {
+  template   = panos_panorama_template.aws.name
+
+  name = "ping"
+  ping = true
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "panos_panorama_ethernet_interface" "aws_eth1_1" {
   template   = panos_panorama_template.aws.name
   name       = "ethernet1/1"
@@ -28,6 +39,7 @@ resource "panos_panorama_ethernet_interface" "aws_eth1_3" {
   vsys       = "vsys1"
   mode       = "layer3"
   static_ips = [local.ip_mask["priv"][0]]
+  management_profile = panos_panorama_management_profile.aws_ping.name
 }
 
 resource "panos_panorama_tunnel_interface" "aws_tun10" {

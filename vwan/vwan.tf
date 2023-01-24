@@ -126,3 +126,10 @@ resource "azurerm_virtual_hub_connection" "hub2-hub2_spoke2" {
 }
 
 
+resource "azurerm_virtual_hub_connection" "hub1-hub1_ipsec" {
+  name                      = "${local.dname}-hub1-ipsec"
+  virtual_hub_id            = azurerm_virtual_hub.hub1.id
+  remote_virtual_network_id = module.ipsec_hub1.vnet.id
+}
+
+

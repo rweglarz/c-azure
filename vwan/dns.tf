@@ -118,3 +118,47 @@ resource "azurerm_dns_a_record" "sdwan_spoke1_fw" {
     module.sdwan_spoke1_fw.mgmt_ip_address
   ]
 }
+
+resource "azurerm_dns_a_record" "ipsec_hub1_fw1" {
+  name                = "vwan-ipsec-hub1-fw1"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 600
+  records = [
+    module.ipsec_hub1_fw1.mgmt_ip_address
+  ]
+}
+
+resource "azurerm_dns_a_record" "ipsec_hub1_fw2" {
+  name                = "vwan-ipsec-hub1-fw2"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 600
+  records = [
+    module.ipsec_hub1_fw2.mgmt_ip_address
+  ]
+}
+
+
+resource "azurerm_dns_a_record" "ipsec_spoke1_fw" {
+  name                = "vwan-ipsec-spoke1-fw"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 600
+  records = [
+    module.ipsec_spoke1_fw.mgmt_ip_address
+  ]
+}
+
+resource "azurerm_dns_a_record" "ipsec_hubs" {
+  name                = "vwan-ipsec-hubs"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 60
+  records = [
+    local.public_ip["ipsec_hub1_fw2"][0]
+  ]
+}
+
+
+
