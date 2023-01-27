@@ -1,0 +1,19 @@
+resource "azurerm_dns_a_record" "left-fw" {
+  name                = "ars-left-fw"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.left_hub_fw.mgmt_ip_address
+  ]
+}
+
+resource "azurerm_dns_a_record" "right-fw" {
+  name                = "ars-right-fw"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.right_hub_fw.mgmt_ip_address
+  ]
+}
