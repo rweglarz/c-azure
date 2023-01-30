@@ -17,3 +17,23 @@ resource "azurerm_dns_a_record" "right-fw" {
     module.right_hub_fw.mgmt_ip_address
   ]
 }
+
+resource "azurerm_dns_a_record" "srv_left_11" {
+  name                = "ars-left-srv-11"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.srv_left_11.public_ip
+  ]
+}
+
+resource "azurerm_dns_a_record" "srv_right_11" {
+  name                = "ars-right-srv-11"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.srv_right_11.public_ip
+  ]
+}

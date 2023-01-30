@@ -31,6 +31,8 @@ resource "azurerm_local_network_gateway" "left_seen_by_right" {
   gateway_address = azurerm_public_ip.vng_left.ip_address
   address_space = [
     module.vnet_left_hub.vnet.address_space[0],
+    module.vnet_left_srv_1.vnet.address_space[0],
+    module.vnet_left_srv_2.vnet.address_space[0],
   ]
 }
 
