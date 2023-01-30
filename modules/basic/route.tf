@@ -47,14 +47,14 @@ resource "azurerm_route_table" "split_private" {
   location            = var.location
 }
 
-resource "azurerm_route" "split_private-dg" {
-  for_each               = var.split_route_tables
-  name                   = "dg"
-  resource_group_name    = var.resource_group_name
-  route_table_name       = azurerm_route_table.split_private[each.key].name
-  address_prefix         = "0.0.0.0/0"
-  next_hop_type          = "Internet"
-}
+# resource "azurerm_route" "split_private-dg" {
+#   for_each               = var.split_route_tables
+#   name                   = "dg"
+#   resource_group_name    = var.resource_group_name
+#   route_table_name       = azurerm_route_table.split_private[each.key].name
+#   address_prefix         = "0.0.0.0/0"
+#   next_hop_type          = "Internet"
+# }
 
 resource "azurerm_route" "split_private-172" {
   for_each               = var.split_route_tables
