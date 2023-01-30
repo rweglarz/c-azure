@@ -3,6 +3,7 @@ resource "azurerm_route_table" "split_mgmt" {
   name                = "${var.name}-spilt-mgmt-${each.key}"
   resource_group_name = var.resource_group_name
   location            = var.location
+  disable_bgp_route_propagation = lookup(each.value, "disable_bgp_route_propagation", false)
 }
 
 resource "azurerm_route" "split_mgmt-dg" {
@@ -45,6 +46,7 @@ resource "azurerm_route_table" "split_private" {
   name                = "${var.name}-private-${each.key}"
   resource_group_name = var.resource_group_name
   location            = var.location
+  disable_bgp_route_propagation = lookup(each.value, "disable_bgp_route_propagation", false)
 }
 
 # resource "azurerm_route" "split_private-dg" {
