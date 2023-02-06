@@ -3,6 +3,7 @@ resource "azurerm_route_table" "split_mgmt" {
   name                = "${var.name}-spilt-mgmt-${each.key}"
   resource_group_name = var.resource_group_name
   location            = var.location
+  disable_bgp_route_propagation = lookup(each.value, "disable_bgp_route_propagation", false)
 }
 
 resource "azurerm_route" "split_mgmt-dg" {
@@ -45,16 +46,17 @@ resource "azurerm_route_table" "split_private" {
   name                = "${var.name}-private-${each.key}"
   resource_group_name = var.resource_group_name
   location            = var.location
+  disable_bgp_route_propagation = lookup(each.value, "disable_bgp_route_propagation", false)
 }
 
-resource "azurerm_route" "split_private-dg" {
-  for_each               = var.split_route_tables
-  name                   = "dg"
-  resource_group_name    = var.resource_group_name
-  route_table_name       = azurerm_route_table.split_private[each.key].name
-  address_prefix         = "0.0.0.0/0"
-  next_hop_type          = "Internet"
-}
+# resource "azurerm_route" "split_private-dg" {
+#   for_each               = var.split_route_tables
+#   name                   = "dg"
+#   resource_group_name    = var.resource_group_name
+#   route_table_name       = azurerm_route_table.split_private[each.key].name
+#   address_prefix         = "0.0.0.0/0"
+#   next_hop_type          = "Internet"
+# }
 
 resource "azurerm_route" "split_private-172" {
   for_each               = var.split_route_tables

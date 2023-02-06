@@ -37,3 +37,8 @@ variable "security_group" {
   type    = string
   default = null
 }
+
+variable "associate_nsg" {
+  type = bool
+  default = false
+}
