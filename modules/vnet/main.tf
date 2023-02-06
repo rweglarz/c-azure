@@ -16,7 +16,7 @@ resource "azurerm_subnet" "this" {
 
 
 resource "azurerm_subnet_network_security_group_association" "this" {
-  for_each = { for k, v in var.subnets : k => v if lookup(v, "attach_nsg", false) == true }
+  for_each = { for k, v in var.subnets : k => v if lookup(v, "associate_nsg", false) == true }
 
   subnet_id                 = azurerm_subnet.this[each.key].id
   network_security_group_id = each.value.network_security_group_id
