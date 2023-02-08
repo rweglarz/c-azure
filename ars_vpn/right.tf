@@ -9,7 +9,7 @@ module "vnet_right_hub" {
   subnets = {
     "mgmt" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.right_hub[0], 3, 0)]
-      attach_nsg                = true
+      associate_nsg             = true
       network_security_group_id = module.basic.sg_id["mgmt"]
     },
     "data" = {
