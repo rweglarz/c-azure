@@ -8,18 +8,18 @@ module "vnet_right_hub" {
 
   subnets = {
     "mgmt" = {
-      address_prefixes          = [cidrsubnet(local.vnet_address_space.right_hub[0], 4, 0)]
+      address_prefixes          = [cidrsubnet(local.vnet_address_space.right_hub[0], 3, 0)]
       attach_nsg                = true
       network_security_group_id = module.basic.sg_id["mgmt"]
     },
     "data" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.right_hub[0], 4, 1)]
+      address_prefixes = [cidrsubnet(local.vnet_address_space.right_hub[0], 3, 1)]
     },
     "GatewaySubnet" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.right_hub[0], 4, 2)]
+      address_prefixes = [cidrsubnet(local.vnet_address_space.right_hub[0], 3, 2)]
     },
     "RouteServerSubnet" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.right_hub[0], 4, 3)]
+      address_prefixes = [cidrsubnet(local.vnet_address_space.right_hub[0], 3, 3)]
     },
   }
 }
@@ -91,4 +91,23 @@ module "right_hub_fw" {
     var.bootstrap_options["common"],
     var.bootstrap_options["right_hub_fw"],
   )
+}
+
+resource "azurerm_public_ip" "right_hub_asr" {
+  name                = "${var.name}-right-hub-asr"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+
+resource "azurerm_route_server" "right_hub" {
+  name                             = "${var.name}-right-hub"
+  resource_group_name              = azurerm_resource_group.this.name
+  location                         = azurerm_resource_group.this.location
+  sku                              = "Standard"
+  public_ip_address_id             = azurerm_public_ip.right_hub_asr.id
+  subnet_id                        = module.vnet_right_hub.subnets["RouteServerSubnet"].id
+  branch_to_branch_traffic_enabled = true
 }

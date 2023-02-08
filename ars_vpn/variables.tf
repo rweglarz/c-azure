@@ -10,6 +10,7 @@ variable "region" {
 
 variable "cidr" {
   type    = string
+  default = "172.16.0.0/20"
 }
 
 variable "mgmt_ips" {

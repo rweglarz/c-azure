@@ -8,18 +8,18 @@ module "vnet_left_hub" {
 
   subnets = {
     "mgmt" = {
-      address_prefixes          = [cidrsubnet(local.vnet_address_space.left_hub[0], 4, 0)]
+      address_prefixes          = [cidrsubnet(local.vnet_address_space.left_hub[0], 3, 0)]
       attach_nsg                = true
       network_security_group_id = module.basic.sg_id["mgmt"]
     },
     "data" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.left_hub[0], 4, 1)]
+      address_prefixes = [cidrsubnet(local.vnet_address_space.left_hub[0], 3, 1)]
     },
     "GatewaySubnet" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.left_hub[0], 4, 2)]
+      address_prefixes = [cidrsubnet(local.vnet_address_space.left_hub[0], 3, 2)]
     },
     "RouteServerSubnet" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.left_hub[0], 4, 3)]
+      address_prefixes = [cidrsubnet(local.vnet_address_space.left_hub[0], 3, 3)]
     },
   }
 }
