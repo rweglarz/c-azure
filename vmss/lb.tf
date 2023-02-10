@@ -119,6 +119,20 @@ resource "azurerm_lb_backend_address_pool" "dmz" {
 }
 
 
+resource "azurerm_lb_rule" "inbound" {
+  name = "inbound"
+
+  loadbalancer_id                = azurerm_lb.fw_int.id
+  frontend_ip_configuration_name = "inbound"
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.inbound.id]
+  probe_id                       = azurerm_lb_probe.fw_int.id
+
+  disable_outbound_snat = true
+
+  protocol      = "All"
+  frontend_port = 0
+  backend_port  = 0
+}
 
 resource "azurerm_lb_rule" "oew" {
   name = "oew"

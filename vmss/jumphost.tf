@@ -9,6 +9,7 @@ module "jumphost" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.this.public_key
   security_group      = module.basic.sg_id["mgmt"]
+  associate_nsg       = true
 }
 
 
