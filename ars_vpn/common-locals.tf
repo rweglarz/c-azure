@@ -6,8 +6,8 @@ locals {
     left_srv2         = [cidrsubnet(var.cidr, 4, 2)]
     right_hub         = [cidrsubnet(var.cidr, 4, 8)]
     right_srv1        = [cidrsubnet(var.cidr, 4, 9)]
-    right_core        = [cidrsubnet(var.cidr, 4, 10)]
-    right_core_spoke1 = [cidrsubnet(var.cidr, 4, 11)]
+    right_env_fw      = [cidrsubnet(var.cidr, 4, 10)]
+    right_env_sdgw    = [cidrsubnet(var.cidr, 4, 11)]
   }
   private_ips = {
     left_hub_fw = {
@@ -35,6 +35,27 @@ locals {
       mgmt_ip   = cidrhost(module.vnet_right_hub.subnets["mgmt"].address_prefixes[0], 5),
       eth1_1_ip = cidrhost(module.vnet_right_hub.subnets["data"].address_prefixes[0], 5),
       eth1_1_gw = cidrhost(module.vnet_right_hub.subnets["data"].address_prefixes[0], 1),
+    }
+    right_env_fw1 = {
+      mgmt_ip   = cidrhost(module.vnet_right_env_fw.subnets["mgmt"].address_prefixes[0], 5),
+      eth1_1_ip = cidrhost(module.vnet_right_env_fw.subnets["core"].address_prefixes[0], 5),
+      eth1_1_gw = cidrhost(module.vnet_right_env_fw.subnets["core"].address_prefixes[0], 1),
+      eth1_2_ip = cidrhost(module.vnet_right_env_fw.subnets["env1"].address_prefixes[0], 5),
+      eth1_2_gw = cidrhost(module.vnet_right_env_fw.subnets["env1"].address_prefixes[0], 1),
+      eth1_3_ip = cidrhost(module.vnet_right_env_fw.subnets["env2"].address_prefixes[0], 5),
+      eth1_3_gw = cidrhost(module.vnet_right_env_fw.subnets["env2"].address_prefixes[0], 1),
+    }
+    right_env_fw2 = {
+      mgmt_ip   = cidrhost(module.vnet_right_env_fw.subnets["mgmt"].address_prefixes[0], 6),
+      eth1_1_ip = cidrhost(module.vnet_right_env_fw.subnets["core"].address_prefixes[0], 6),
+      eth1_1_gw = cidrhost(module.vnet_right_env_fw.subnets["core"].address_prefixes[0], 1),
+      eth1_2_ip = cidrhost(module.vnet_right_env_fw.subnets["env1"].address_prefixes[0], 6),
+      eth1_2_gw = cidrhost(module.vnet_right_env_fw.subnets["env1"].address_prefixes[0], 1),
+      eth1_3_ip = cidrhost(module.vnet_right_env_fw.subnets["env2"].address_prefixes[0], 6),
+      eth1_3_gw = cidrhost(module.vnet_right_env_fw.subnets["env2"].address_prefixes[0], 1),
+    }
+    right_env1_sdgw1 = {
+      eth0 = cidrhost(module.vnet_right_env_sdgw.subnets["env1"].address_prefixes[0], 5)
     }
   }
   public_ips = {

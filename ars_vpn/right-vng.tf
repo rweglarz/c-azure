@@ -35,7 +35,7 @@ resource "azurerm_virtual_network_gateway" "right" {
     subnet_id            = module.vnet_right_hub.subnets["GatewaySubnet"].id
   }
   bgp_settings {
-    asn = 65515 # in theory it should be 65515 but putting it explicitly to work with ARS
+    asn = var.asn["right_vng"] # in theory it should be 65515 but putting it explicitly to work with ARS
     peering_addresses {
       ip_configuration_name = "c1"
       apipa_addresses = [
@@ -60,7 +60,7 @@ resource "azurerm_local_network_gateway" "right_left_fw1" {
 
   gateway_address = local.public_ips["left_ipsec_fw1"][0]
   bgp_settings {
-    asn                 = 65001
+    asn                 = var.asn["left_ipsec_fw1"]
     bgp_peering_address = "169.254.21.1"
   }
 }
@@ -72,7 +72,7 @@ resource "azurerm_local_network_gateway" "right_left_fw2" {
 
   gateway_address = local.public_ips["left_ipsec_fw2"][0]
   bgp_settings {
-    asn                 = 65002
+    asn                 = var.asn["left_ipsec_fw2"]
     bgp_peering_address = "169.254.21.3"
   }
 }

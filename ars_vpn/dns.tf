@@ -38,6 +38,17 @@ resource "azurerm_dns_a_record" "right-fw" {
   ]
 }
 
+resource "azurerm_dns_a_record" "right-env-fw1" {
+  name                = "ars-right-env-fw1"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.right_env_fw1.mgmt_ip_address
+  ]
+}
+
+
 resource "azurerm_dns_a_record" "srv_left_11" {
   name                = "ars-left-srv-11"
   resource_group_name = var.dns_zone_rg
@@ -57,3 +68,14 @@ resource "azurerm_dns_a_record" "srv_right_11" {
     module.srv_right_11.public_ip
   ]
 }
+
+resource "azurerm_dns_a_record" "right_env1_sdgw1" {
+  name                = "ars-right-env1-sdgw1"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.right_env1_sdgw1.public_ip
+  ]
+}
+

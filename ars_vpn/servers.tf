@@ -9,12 +9,12 @@ module "vnet_left_srv_1" {
   subnets = {
     "s1" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.left_srv1[0], 4, 0)]
-      attach_nsg                = true
+      associate_nsg             = true
       network_security_group_id = module.basic.sg_id["mgmt"]
     },
     "s2" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.left_srv1[0], 4, 1)]
-      attach_nsg                = true
+      associate_nsg             = true
       network_security_group_id = module.basic.sg_id["mgmt"]
     },
   }
@@ -31,12 +31,12 @@ module "vnet_left_srv_2" {
   subnets = {
     "s1" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.left_srv2[0], 4, 0)]
-      attach_nsg                = true
+      associate_nsg             = true
       network_security_group_id = module.basic.sg_id["mgmt"]
     },
     "s2" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.left_srv2[0], 4, 1)]
-      attach_nsg                = true
+      associate_nsg             = true
       network_security_group_id = module.basic.sg_id["mgmt"]
     },
   }
@@ -53,12 +53,12 @@ module "vnet_right_srv_1" {
   subnets = {
     "s1" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.right_srv1[0], 4, 0)]
-      attach_nsg                = true
+      associate_nsg             = true
       network_security_group_id = module.basic.sg_id["mgmt"]
     },
     "s2" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.right_srv1[0], 4, 1)]
-      attach_nsg                = true
+      associate_nsg             = true
       network_security_group_id = module.basic.sg_id["mgmt"]
     },
   }

@@ -111,3 +111,10 @@ resource "azurerm_route_server" "right_hub" {
   subnet_id                        = module.vnet_right_hub.subnets["RouteServerSubnet"].id
   branch_to_branch_traffic_enabled = true
 }
+
+resource "azurerm_route_server_bgp_connection" "right_hub-right_env_fw1" {
+  name            = "right_env_fw1"
+  route_server_id = azurerm_route_server.right_hub.id
+  peer_asn        = var.asn["right_env_fw1"]
+  peer_ip         = local.private_ips.right_env_fw1["eth1_1_ip"]
+}
