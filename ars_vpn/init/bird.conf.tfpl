@@ -17,7 +17,7 @@ protocol kernel {
   scan time 15;
 }
 
-protocol bgp pan {
+protocol bgp fw1 {
   import filter {
         accept;
   };
@@ -27,7 +27,7 @@ protocol bgp pan {
   neighbor ${peer1_ip} as ${peer1_asn};
 }
 
-protocol bgp m2 {
+protocol bgp fw2 {
   import filter {
         accept;
   };
