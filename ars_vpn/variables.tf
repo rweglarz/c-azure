@@ -64,6 +64,6 @@ variable "router_ids" {
     right_env_fw1  = "192.168.3.1"
     right_env_fw2  = "192.168.3.2"
     right_env1_sdgw1 = "192.168.3.11"
-    right_env1_sdgw1 = "192.168.3.12"
+    right_env1_sdgw2 = "192.168.3.12"
   }
 }

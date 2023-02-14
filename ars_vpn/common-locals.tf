@@ -54,8 +54,14 @@ locals {
       eth1_3_ip = cidrhost(module.vnet_right_env_fw.subnets["env2"].address_prefixes[0], 6),
       eth1_3_gw = cidrhost(module.vnet_right_env_fw.subnets["env2"].address_prefixes[0], 1),
     }
+    right_env_r_test = {
+      eth0 = cidrhost(module.vnet_right_env_fw.subnets["core"].address_prefixes[0], 9)
+    }
     right_env1_sdgw1 = {
       eth0 = cidrhost(module.vnet_right_env_sdgw.subnets["env1"].address_prefixes[0], 5)
+    }
+    right_env1_sdgw2 = {
+      eth0 = cidrhost(module.vnet_right_env_sdgw.subnets["env1"].address_prefixes[0], 6)
     }
   }
   public_ips = {

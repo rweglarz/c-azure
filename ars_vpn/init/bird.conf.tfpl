@@ -15,10 +15,14 @@ protocol kernel {
   export all;
   import all;
   scan time 15;
+  learn yes;
 }
 
 protocol bgp fw1 {
   import filter {
+        accept;
+  };
+  export filter {
         accept;
   };
   multihop;
@@ -30,6 +34,9 @@ protocol bgp fw1 {
 
 protocol bgp fw2 {
   import filter {
+        accept;
+  };
+  export filter {
         accept;
   };
   multihop;

@@ -98,3 +98,78 @@ module "right_env_fw1" {
     var.bootstrap_options["right_env_fw1"],
   )
 }
+
+
+resource "azurerm_virtual_network_peering" "vnet_right_hub-vnet_right_env_fw" {
+  name                      = "right-hub--right-env_fw"
+  resource_group_name       = azurerm_resource_group.this.name
+  virtual_network_name      = module.vnet_right_hub.vnet.name
+  remote_virtual_network_id = module.vnet_right_env_fw.vnet.id
+}
+
+resource "azurerm_virtual_network_peering" "vnet_right_env_fw-vnet_right_hub" {
+  name                      = "right-env-fw--right-hub"
+  resource_group_name       = azurerm_resource_group.this.name
+  virtual_network_name      = module.vnet_right_env_fw.vnet.name
+  remote_virtual_network_id = module.vnet_right_hub.vnet.id
+  depends_on = [
+    azurerm_virtual_network_peering.vnet_right_hub-vnet_right_env_fw
+  ]
+}
+
+
+/*
+locals {
+    env_r_test = {
+      router_id = var.router_ids["right_env_r_test"]
+      local_ip  = local.private_ips.right_env_r_test["eth0"]
+      local_asn = var.asn["right_vng"]
+      peer1_ip  = local.private_ips.right_env_fw1["eth1_2_ip"]
+      peer2_ip  = local.private_ips.right_env_fw2["eth1_2_ip"]
+      peer1_asn = var.asn["right_env_fw1"]
+      peer2_asn = var.asn["right_env_fw2"]
+    }
+}
+
+data "template_cloudinit_config" "env_r_test" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    filename     = "init.cfg"
+    content_type = "text/cloud-config"
+    content = jsonencode({
+      write_files = [
+        {
+          path    = "/etc/bird/bird.conf"
+          content = templatefile("${path.module}/init/bird.conf.tfpl", local.env_r_test)
+        },
+        {
+          path        = "/var/lib/cloud/scripts/per-once/bird.sh"
+          content     = file("${path.module}/init/bird.sh")
+          permissions = "0744"
+        },
+      ]
+      packages = [
+        "bird",
+        "net-tools",
+      ]
+    })
+  }
+}
+
+
+
+module "right_env_r_test" {
+  source = "../modules/linux"
+
+  name                = "${var.name}-right-env-r-test"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+  subnet_id           = module.vnet_right_env_fw.subnets["core"].id
+  private_ip_address  = local.private_ips.right_env_r_test["eth0"]
+  password            = var.password
+  public_key          = azurerm_ssh_public_key.this.public_key
+  custom_data         = data.template_cloudinit_config.env_r_test.rendered
+}
+*/

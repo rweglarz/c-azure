@@ -24,6 +24,12 @@ module "cfg_right_env_fw1" {
       type        = "ip-address"
       next_hop    = local.private_ips.right_env_fw1["eth1_1_gw"]
     }
+    sdgw = {
+      destination = module.vnet_right_env_sdgw.vnet.address_space[0]
+      interface   = "ethernet1/2"
+      type        = "ip-address"
+      next_hop    = local.private_ips.right_env_fw1["eth1_2_gw"]
+    }
   }
   enable_ecmp = false
 }
@@ -95,4 +101,41 @@ resource "panos_panorama_bgp_peer" "right_env_fw1-right_env_fw_asr" {
   peer_address_ip         = each.key
   max_prefixes            = "unlimited"
   multi_hop               = 1
+}
+ 
+resource "panos_panorama_bgp_peer_group" "right_env_fw1-right_env1_sdgw" {
+  template        = module.cfg_right_env_fw1.template_name
+  virtual_router  = "vr1"
+  name            = "right_env1_sdgw"
+  type            = "ebgp"
+  export_next_hop = "use-self"
+  depends_on = [
+    panos_panorama_bgp.right_env_fw1
+  ]
+}
+
+resource "panos_panorama_bgp_peer" "right_env_fw1-right_env1_sdgw1" {
+  template                = module.cfg_right_env_fw1.template_name
+  name                    = "right_env1_sdgw1"
+  virtual_router          = "vr1"
+  bgp_peer_group          = panos_panorama_bgp_peer_group.right_env_fw1-right_env1_sdgw.name
+  peer_as                 = var.asn["right_env1_sdgw1"]
+  local_address_interface = "ethernet1/2"
+  local_address_ip        = format("%s/%s", local.private_ips.right_env_fw1["eth1_2_ip"], local.subnet_prefix_length)
+  peer_address_ip         = local.private_ips.right_env1_sdgw1["eth0"]
+  max_prefixes            = "unlimited"
+  multi_hop               = 2
+}
+
+resource "panos_panorama_bgp_peer" "right_env_fw1-right_env1_sdgw2" {
+  template                = module.cfg_right_env_fw1.template_name
+  name                    = "right_env1_sdgw2"
+  virtual_router          = "vr1"
+  bgp_peer_group          = panos_panorama_bgp_peer_group.right_env_fw1-right_env1_sdgw.name
+  peer_as                 = var.asn["right_env1_sdgw2"]
+  local_address_interface = "ethernet1/2"
+  local_address_ip        = format("%s/%s", local.private_ips.right_env_fw1["eth1_2_ip"], local.subnet_prefix_length)
+  peer_address_ip         = local.private_ips.right_env1_sdgw2["eth0"]
+  max_prefixes            = "unlimited"
+  multi_hop               = 2
 }
