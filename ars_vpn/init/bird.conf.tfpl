@@ -21,6 +21,7 @@ protocol bgp fw1 {
   import filter {
         accept;
   };
+  multihop;
   local as ${local_asn};
   source address ${local_ip};
   graceful restart on;
@@ -31,6 +32,7 @@ protocol bgp fw2 {
   import filter {
         accept;
   };
+  multihop;
   local as ${local_asn};
   source address ${local_ip};
   graceful restart on;
