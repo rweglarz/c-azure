@@ -39,6 +39,11 @@ variable "security_group" {
 }
 
 variable "associate_nsg" {
-  type = bool
+  type    = bool
   default = false
+}
+
+variable "custom_data" {
+  type    = string
+  default = null
 }

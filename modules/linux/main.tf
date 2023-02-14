@@ -46,6 +46,8 @@ resource "azurerm_linux_virtual_machine" "this" {
   admin_password                  = var.password
   disable_password_authentication = false
 
+  custom_data = var.custom_data
+
   admin_ssh_key {
     username   = "ubuntu"
     public_key = var.public_key
