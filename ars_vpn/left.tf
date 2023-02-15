@@ -147,6 +147,12 @@ module "cfg_left_ipsec_fw1" {
       type        = "ip-address"
       next_hop    = local.private_ips.left_ipsec_fw1["eth1_1_gw"]
     }
+    left-hub = {
+      destination = module.vnet_left_hub.vnet.address_space[0]
+      interface   = "ethernet1/2"
+      type        = "ip-address"
+      next_hop    = local.private_ips.left_ipsec_fw1["eth1_2_gw"]
+    }
     c1 = {
       destination = "169.254.22.1/32"
       interface   = "tunnel.11"
@@ -218,6 +224,12 @@ module "cfg_left_ipsec_fw2" {
       interface   = "ethernet1/1"
       type        = "ip-address"
       next_hop    = local.private_ips.left_ipsec_fw2["eth1_1_gw"]
+    }
+    left-hub = {
+      destination = module.vnet_left_hub.vnet.address_space[0]
+      interface   = "ethernet1/2"
+      type        = "ip-address"
+      next_hop    = local.private_ips.left_ipsec_fw2["eth1_2_gw"]
     }
     c2 = {
       destination = "169.254.22.3/32"
@@ -335,4 +347,38 @@ module "tunnel-left_ipsec_fw2-vng_right_c2" {
     }
   }
   psk = var.psk
+}
+
+
+resource "azurerm_public_ip" "left_hub_asr" {
+  name                = "${var.name}-left-hub-asr"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+
+resource "azurerm_route_server" "left_hub" {
+  name                             = "${var.name}-left-hub"
+  resource_group_name              = azurerm_resource_group.this.name
+  location                         = azurerm_resource_group.this.location
+  sku                              = "Standard"
+  public_ip_address_id             = azurerm_public_ip.left_hub_asr.id
+  subnet_id                        = module.vnet_left_hub.subnets["RouteServerSubnet"].id
+  branch_to_branch_traffic_enabled = true
+}
+
+resource "azurerm_route_server_bgp_connection" "left_hub-left_ipsec_fw1" {
+  name            = "left_ipsec_fw1"
+  route_server_id = azurerm_route_server.left_hub.id
+  peer_asn        = var.asn["left_ipsec_fw1"]
+  peer_ip         = local.private_ips.left_ipsec_fw1["eth1_2_ip"]
+}
+
+resource "azurerm_route_server_bgp_connection" "left_hub-left_ipsec_fw2" {
+  name            = "left_ipsec_fw2"
+  route_server_id = azurerm_route_server.left_hub.id
+  peer_asn        = var.asn["left_ipsec_fw2"]
+  peer_ip         = local.private_ips.left_ipsec_fw2["eth1_2_ip"]
 }

@@ -31,31 +31,6 @@ resource "panos_panorama_bgp_peer" "left_ipsec_fw1-hub1_i1" {
 }
 
 
-/*
-resource "panos_panorama_redistribution_profile_ipv4" "azure_ipsec_hub1_fw1" {
-  template       = module.cfg_ipsec_hub1_fw1.template_name
-  virtual_router = "vr1"
-  name           = "redis-static"
-  priority       = 1
-  action         = "redist"
-  types          = ["static"]
-  destinations = [
-    "10.66.66.32/28"
-  ]
-}
-
-
-resource "panos_panorama_bgp_redist_rule" "azure_ipsec_hub1_fw1" {
-  template       = module.cfg_ipsec_hub1_fw1.template_name
-  virtual_router = "vr1"
-  route_table    = "unicast"
-  name           = panos_panorama_redistribution_profile_ipv4.azure_ipsec_hub1_fw1.name
-  set_med        = "20"
-}
-*/
-
-
-
 resource "panos_panorama_bgp" "left_ipsec_fw2" {
   template       = module.cfg_left_ipsec_fw2.template_name
   virtual_router = "vr1"
@@ -88,3 +63,60 @@ resource "panos_panorama_bgp_peer" "left_ipsec_fw2-hub1_i1" {
   multi_hop               = 1
 }
 
+
+resource "panos_panorama_bgp_peer_group" "left_ipsec_fw1-left_hub_asr" {
+  template        = module.cfg_left_ipsec_fw2.template_name
+  virtual_router  = "vr1"
+  name            = "left_hub_asr"
+  type            = "ebgp"
+  export_next_hop = "use-self"
+  depends_on = [
+    panos_panorama_bgp.left_ipsec_fw1
+  ]
+}
+
+resource "panos_panorama_bgp_peer_group" "left_ipsec_fw2-left_hub_asr" {
+  template        = module.cfg_left_ipsec_fw2.template_name
+  virtual_router  = "vr1"
+  name            = "left_hub_asr"
+  type            = "ebgp"
+  export_next_hop = "use-self"
+  depends_on = [
+    panos_panorama_bgp.left_ipsec_fw2
+  ]
+}
+
+
+resource "panos_panorama_bgp_peer" "left_ipsec_fw1-left_hub_asr" {
+  for_each = {
+    0 : tolist(azurerm_route_server.left_hub.virtual_router_ips)[0],
+    1 : tolist(azurerm_route_server.left_hub.virtual_router_ips)[1],
+  }
+  template                = module.cfg_left_ipsec_fw1.template_name
+  name                    = "left_hub_asr-${each.value}"
+  virtual_router          = "vr1"
+  bgp_peer_group          = panos_panorama_bgp_peer_group.left_ipsec_fw1-left_hub_asr.name
+  peer_as                 = var.asn["ars"]
+  local_address_interface = "ethernet1/2"
+  local_address_ip        = format("%s/%s", local.private_ips.left_ipsec_fw1["eth1_2_ip"], local.subnet_prefix_length)
+  peer_address_ip         = each.value
+  max_prefixes            = "unlimited"
+  multi_hop               = 1
+}
+
+resource "panos_panorama_bgp_peer" "left_ipsec_fw2-left_hub_asr" {
+  for_each = {
+    0 : tolist(azurerm_route_server.left_hub.virtual_router_ips)[0],
+    1 : tolist(azurerm_route_server.left_hub.virtual_router_ips)[1],
+  }
+  template                = module.cfg_left_ipsec_fw2.template_name
+  name                    = "left_hub_asr-${each.key}"
+  virtual_router          = "vr1"
+  bgp_peer_group          = panos_panorama_bgp_peer_group.left_ipsec_fw2-left_hub_asr.name
+  peer_as                 = var.asn["ars"]
+  local_address_interface = "ethernet1/2"
+  local_address_ip        = format("%s/%s", local.private_ips.left_ipsec_fw2["eth1_2_ip"], local.subnet_prefix_length)
+  peer_address_ip         = each.value
+  max_prefixes            = "unlimited"
+  multi_hop               = 1
+}

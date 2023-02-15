@@ -76,33 +76,39 @@ resource "panos_panorama_bgp_peer_group" "right_env_fw1-right_env_fw_asr" {
 }
 
 resource "panos_panorama_bgp_peer" "right_env_fw1-right_hub_asr" {
-  for_each                = azurerm_route_server.right_hub.virtual_router_ips
+  for_each = {
+    0 : tolist(azurerm_route_server.right_hub.virtual_router_ips)[0],
+    1 : tolist(azurerm_route_server.right_hub.virtual_router_ips)[1],
+  }
   template                = module.cfg_right_env_fw1.template_name
-  name                    = "right_hub_asr-${each.key}"
+  name                    = "right_hub_asr-${each.value}"
   virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.right_env_fw1-right_hub_asr.name
   peer_as                 = var.asn["right_vng"]
   local_address_interface = "ethernet1/1"
   local_address_ip        = format("%s/%s", local.private_ips.right_env_fw1["eth1_1_ip"], local.subnet_prefix_length)
-  peer_address_ip         = each.key
+  peer_address_ip         = each.value
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
 
 resource "panos_panorama_bgp_peer" "right_env_fw1-right_env_fw_asr" {
-  for_each                = azurerm_route_server.right_env_fw.virtual_router_ips
+  for_each = {
+    0 : tolist(azurerm_route_server.right_env_fw.virtual_router_ips)[0],
+    1 : tolist(azurerm_route_server.right_env_fw.virtual_router_ips)[1],
+  }
   template                = module.cfg_right_env_fw1.template_name
-  name                    = "right_env_fw_asr-${each.key}"
+  name                    = "right_env_fw_asr-${each.value}"
   virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.right_env_fw1-right_env_fw_asr.name
   peer_as                 = var.asn["right_vng"]
   local_address_interface = "ethernet1/1"
   local_address_ip        = format("%s/%s", local.private_ips.right_env_fw1["eth1_1_ip"], local.subnet_prefix_length)
-  peer_address_ip         = each.key
+  peer_address_ip         = each.value
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
- 
+
 resource "panos_panorama_bgp_peer_group" "right_env_fw1-right_env1_sdgw" {
   template        = module.cfg_right_env_fw1.template_name
   virtual_router  = "vr1"
