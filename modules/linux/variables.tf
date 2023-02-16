@@ -47,3 +47,8 @@ variable "custom_data" {
   type    = string
   default = null
 }
+
+variable "enable_ip_forwarding" {
+  type    = bool
+  default = false
+}
