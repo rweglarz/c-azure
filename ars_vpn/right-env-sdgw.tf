@@ -118,7 +118,6 @@ module "right_env1_sdgw" {
   name                = format("%s-right-%s", var.name, replace(each.key, "_", "-"))
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
-  subnet_id           = module.vnet_right_env_sdgw.subnets["env1"].id
 
   subnet_id            = module.vnet_right_env_sdgw.subnets["env1"].id
   private_ip_address   = each.value.local_ip
@@ -145,4 +144,29 @@ resource "azurerm_virtual_network_peering" "vnet_right_env_sdgw-vnet_right_env_f
   depends_on = [
     azurerm_virtual_network_peering.vnet_right_env_fw-vnet_right_env_sdgw
   ]
+}
+
+
+resource "azurerm_route_table" "right_env1_sdgw" {
+  name                = "${var.name}-right-env1-sdgw"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+}
+
+resource "azurerm_route" "right_env1_sdgw" {
+  for_each = {
+    envs = "10.0.0.0/8"
+    left = "172.16.0.0/21"
+  }
+  name                   = each.key
+  resource_group_name    = azurerm_resource_group.this.name
+  route_table_name       = azurerm_route_table.right_env1_sdgw.name
+  address_prefix         = each.value
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = local.private_ips.right_env_fw1["eth1_2_ip"]
+}
+
+resource "azurerm_subnet_route_table_association" "right_env1_sdgw" {
+  subnet_id      = module.vnet_right_env_sdgw.subnets["env1"].id
+  route_table_id = azurerm_route_table.right_env1_sdgw.id
 }

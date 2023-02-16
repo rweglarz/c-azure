@@ -118,58 +118,25 @@ resource "azurerm_virtual_network_peering" "vnet_right_env_fw-vnet_right_hub" {
 }
 
 
-/*
-locals {
-    env_r_test = {
-      router_id = var.router_ids["right_env_r_test"]
-      local_ip  = local.private_ips.right_env_r_test["eth0"]
-      local_asn = var.asn["right_vng"]
-      peer1_ip  = local.private_ips.right_env_fw1["eth1_2_ip"]
-      peer2_ip  = local.private_ips.right_env_fw2["eth1_2_ip"]
-      peer1_asn = var.asn["right_env_fw1"]
-      peer2_asn = var.asn["right_env_fw2"]
-    }
+resource "azurerm_route_table" "right_env_fw_core" {
+  name                          = "${var.name}-right-env-fw-core"
+  resource_group_name           = azurerm_resource_group.this.name
+  location                      = azurerm_resource_group.this.location
 }
 
-data "template_cloudinit_config" "env_r_test" {
-  gzip          = true
-  base64_encode = true
-
-  part {
-    filename     = "init.cfg"
-    content_type = "text/cloud-config"
-    content = jsonencode({
-      write_files = [
-        {
-          path    = "/etc/bird/bird.conf"
-          content = templatefile("${path.module}/init/bird.conf.tfpl", local.env_r_test)
-        },
-        {
-          path        = "/var/lib/cloud/scripts/per-once/bird.sh"
-          content     = file("${path.module}/init/bird.sh")
-          permissions = "0744"
-        },
-      ]
-      packages = [
-        "bird",
-        "net-tools",
-      ]
-    })
+resource "azurerm_route" "right_hub_env_fw_core" {
+  for_each = {
+    left = "172.16.0.0/21"
   }
+  name                   = each.key
+  resource_group_name    = azurerm_resource_group.this.name
+  route_table_name       = azurerm_route_table.right_env_fw_core.name
+  address_prefix         = each.value
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = local.private_ips.right_hub_fw["eth1_1_ip"]
 }
 
-
-
-module "right_env_r_test" {
-  source = "../modules/linux"
-
-  name                = "${var.name}-right-env-r-test"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  subnet_id           = module.vnet_right_env_fw.subnets["core"].id
-  private_ip_address  = local.private_ips.right_env_r_test["eth0"]
-  password            = var.password
-  public_key          = azurerm_ssh_public_key.this.public_key
-  custom_data         = data.template_cloudinit_config.env_r_test.rendered
+resource "azurerm_subnet_route_table_association" "right_env_fw_core" {
+  subnet_id      = module.vnet_right_env_fw.subnets["core"].id
+  route_table_id = azurerm_route_table.right_env_fw_core.id
 }
-*/

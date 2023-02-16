@@ -118,3 +118,28 @@ resource "azurerm_route_server_bgp_connection" "right_hub-right_env_fw1" {
   peer_asn        = var.asn["right_env_fw1"]
   peer_ip         = local.private_ips.right_env_fw1["eth1_1_ip"]
 }
+
+
+resource "azurerm_route_table" "right_hub_gateway_subnet" {
+  name                          = "${var.name}-right-hub-gateway-subnet"
+  resource_group_name           = azurerm_resource_group.this.name
+  location                      = azurerm_resource_group.this.location
+  disable_bgp_route_propagation = true
+}
+
+resource "azurerm_route" "right_hub_gateway_subnet" {
+  for_each = {
+    envs = "10.0.0.0/8"
+  }
+  name                   = each.key
+  resource_group_name    = azurerm_resource_group.this.name
+  route_table_name       = azurerm_route_table.right_hub_gateway_subnet.name
+  address_prefix         = each.value
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = local.private_ips.right_hub_fw["eth1_1_ip"]
+}
+
+resource "azurerm_subnet_route_table_association" "right_hub_gateway_subnet" {
+  subnet_id      = module.vnet_right_hub.subnets["GatewaySubnet"].id
+  route_table_id = azurerm_route_table.right_hub_gateway_subnet.id
+}
