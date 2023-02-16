@@ -119,11 +119,14 @@ module "right_env1_sdgw" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = module.vnet_right_env_sdgw.subnets["env1"].id
-  
-  private_ip_address  = each.value.local_ip
-  password            = var.password
-  public_key          = azurerm_ssh_public_key.this.public_key
-  custom_data         = data.template_cloudinit_config.sdgw[each.key].rendered
+
+  subnet_id            = module.vnet_right_env_sdgw.subnets["env1"].id
+  private_ip_address   = each.value.local_ip
+  enable_ip_forwarding = true
+
+  password    = var.password
+  public_key  = azurerm_ssh_public_key.this.public_key
+  custom_data = data.template_cloudinit_config.sdgw[each.key].rendered
 }
 
 
