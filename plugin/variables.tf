@@ -5,6 +5,7 @@ variable "name" {
 variable "vpc_cidr" {
   description = "vpc cidr"
   type        = string
+  default     = "172.29.0.0/21"
 }
 variable "mgmt_ips" {
   description = "List of IPs allowed external access"
