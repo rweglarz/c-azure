@@ -88,11 +88,17 @@ data "template_cloudinit_config" "sdgw" {
             network = {
               version = 2
               ethernets = {
-                lo = {
-                  addresses = each.value.lo_ips
-                }
                 eth0 = {
                   dhcp4 = "yes"
+                }
+              }
+              bridges = {
+                db0 = {
+                  dhcp4      = "no"
+                  dhcp6      = "no"
+                  accept-ra  = "no"
+                  interfaces = []
+                  addresses  = each.value.lo_ips
                 }
               }
             }

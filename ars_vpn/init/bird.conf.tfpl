@@ -9,7 +9,7 @@ protocol device {
   import all;
 }
 protocol direct {
-  interface "lo";
+  interface "db0";
 }
 protocol kernel {
   export all;
