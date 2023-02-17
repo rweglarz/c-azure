@@ -84,7 +84,7 @@ resource "panos_panorama_bgp_peer" "right_env_fw1-right_hub_asr" {
   name                    = "right_hub_asr-${each.value}"
   virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.right_env_fw1-right_hub_asr.name
-  peer_as                 = var.asn["right_vng"]
+  peer_as                 = var.asn["ars"]
   local_address_interface = "ethernet1/1"
   local_address_ip        = format("%s/%s", local.private_ips.right_env_fw1["eth1_1_ip"], local.subnet_prefix_length)
   peer_address_ip         = each.value
@@ -101,7 +101,7 @@ resource "panos_panorama_bgp_peer" "right_env_fw1-right_env_fw_asr" {
   name                    = "right_env_fw_asr-${each.value}"
   virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.right_env_fw1-right_env_fw_asr.name
-  peer_as                 = var.asn["right_vng"]
+  peer_as                 = var.asn["ars"]
   local_address_interface = "ethernet1/1"
   local_address_ip        = format("%s/%s", local.private_ips.right_env_fw1["eth1_1_ip"], local.subnet_prefix_length)
   peer_address_ip         = each.value

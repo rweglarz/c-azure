@@ -22,7 +22,7 @@ resource "panos_panorama_bgp_peer" "left_ipsec_fw1-hub1_i1" {
   name                    = "vng-i1"
   virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.left_ipsec_fw1-vng_right.name
-  peer_as                 = var.asn["right_vng"]
+  peer_as                 = var.asn["ars"]
   local_address_interface = "tunnel.11"
   local_address_ip        = format("%s/%s", local.private_ips.left_ipsec_fw1["tun11_ip"], 32)
   peer_address_ip         = azurerm_virtual_network_gateway.right.bgp_settings[0].peering_addresses[0].apipa_addresses[0]
@@ -55,7 +55,7 @@ resource "panos_panorama_bgp_peer" "left_ipsec_fw2-hub1_i1" {
   name                    = "vng-i1"
   virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.left_ipsec_fw2-vng_right.name
-  peer_as                 = var.asn["right_vng"]
+  peer_as                 = var.asn["ars"]
   local_address_interface = "tunnel.11"
   local_address_ip        = format("%s/%s", local.private_ips.left_ipsec_fw2["tun11_ip"], 32)
   peer_address_ip         = azurerm_virtual_network_gateway.right.bgp_settings[0].peering_addresses[1].apipa_addresses[0]

@@ -35,7 +35,7 @@ resource "azurerm_virtual_network_gateway" "right" {
     subnet_id            = module.vnet_right_hub.subnets["GatewaySubnet"].id
   }
   bgp_settings {
-    asn = var.asn["right_vng"] # in theory it should be 65515 but putting it explicitly to work with ARS
+    asn = var.asn["ars"] # it should be 65515 by default but putting it explicitly to work with ARS
     peering_addresses {
       ip_configuration_name = "c1"
       apipa_addresses = [
