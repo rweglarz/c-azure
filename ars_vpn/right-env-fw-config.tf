@@ -155,6 +155,14 @@ resource "panos_panorama_bgp_aggregate" "right_env_fw1-10_1_0_0_19" {
   summary        = true
 }
 
+resource "panos_panorama_bgp_aggregate" "right_env_fw1-10_1_32_0_19" {
+  template       = module.cfg_right_env_fw1.template_name
+  virtual_router = "vr1"
+  name           = "10_1_32_0_19"
+  prefix         = "10.1.32.0/19"
+  summary        = true
+}
+
 resource "panos_panorama_bgp_aggregate_suppress_filter" "right_env_fw1-sdgw1-10_1_0_0_19" {
   template       = module.cfg_right_env_fw1.template_name
   virtual_router = "vr1"
@@ -183,6 +191,35 @@ resource "panos_panorama_bgp_aggregate_suppress_filter" "right_env_fw1-sdgw2-10_
   ]
 }
 
+resource "panos_panorama_bgp_aggregate_suppress_filter" "right_env_fw1-sdgw1-10_1_32_0_19" {
+  template       = module.cfg_right_env_fw1.template_name
+  virtual_router = "vr1"
+  bgp_aggregate  = panos_panorama_bgp_aggregate.right_env_fw1-10_1_32_0_19.name
+  name           = "sdgw1-10_1_32_0_19"
+  address_prefix {
+    prefix = "10.1.32.0/19"
+    exact  = false
+  }
+  from_peers = [
+    panos_panorama_bgp_peer.right_env_fw1-right_env1_sdgw1.name
+  ]
+}
+
+resource "panos_panorama_bgp_aggregate_suppress_filter" "right_env_fw1-sdgw2-10_1_32_0_19" {
+  template       = module.cfg_right_env_fw1.template_name
+  virtual_router = "vr1"
+  bgp_aggregate  = panos_panorama_bgp_aggregate.right_env_fw1-10_1_32_0_19.name
+  name           = "sdgw2-10_1_32_0_19"
+  address_prefix {
+    prefix = "10.1.32.0/19"
+    exact  = false
+  }
+  from_peers = [
+    panos_panorama_bgp_peer.right_env_fw1-right_env1_sdgw2.name
+  ]
+}
+
+
 resource "panos_panorama_bgp_export_rule_group" "right_env_fw1-ars" {
   template       = module.cfg_right_env_fw1.template_name
   virtual_router = "vr1"
@@ -206,6 +243,38 @@ resource "panos_panorama_bgp_export_rule_group" "right_env_fw1-ars" {
     name = "sdgw2-10_1_0_0_19"
     match_address_prefix {
       prefix = "10.1.0.0/19"
+      exact  = true
+    }
+    match_from_peers = [
+      panos_panorama_bgp_peer.right_env_fw1-right_env1_sdgw2.name
+    ]
+    match_route_table = "unicast"
+    action            = "allow"
+    next_hop          = local.private_ips.right_env1_sdgw2["eth0"]
+    used_by = [
+      panos_panorama_bgp_peer_group.right_env_fw1-right_env_fw_asr.name
+    ]
+  }
+  rule {
+    name = "sdgw1-10_1_32_0_19"
+    match_address_prefix {
+      prefix = "10.1.32.0/19"
+      exact  = true
+    }
+    match_from_peers = [
+      panos_panorama_bgp_peer.right_env_fw1-right_env1_sdgw1.name
+    ]
+    match_route_table = "unicast"
+    action            = "allow"
+    next_hop          = local.private_ips.right_env1_sdgw1["eth0"]
+    used_by = [
+      panos_panorama_bgp_peer_group.right_env_fw1-right_env_fw_asr.name
+    ]
+  }
+  rule {
+    name = "sdgw2-10_1_32_0_19"
+    match_address_prefix {
+      prefix = "10.1.32.0/19"
       exact  = true
     }
     match_from_peers = [
