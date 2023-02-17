@@ -382,3 +382,29 @@ resource "azurerm_route_server_bgp_connection" "left_hub-left_ipsec_fw2" {
   peer_asn        = var.asn["left_ipsec_fw2"]
   peer_ip         = local.private_ips.left_ipsec_fw2["eth1_2_ip"]
 }
+
+
+
+resource "azurerm_route_table" "left_hub_private" {
+  name                          = "${var.name}-left-hub-private"
+  resource_group_name           = azurerm_resource_group.this.name
+  location                      = azurerm_resource_group.this.location
+  disable_bgp_route_propagation = true
+}
+
+resource "azurerm_route" "left_hub_private" {
+  for_each = {
+    srv1 = "172.16.1.0/24"
+  }
+  name                   = each.key
+  resource_group_name    = azurerm_resource_group.this.name
+  route_table_name       = azurerm_route_table.left_hub_private.name
+  address_prefix         = each.value
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = local.private_ips.left_hub_fw["eth1_1_ip"]
+}
+
+resource "azurerm_subnet_route_table_association" "left_hub_private" {
+  subnet_id      = module.vnet_left_hub.subnets["private"].id
+  route_table_id = azurerm_route_table.left_hub_private.id
+}
