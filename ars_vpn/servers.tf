@@ -106,7 +106,7 @@ resource "azurerm_virtual_network_peering" "vnet_right_srv_1-vnet_right_hub" {
 
 resource "azurerm_subnet_route_table_association" "left_u_srv1" {
   subnet_id      = module.vnet_left_u_srv_1.subnets["s1"].id
-  route_table_id = module.basic.route_table_id["mgmt-via-igw"]["left"]
+  route_table_id = module.basic.route_table_id["private-via-fw"]["left_u"]
 }
 
 
