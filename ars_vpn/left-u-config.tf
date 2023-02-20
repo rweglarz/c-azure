@@ -8,10 +8,12 @@ resource "panos_panorama_bgp" "left_u_ipsec_fw1" {
 }
 
 resource "panos_panorama_bgp_peer_group" "left_u_ipsec_fw1-vng_right" {
-  template       = module.cfg_left_u_ipsec_fw1.template_name
-  virtual_router = "vr1"
-  name           = "vng_right"
-  type           = "ebgp"
+  template        = module.cfg_left_u_ipsec_fw1.template_name
+  virtual_router  = "vr1"
+  name            = "vng_right"
+  type            = "ebgp"
+  import_next_hop = "use-peer"
+  export_next_hop = "use-self"
   depends_on = [
     panos_panorama_bgp.left_u_ipsec_fw1
   ]
@@ -41,10 +43,12 @@ resource "panos_panorama_bgp" "left_u_ipsec_fw2" {
 }
 
 resource "panos_panorama_bgp_peer_group" "left_u_ipsec_fw2-vng_right" {
-  template       = module.cfg_left_u_ipsec_fw2.template_name
-  virtual_router = "vr1"
-  name           = "vng_right"
-  type           = "ebgp"
+  template        = module.cfg_left_u_ipsec_fw2.template_name
+  virtual_router  = "vr1"
+  name            = "vng_right"
+  type            = "ebgp"
+  import_next_hop = "use-peer"
+  export_next_hop = "use-self"
   depends_on = [
     panos_panorama_bgp.left_u_ipsec_fw2
   ]
@@ -65,22 +69,26 @@ resource "panos_panorama_bgp_peer" "left_u_ipsec_fw2-hub1_i1" {
 
 
 resource "panos_panorama_bgp_peer_group" "left_u_ipsec_fw1-left_u_hub_asr" {
-  template        = module.cfg_left_u_ipsec_fw2.template_name
-  virtual_router  = "vr1"
-  name            = "left_u_hub_asr"
-  type            = "ebgp"
-  export_next_hop = "use-self"
+  template          = module.cfg_left_u_ipsec_fw1.template_name
+  virtual_router    = "vr1"
+  name              = "left_u_hub_asr"
+  type              = "ebgp"
+  import_next_hop   = "original"
+  export_next_hop   = "use-self"
+  remove_private_as = false
   depends_on = [
     panos_panorama_bgp.left_u_ipsec_fw1
   ]
 }
 
 resource "panos_panorama_bgp_peer_group" "left_u_ipsec_fw2-left_u_hub_asr" {
-  template        = module.cfg_left_u_ipsec_fw2.template_name
-  virtual_router  = "vr1"
-  name            = "left_u_hub_asr"
-  type            = "ebgp"
-  export_next_hop = "use-self"
+  template          = module.cfg_left_u_ipsec_fw2.template_name
+  virtual_router    = "vr1"
+  name              = "left_u_hub_asr"
+  type              = "ebgp"
+  import_next_hop   = "original"
+  export_next_hop   = "use-self"
+  remove_private_as = false
   depends_on = [
     panos_panorama_bgp.left_u_ipsec_fw2
   ]
