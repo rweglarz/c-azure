@@ -43,7 +43,7 @@ module "basic" {
   mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
   split_route_tables = {
     left = {
-      nh                            = local.private_ips.left_hub_fw["eth1_1_ip"]
+      nh                            = local.private_ips.left_u_hub_fw["eth1_1_ip"]
       disable_bgp_route_propagation = true
     }
     right = {

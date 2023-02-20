@@ -58,9 +58,9 @@ resource "azurerm_local_network_gateway" "right_left_fw1" {
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 
-  gateway_address = local.public_ips["left_ipsec_fw1"][0]
+  gateway_address = local.public_ips["left_u_ipsec_fw1"][0]
   bgp_settings {
-    asn                 = var.asn["left_ipsec_fw1"]
+    asn                 = var.asn["left_u_ipsec_fw1"]
     bgp_peering_address = "169.254.21.1"
   }
 }
@@ -70,9 +70,9 @@ resource "azurerm_local_network_gateway" "right_left_fw2" {
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 
-  gateway_address = local.public_ips["left_ipsec_fw2"][0]
+  gateway_address = local.public_ips["left_u_ipsec_fw2"][0]
   bgp_settings {
-    asn                 = var.asn["left_ipsec_fw2"]
+    asn                 = var.asn["left_u_ipsec_fw2"]
     bgp_peering_address = "169.254.21.3"
   }
 }

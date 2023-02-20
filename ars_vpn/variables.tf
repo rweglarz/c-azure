@@ -5,6 +5,11 @@ variable "name" {
 
 variable "region" {
   type    = string
+  default = "Germany West Central"
+}
+
+variable "region_fl" {
+  type    = string
   default = "West Europe"
 }
 
@@ -46,8 +51,8 @@ variable "bootstrap_options" {
 variable "asn" {
   default = {
     ars              = "65515"
-    left_ipsec_fw1   = "65001"
-    left_ipsec_fw2   = "65001"
+    left_u_ipsec_fw1 = "65001"
+    left_u_ipsec_fw2 = "65001"
     right_env_fw1    = "65011"
     right_env_fw2    = "65011"
     right_env1_sdgw1 = "65101"
@@ -59,8 +64,8 @@ variable "asn" {
 
 variable "router_ids" {
   default = {
-    left_ipsec_fw1   = "192.168.0.1"
-    left_ipsec_fw2   = "192.168.0.2"
+    left_u_ipsec_fw1 = "192.168.0.1"
+    left_u_ipsec_fw2 = "192.168.0.2"
     right_env_fw1    = "192.168.1.1"
     right_env_fw2    = "192.168.1.2"
     right_env1_sdgw1 = "192.168.10.1"
