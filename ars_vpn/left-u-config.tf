@@ -101,7 +101,7 @@ resource "panos_panorama_bgp_peer" "left_u_ipsec_fw1-left_u_hub_asr" {
     1 : tolist(azurerm_route_server.left_u_hub.virtual_router_ips)[1],
   }
   template                = module.cfg_left_u_ipsec_fw1.template_name
-  name                    = "left_u_hub_asr-${each.value}"
+  name                    = "left_u_hub_asr-${each.key}"
   virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.left_u_ipsec_fw1-left_u_hub_asr.name
   peer_as                 = var.asn["ars"]
@@ -127,4 +127,72 @@ resource "panos_panorama_bgp_peer" "left_u_ipsec_fw2-left_u_hub_asr" {
   peer_address_ip         = each.value
   max_prefixes            = "unlimited"
   multi_hop               = 1
+}
+
+resource "panos_panorama_bgp_export_rule_group" "left_u_ipsec_fw1" {
+  template       = module.cfg_left_u_ipsec_fw1.template_name
+  virtual_router = "vr1"
+  rule {
+    name = "right-vng"
+    match_address_prefix {
+      prefix = cidrsubnet(var.cidr, 2, 0)
+      exact  = false
+    }
+    match_route_table   = "unicast"
+    action              = "allow"
+    match_as_path_regex = "65515"
+    as_path_type        = "remove"
+    med                 = 90
+    used_by = [
+      panos_panorama_bgp_peer_group.left_u_ipsec_fw1-vng_right.name
+    ]
+  }
+  rule {
+    name = "left-asr"
+    match_from_peers = [
+      panos_panorama_bgp_peer.left_u_ipsec_fw1-hub1_i1.name
+    ]
+    match_route_table   = "unicast"
+    action              = "allow"
+    med                 = 90
+    match_as_path_regex = "65515"
+    as_path_type        = "remove"
+    used_by = [
+      panos_panorama_bgp_peer_group.left_u_ipsec_fw1-left_u_hub_asr.name
+    ]
+  }
+}
+
+resource "panos_panorama_bgp_export_rule_group" "left_u_ipsec_fw2" {
+  template       = module.cfg_left_u_ipsec_fw2.template_name
+  virtual_router = "vr1"
+  rule {
+    name = "right-vng"
+    match_address_prefix {
+      prefix = cidrsubnet(var.cidr, 2, 0)
+      exact  = false
+    }
+    match_route_table   = "unicast"
+    action              = "allow"
+    match_as_path_regex = "65515"
+    as_path_type        = "remove"
+    med                 = 10
+    used_by = [
+      panos_panorama_bgp_peer_group.left_u_ipsec_fw2-vng_right.name
+    ]
+  }
+  rule {
+    name = "left-asr"
+    match_from_peers = [
+      panos_panorama_bgp_peer.left_u_ipsec_fw2-hub1_i1.name
+    ]
+    match_route_table   = "unicast"
+    action              = "allow"
+    match_as_path_regex = "65515"
+    as_path_type        = "remove"
+    med                 = 10
+    used_by = [
+      panos_panorama_bgp_peer_group.left_u_ipsec_fw1-left_u_hub_asr.name
+    ]
+  }
 }
