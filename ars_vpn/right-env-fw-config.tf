@@ -153,6 +153,9 @@ resource "panos_panorama_bgp_aggregate" "right_env_fw1-10_1_0_0_19" {
   name           = "10_1_0_0_19"
   prefix         = "10.1.0.0/19"
   summary        = true
+  depends_on = [
+    panos_panorama_bgp.right_env_fw1
+  ]
 }
 
 resource "panos_panorama_bgp_aggregate" "right_env_fw1-10_1_32_0_19" {
@@ -161,6 +164,9 @@ resource "panos_panorama_bgp_aggregate" "right_env_fw1-10_1_32_0_19" {
   name           = "10_1_32_0_19"
   prefix         = "10.1.32.0/19"
   summary        = true
+  depends_on = [
+    panos_panorama_bgp.right_env_fw1
+  ]
 }
 
 resource "panos_panorama_bgp_aggregate_suppress_filter" "right_env_fw1-sdgw1-10_1_0_0_19" {
