@@ -42,7 +42,7 @@ module "basic" {
   location            = azurerm_resource_group.this.location
   mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
   split_route_tables = {
-    left = {
+    left_u = {
       nh                            = local.private_ips.left_u_hub_fw["eth1_1_ip"]
       disable_bgp_route_propagation = true
     }

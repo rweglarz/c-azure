@@ -113,10 +113,10 @@ resource "azurerm_subnet_route_table_association" "left_u_srv1" {
 
 
 
-module "srv_left_11" {
+module "linux_left_srv11" {
   source = "../modules/linux"
 
-  name                = "${var.name}-srv-left-11"
+  name                = "${var.name}-left-srv11"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = module.vnet_left_u_srv_1.subnets["s1"].id
@@ -125,10 +125,10 @@ module "srv_left_11" {
   public_key          = azurerm_ssh_public_key.this.public_key
 }
 
-module "srv_right_11" {
+module "linux_right_srv11" {
   source = "../modules/linux"
 
-  name                = "${var.name}-srv-right-11"
+  name                = "${var.name}-right-srv11"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = module.vnet_right_srv_1.subnets["s1"].id

@@ -114,7 +114,7 @@ data "template_cloudinit_config" "sdgw" {
 }
 
 
-module "right_env1_sdgw" {
+module "linux_right_env1_sdgw" {
   for_each = { for k, v in local.sdgw_init_p : k => v if length(regexall("env1", k)) > 0 }
   source   = "../modules/linux"
 

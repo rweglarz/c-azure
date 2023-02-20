@@ -49,28 +49,28 @@ resource "azurerm_dns_a_record" "right-env-fw1" {
 }
 
 
-resource "azurerm_dns_a_record" "srv_left_11" {
-  name                = "ars-left-srv-11"
+resource "azurerm_dns_a_record" "left_u_srv11" {
+  name                = "ars-left-u-srv11"
   resource_group_name = var.dns_zone_rg
   zone_name           = var.dns_zone_name
   ttl                 = 300
   records = [
-    module.srv_left_11.public_ip
+    module.linux_left_srv11.public_ip
   ]
 }
 
-resource "azurerm_dns_a_record" "srv_right_11" {
-  name                = "ars-right-srv-11"
+resource "azurerm_dns_a_record" "right_srv11" {
+  name                = "ars-right-srv11"
   resource_group_name = var.dns_zone_rg
   zone_name           = var.dns_zone_name
   ttl                 = 300
   records = [
-    module.srv_right_11.public_ip
+    module.linux_right_srv11.public_ip
   ]
 }
 
 resource "azurerm_dns_a_record" "right_env1_sdgw" {
-  for_each            = module.right_env1_sdgw
+  for_each            = module.linux_right_env1_sdgw
   name                = format("ars-right-%s", replace(each.key, "_", "-"))
   resource_group_name = var.dns_zone_rg
   zone_name           = var.dns_zone_name
