@@ -13,6 +13,9 @@ locals {
     right_env_sdgw = [cidrsubnet(var.cidr, 4, 13)]
   }
   private_ips = {
+    left_u_hub_ilb = {
+      obew   = cidrhost(module.vnet_left_u_hub.subnets["data"].address_prefixes[0], 4),
+    }
     left_u_hub_fw = {
       mgmt_ip   = cidrhost(module.vnet_left_u_hub.subnets["mgmt"].address_prefixes[0], 5),
       eth1_1_ip = cidrhost(module.vnet_left_u_hub.subnets["data"].address_prefixes[0], 5),

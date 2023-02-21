@@ -27,6 +27,15 @@ module "vnet_left_u_hub" {
   }
 }
 
+module "ilb_left_u_hub" {
+  source = "../modules/ilb"
+
+  name                = "${var.name}-left-u-hub"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+  subnet_id           = module.vnet_left_u_hub.subnets["data"].id
+  private_ip_address  = local.private_ips.left_u_hub_ilb["obew"]
+}
 
 
 resource "panos_panorama_template_stack" "azure_left_u_hub_fw" {
@@ -72,7 +81,9 @@ module "cfg_left_u_hub_fw" {
   interfaces = {
     "ethernet1/1" = {
       static_ips = [format("%s/%s", local.private_ips.left_u_hub_fw["eth1_1_ip"], local.subnet_prefix_length)]
-      zone       = "data"
+
+      zone               = "data"
+      management_profile = "hc-azure"
     }
   }
   routes = {
@@ -110,6 +121,8 @@ module "left_u_hub_fw" {
       public_ip          = true
       subnet_id          = module.vnet_left_u_hub.subnets["data"].id
       private_ip_address = local.private_ips.left_u_hub_fw["eth1_1_ip"]
+
+      load_balancer_backend_address_pool_id = module.ilb_left_u_hub.backend_address_pool_ids["obew"]
     }
   }
 
@@ -307,7 +320,7 @@ module "tunnel-left_u_ipsec_fw1-vng_right_c1" {
         type  = "ipaddr"
         value = local.public_ips["right_vng"][0]
       }
-      template = module.cfg_left_u_ipsec_fw1.template_name
+      template         = module.cfg_left_u_ipsec_fw1.template_name
       do_not_configure = true
     }
   }
@@ -342,7 +355,7 @@ module "tunnel-left_u_ipsec_fw2-vng_right_c2" {
         type  = "ipaddr"
         value = local.public_ips["right_vng"][0]
       }
-      template = module.cfg_left_u_ipsec_fw2.template_name
+      template         = module.cfg_left_u_ipsec_fw2.template_name
       do_not_configure = true
     }
   }
