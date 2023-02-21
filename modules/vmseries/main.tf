@@ -36,6 +36,13 @@ locals {
   ]
 }
 
+resource "azurerm_network_interface_backend_address_pool_association" "this" {
+  for_each                = { for k, v in var.interfaces : k => v if contains(keys(v), "load_balancer_backend_address_pool_id") }
+  ip_configuration_name   = "primary"
+  network_interface_id    = azurerm_network_interface.this[each.key].id
+  backend_address_pool_id = each.value["load_balancer_backend_address_pool_id"]
+}
+
 resource "azurerm_linux_virtual_machine" "this" {
   resource_group_name = var.resource_group_name
   location            = var.location
