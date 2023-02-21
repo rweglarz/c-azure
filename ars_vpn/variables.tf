@@ -74,3 +74,10 @@ variable "router_ids" {
     right_env2_sdgw2 = "192.168.20.2"
   }
 }
+
+variable "med" {
+  default = {
+    left_u_ipsec_fw1 = 10
+    left_u_ipsec_fw2 = 90
+  }
+}

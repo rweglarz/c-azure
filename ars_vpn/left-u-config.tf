@@ -142,7 +142,7 @@ resource "panos_panorama_bgp_export_rule_group" "left_u_ipsec_fw1" {
     action              = "allow"
     match_as_path_regex = "65515"
     as_path_type        = "remove"
-    med                 = 90
+    med                 = var.med["left_u_ipsec_fw1"]
     used_by = [
       panos_panorama_bgp_peer_group.left_u_ipsec_fw1-vng_right.name
     ]
@@ -154,7 +154,7 @@ resource "panos_panorama_bgp_export_rule_group" "left_u_ipsec_fw1" {
     ]
     match_route_table   = "unicast"
     action              = "allow"
-    med                 = 90
+    med                 = var.med["left_u_ipsec_fw1"]
     match_as_path_regex = "65515"
     as_path_type        = "remove"
     used_by = [
@@ -176,7 +176,7 @@ resource "panos_panorama_bgp_export_rule_group" "left_u_ipsec_fw2" {
     action              = "allow"
     match_as_path_regex = "65515"
     as_path_type        = "remove"
-    med                 = 10
+    med                 = var.med["left_u_ipsec_fw2"]
     used_by = [
       panos_panorama_bgp_peer_group.left_u_ipsec_fw2-vng_right.name
     ]
@@ -190,7 +190,7 @@ resource "panos_panorama_bgp_export_rule_group" "left_u_ipsec_fw2" {
     action              = "allow"
     match_as_path_regex = "65515"
     as_path_type        = "remove"
-    med                 = 10
+    med                 = var.med["left_u_ipsec_fw2"]
     used_by = [
       panos_panorama_bgp_peer_group.left_u_ipsec_fw1-left_u_hub_asr.name
     ]
