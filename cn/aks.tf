@@ -1,65 +1,46 @@
-resource "azurerm_kubernetes_cluster" "this" {
-  name                = "${var.name}-k8s1"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  dns_prefix          = "k8s1"
-  kubernetes_version  = var.kubernetes_version
+module "aks" {
+  source = "../modules/aks"
 
-  role_based_access_control_enabled = true
+  name                   = "${var.name}-k8s1"
+  resource_group_name    = azurerm_resource_group.rg.name
+  location               = azurerm_resource_group.rg.location
+  subnet_id              = azurerm_subnet.aks.id
+  application_gateway_id = module.appgw.id
+  outbound_type          = "userAssignedNATGateway"
 
-  identity {
-    type = "SystemAssigned"
-  }
-
-  network_profile {
-    network_plugin = "azure"
-    outbound_type  = "userAssignedNATGateway"
-  }
-
-  default_node_pool {
-    name            = "default"
-    node_count      = 1
-    vm_size         = "Standard_A2_v2"
-    os_disk_size_gb = 30
-    vnet_subnet_id  = azurerm_subnet.aks.id
-  }
-  api_server_authorized_ip_ranges = concat(
+  mgmt_cidrs = concat(
     [for r in var.mgmt_ips : "${r.cidr}"],
-    ["${azurerm_public_ip.ngw.ip_address}/32"],
-    ["${var.panorama1_ip}/32", "${var.panorama2_ip}/32"],
+    [for ip in [var.panorama1_ip, var.panorama2_ip, azurerm_public_ip.ngw.ip_address]: "${ip}/32"],
   )
+}
 
-  ingress_application_gateway {
-    gateway_id = azurerm_application_gateway.appgw.id
+module "appgw" {
+  source = "../modules/appgw"
+
+  name                = "${var.name}-appgw"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  subnet_id           = azurerm_subnet.appgw.id
+  tier                = "Standard_v2"
+  use_public_ip       = true
+  private_ip_address  = cidrhost(azurerm_subnet.appgw.address_prefixes[0], 10)
+
+  virtual_hosts = {
+    "dummy" = {
+      priority = 11
+      host_names = [
+        "dummy.internal",
+      ]
+      ip_addresses = []
+    }
   }
-  depends_on = [
-    azurerm_subnet_nat_gateway_association.aks,
-  ]
-}
-resource "azurerm_kubernetes_cluster_node_pool" "this" {
-  kubernetes_cluster_id = azurerm_kubernetes_cluster.this.id
-  name                  = "pool1"
-  node_count            = 2
-  vm_size               = "Standard_D3_v2"
-  os_disk_size_gb       = 30
-  vnet_subnet_id        = azurerm_subnet.aks.id
+
+  managed_by_agic = true
 }
 
-
-provider "kubernetes" {
-  host                   = azurerm_kubernetes_cluster.this.kube_config.0.host
-  username               = azurerm_kubernetes_cluster.this.kube_config.0.username
-  password               = azurerm_kubernetes_cluster.this.kube_config.0.password
-  client_certificate     = base64decode(azurerm_kubernetes_cluster.this.kube_config.0.client_certificate)
-  client_key             = base64decode(azurerm_kubernetes_cluster.this.kube_config.0.client_key)
-  cluster_ca_certificate = base64decode(azurerm_kubernetes_cluster.this.kube_config.0.cluster_ca_certificate)
-
-  load_config_file = "false"
+output "aks_identities" {
+  value = {
+    aks = module.aks.identity
+    appgw = module.aks.ingress_application_gateway_identity
+  }
 }
-
-
-/*
-output "kubeconfig" {
-  value     = azurerm_kubernetes_cluster.this.kube_config_raw
-}
-*/

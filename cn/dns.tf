@@ -4,6 +4,6 @@ resource "azurerm_dns_a_record" "appgw" {
   zone_name           = var.dns_zone_name
   ttl                 = 300
   records = [
-    azurerm_public_ip.appgw.ip_address
+    module.appgw.public_ip_address
   ]
 }
