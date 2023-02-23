@@ -18,12 +18,12 @@ protocol kernel {
   learn yes;
 }
 
-protocol bgp fw1 {
+protocol bgp peer1 {
   import filter {
-        accept;
+    accept;
   };
   export filter {
-        accept;
+    if (net ~ [10.0.0.0/8+] ) then accept;
   };
   multihop;
   local as ${local_asn};
@@ -32,12 +32,12 @@ protocol bgp fw1 {
   neighbor ${peer1_ip} as ${peer1_asn};
 }
 
-protocol bgp fw2 {
+protocol bgp peer2 {
   import filter {
-        accept;
+    accept;
   };
   export filter {
-        accept;
+    if (net ~ [10.0.0.0/8+] ) then accept;
   };
   multihop;
   local as ${local_asn};
