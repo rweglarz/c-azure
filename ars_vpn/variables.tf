@@ -53,6 +53,8 @@ variable "asn" {
     ars              = "65515"
     left_u_ipsec_fw1 = "65001"
     left_u_ipsec_fw2 = "65001"
+    left_b_ipsec_fw1 = "65002"
+    left_b_ipsec_fw2 = "65002"
     right_env_fw1    = "65011"
     right_env_fw2    = "65011"
     right_env1_sdgw1 = "65101"
@@ -66,6 +68,8 @@ variable "router_ids" {
   default = {
     left_u_ipsec_fw1 = "192.168.0.1"
     left_u_ipsec_fw2 = "192.168.0.2"
+    left_b_ipsec_fw1 = "192.168.0.3"
+    left_b_ipsec_fw2 = "192.168.0.4"
     right_env_fw1    = "192.168.1.1"
     right_env_fw2    = "192.168.1.2"
     right_env1_sdgw1 = "192.168.10.1"
@@ -79,5 +83,7 @@ variable "med" {
   default = {
     left_u_ipsec_fw1 = 10
     left_u_ipsec_fw2 = 90
+    left_b_ipsec_fw1 = 10
+    left_b_ipsec_fw2 = 90
   }
 }

@@ -53,38 +53,39 @@ resource "azurerm_virtual_network_gateway" "right" {
   }
 }
 
-resource "azurerm_local_network_gateway" "right_left_fw1" {
-  name                = "${var.name}-right--left-fw1"
+
+resource "azurerm_local_network_gateway" "right_left_u_fw1" {
+  name                = "${var.name}-right--left-u-fw1"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 
   gateway_address = local.public_ips["left_u_ipsec_fw1"][0]
   bgp_settings {
     asn                 = var.asn["left_u_ipsec_fw1"]
-    bgp_peering_address = "169.254.21.1"
+    bgp_peering_address = local.private_ips.left_u_ipsec_fw1["tun11_ip"]
   }
 }
 
-resource "azurerm_local_network_gateway" "right_left_fw2" {
-  name                = "${var.name}-right--left-fw2"
+resource "azurerm_local_network_gateway" "right_left_u_fw2" {
+  name                = "${var.name}-right--left-u-fw2"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 
   gateway_address = local.public_ips["left_u_ipsec_fw2"][0]
   bgp_settings {
     asn                 = var.asn["left_u_ipsec_fw2"]
-    bgp_peering_address = "169.254.21.3"
+    bgp_peering_address = local.private_ips.left_u_ipsec_fw2["tun11_ip"]
   }
 }
 
-resource "azurerm_virtual_network_gateway_connection" "right_left_1" {
-  name                = "${var.name}-right-left-1"
+resource "azurerm_virtual_network_gateway_connection" "right_left_u_1" {
+  name                = "${var.name}-right-left-u-1"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 
   type                       = "IPsec"
   virtual_network_gateway_id = azurerm_virtual_network_gateway.right.id
-  local_network_gateway_id   = azurerm_local_network_gateway.right_left_fw1.id
+  local_network_gateway_id   = azurerm_local_network_gateway.right_left_u_fw1.id
 
   enable_bgp = true
 
@@ -96,14 +97,77 @@ resource "azurerm_virtual_network_gateway_connection" "right_left_1" {
   }
 }
 
-resource "azurerm_virtual_network_gateway_connection" "right_left_2" {
-  name                = "${var.name}-right-left-2"
+resource "azurerm_virtual_network_gateway_connection" "right_left_u_2" {
+  name                = "${var.name}-right-left-u-2"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 
   type                       = "IPsec"
   virtual_network_gateway_id = azurerm_virtual_network_gateway.right.id
-  local_network_gateway_id   = azurerm_local_network_gateway.right_left_fw2.id
+  local_network_gateway_id   = azurerm_local_network_gateway.right_left_u_fw2.id
+
+  enable_bgp = true
+
+  shared_key = var.psk
+
+  custom_bgp_addresses {
+    primary   = "169.254.22.2"
+    secondary = "169.254.22.4"
+  }
+}
+
+
+resource "azurerm_local_network_gateway" "right_left_b_fw1" {
+  name                = "${var.name}-right--left-b-fw1"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+
+  gateway_address = local.public_ips["left_b_ipsec_fw1"][0]
+  bgp_settings {
+    asn                 = var.asn["left_b_ipsec_fw1"]
+    bgp_peering_address = local.private_ips.left_b_ipsec_fw1["tun11_ip"]
+  }
+}
+
+resource "azurerm_local_network_gateway" "right_left_b_fw2" {
+  name                = "${var.name}-right--left-b-fw2"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+
+  gateway_address = local.public_ips["left_b_ipsec_fw2"][0]
+  bgp_settings {
+    asn                 = var.asn["left_b_ipsec_fw2"]
+    bgp_peering_address = local.private_ips.left_b_ipsec_fw2["tun11_ip"]
+  }
+}
+
+resource "azurerm_virtual_network_gateway_connection" "right_left_b_1" {
+  name                = "${var.name}-right-left-b-1"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+
+  type                       = "IPsec"
+  virtual_network_gateway_id = azurerm_virtual_network_gateway.right.id
+  local_network_gateway_id   = azurerm_local_network_gateway.right_left_b_fw1.id
+
+  enable_bgp = true
+
+  shared_key = var.psk
+
+  custom_bgp_addresses {
+    primary   = "169.254.22.1"
+    secondary = "169.254.22.3"
+  }
+}
+
+resource "azurerm_virtual_network_gateway_connection" "right_left_b_2" {
+  name                = "${var.name}-right-left-b-2"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+
+  type                       = "IPsec"
+  virtual_network_gateway_id = azurerm_virtual_network_gateway.right.id
+  local_network_gateway_id   = azurerm_local_network_gateway.right_left_b_fw2.id
 
   enable_bgp = true
 

@@ -37,6 +37,30 @@ locals {
       eth1_2_gw = cidrhost(module.vnet_left_u_hub.subnets["private"].address_prefixes[0], 1),
       tun11_ip  = "169.254.21.3"
     }
+    left_b_hub_ilb = {
+      obew   = cidrhost(module.vnet_left_b_hub.subnets["data"].address_prefixes[0], 4),
+    }
+    left_b_hub_fw = {
+      mgmt_ip   = cidrhost(module.vnet_left_b_hub.subnets["mgmt"].address_prefixes[0], 5),
+      eth1_1_ip = cidrhost(module.vnet_left_b_hub.subnets["data"].address_prefixes[0], 5),
+      eth1_1_gw = cidrhost(module.vnet_left_b_hub.subnets["data"].address_prefixes[0], 1),
+    }
+    left_b_ipsec_fw1 = {
+      mgmt_ip   = cidrhost(module.vnet_left_b_hub.subnets["mgmt"].address_prefixes[0], 6),
+      eth1_1_ip = cidrhost(module.vnet_left_b_hub.subnets["internet"].address_prefixes[0], 6),
+      eth1_1_gw = cidrhost(module.vnet_left_b_hub.subnets["internet"].address_prefixes[0], 1),
+      eth1_2_ip = cidrhost(module.vnet_left_b_hub.subnets["private"].address_prefixes[0], 6),
+      eth1_2_gw = cidrhost(module.vnet_left_b_hub.subnets["private"].address_prefixes[0], 1),
+      tun11_ip  = "169.254.21.5"
+    }
+    left_b_ipsec_fw2 = {
+      mgmt_ip   = cidrhost(module.vnet_left_b_hub.subnets["mgmt"].address_prefixes[0], 7),
+      eth1_1_ip = cidrhost(module.vnet_left_b_hub.subnets["internet"].address_prefixes[0], 7),
+      eth1_1_gw = cidrhost(module.vnet_left_b_hub.subnets["internet"].address_prefixes[0], 1),
+      eth1_2_ip = cidrhost(module.vnet_left_b_hub.subnets["private"].address_prefixes[0], 7),
+      eth1_2_gw = cidrhost(module.vnet_left_b_hub.subnets["private"].address_prefixes[0], 1),
+      tun11_ip  = "169.254.21.7"
+    }
     right_hub_fw = {
       mgmt_ip   = cidrhost(module.vnet_right_hub.subnets["mgmt"].address_prefixes[0], 5),
       eth1_1_ip = cidrhost(module.vnet_right_hub.subnets["data"].address_prefixes[0], 5),
@@ -76,6 +100,12 @@ locals {
     ],
     left_u_ipsec_fw2 = [
       one([for k, v in module.left_u_ipsec_fw2.public_ips : v if length(regexall("internet", k)) > 0]),
+    ],
+    left_b_ipsec_fw1 = [
+      one([for k, v in module.left_b_ipsec_fw1.public_ips : v if length(regexall("internet", k)) > 0]),
+    ],
+    left_b_ipsec_fw2 = [
+      one([for k, v in module.left_b_ipsec_fw2.public_ips : v if length(regexall("internet", k)) > 0]),
     ],
     right_vng = [
       azurerm_virtual_network_gateway.right.bgp_settings[0].peering_addresses[0].tunnel_ip_addresses[0],

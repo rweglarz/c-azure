@@ -28,6 +28,38 @@ resource "azurerm_dns_a_record" "left-u-ipsec-fw2" {
   ]
 }
 
+
+resource "azurerm_dns_a_record" "left-b-hub-fw" {
+  name                = "ars-left-b-hub-fw"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.left_b_hub_fw.mgmt_ip_address
+  ]
+}
+
+resource "azurerm_dns_a_record" "left-b-ipsec-fw1" {
+  name                = "ars-left-b-ipsec-fw1"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.left_b_ipsec_fw1.mgmt_ip_address
+  ]
+}
+
+resource "azurerm_dns_a_record" "left-b-ipsec-fw2" {
+  name                = "ars-left-b-ipsec-fw2"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.left_b_ipsec_fw2.mgmt_ip_address
+  ]
+}
+
+
 resource "azurerm_dns_a_record" "right-hub-fw" {
   name                = "ars-right-hub-fw"
   resource_group_name = var.dns_zone_rg
@@ -55,7 +87,17 @@ resource "azurerm_dns_a_record" "left_u_srv11" {
   zone_name           = var.dns_zone_name
   ttl                 = 300
   records = [
-    module.linux_left_srv11.public_ip
+    module.linux_left_u_srv11.public_ip
+  ]
+}
+
+resource "azurerm_dns_a_record" "left_b_srv11" {
+  name                = "ars-left-b-srv11"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 300
+  records = [
+    module.linux_left_b_srv11.public_ip
   ]
 }
 

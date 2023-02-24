@@ -407,14 +407,15 @@ resource "azurerm_route_table" "left_u_hub_private" {
 
 resource "azurerm_route" "left_u_hub_private" {
   for_each = {
-    srv1 = "172.16.1.0/24"
+    srv1 = local.vnet_address_space["left_u_srv1"][0],
+    srv2 = local.vnet_address_space["left_u_srv2"][0],
   }
   name                   = each.key
   resource_group_name    = azurerm_resource_group.this.name
   route_table_name       = azurerm_route_table.left_u_hub_private.name
   address_prefix         = each.value
   next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = local.private_ips.left_u_hub_fw["eth1_1_ip"]
+  next_hop_in_ip_address = local.private_ips.left_u_hub_ilb["obew"]
 }
 
 resource "azurerm_subnet_route_table_association" "left_u_hub_private" {
