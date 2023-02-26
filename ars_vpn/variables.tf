@@ -88,3 +88,15 @@ variable "med" {
     left_b_ipsec_fw2 = 90
   }
 }
+
+variable "left_u_hub_fws" {
+  default = {
+    "1" = {}
+  }
+}
+
+variable "left_b_hub_fws" {
+  default = {
+    "1" = {}
+  }
+}

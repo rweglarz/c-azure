@@ -100,11 +100,13 @@ module "cfg_left_u_hub_fw" {
 
 
 module "left_u_hub_fw" {
+  for_each = var.left_u_hub_fws
+
   source              = "../modules/vmseries"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
 
-  name  = "${var.name}-left-u-hub-fw"
+  name  = "${var.name}-left-u-hub-fw-${each.key}"
   panos = var.fw_version
 
   username = var.username

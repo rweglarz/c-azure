@@ -4,7 +4,7 @@ resource "azurerm_dns_a_record" "left-u-hub-fw" {
   zone_name           = var.dns_zone_name
   ttl                 = 300
   records = [
-    module.left_u_hub_fw.mgmt_ip_address
+    module.left_u_hub_fw["1"].mgmt_ip_address
   ]
 }
 
@@ -35,7 +35,7 @@ resource "azurerm_dns_a_record" "left-b-hub-fw" {
   zone_name           = var.dns_zone_name
   ttl                 = 300
   records = [
-    module.left_b_hub_fw.mgmt_ip_address
+    module.left_b_hub_fw["1"].mgmt_ip_address
   ]
 }
 
