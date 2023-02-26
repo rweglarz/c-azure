@@ -102,6 +102,7 @@ resource "azurerm_virtual_network_peering" "vnet_left_u_srv_1-vnet_left_u_hub" {
   virtual_network_name      = module.vnet_left_u_srv_1.vnet.name
   remote_virtual_network_id = module.vnet_left_u_hub.vnet.id
   use_remote_gateways       = true
+  allow_forwarded_traffic   = true
   depends_on = [
     azurerm_virtual_network_peering.vnet_left_u_hub-vnet_left_u_srv_1
   ]
@@ -122,6 +123,7 @@ resource "azurerm_virtual_network_peering" "vnet_left_b_srv_1-vnet_left_b_hub" {
   virtual_network_name      = module.vnet_left_b_srv_1.vnet.name
   remote_virtual_network_id = module.vnet_left_b_hub.vnet.id
   use_remote_gateways       = true
+  allow_forwarded_traffic   = true
   depends_on = [
     azurerm_virtual_network_peering.vnet_left_b_hub-vnet_left_b_srv_1
   ]
