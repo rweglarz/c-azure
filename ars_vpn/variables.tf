@@ -3,12 +3,13 @@ variable "name" {
   type        = string
 }
 
-variable "region" {
+variable "region_m" {
   type    = string
-  default = "Germany West Central"
+  default = "North Europe"
+  #North Europe
 }
 
-variable "region_fl" {
+variable "region_b" {
   type    = string
   default = "West Europe"
 }

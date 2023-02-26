@@ -1,7 +1,7 @@
 module "vnet_right_env_sdgw" {
   source              = "../modules/vnet"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   name          = "${var.name}-right-env-sdgw"
   address_space = local.vnet_address_space.right_env_sdgw
@@ -10,12 +10,12 @@ module "vnet_right_env_sdgw" {
     "env1" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.right_env_sdgw[0], 3, 2)]
       associate_nsg             = true
-      network_security_group_id = module.basic.sg_id["mgmt"]
+      network_security_group_id = module.basic_rg1.sg_id["mgmt"]
     },
     "env2" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.right_env_sdgw[0], 3, 3)]
       attach_nsg                = true
-      network_security_group_id = module.basic.sg_id["mgmt"]
+      network_security_group_id = module.basic_rg1.sg_id["mgmt"]
     },
     "RouteServerSubnet" = {
       address_prefixes = [cidrsubnet(local.vnet_address_space.right_env_sdgw[0], 3, 7)]
@@ -119,29 +119,29 @@ module "linux_right_env1_sdgw" {
   source   = "../modules/linux"
 
   name                = format("%s-right-%s", var.name, replace(each.key, "_", "-"))
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.rg1.location
+  resource_group_name = azurerm_resource_group.rg1.name
 
   subnet_id            = module.vnet_right_env_sdgw.subnets["env1"].id
   private_ip_address   = each.value.local_ip
   enable_ip_forwarding = true
 
   password    = var.password
-  public_key  = azurerm_ssh_public_key.this.public_key
+  public_key  = azurerm_ssh_public_key.rg1.public_key
   custom_data = data.template_cloudinit_config.sdgw[each.key].rendered
 }
 
 
 resource "azurerm_virtual_network_peering" "vnet_right_env_fw-vnet_right_env_sdgw" {
   name                      = "right-env-fw--right-env-sdgw"
-  resource_group_name       = azurerm_resource_group.this.name
+  resource_group_name       = azurerm_resource_group.rg1.name
   virtual_network_name      = module.vnet_right_env_fw.vnet.name
   remote_virtual_network_id = module.vnet_right_env_sdgw.vnet.id
 }
 
 resource "azurerm_virtual_network_peering" "vnet_right_env_sdgw-vnet_right_env_fw" {
   name                      = "right-env-sdgw--right-env-fw"
-  resource_group_name       = azurerm_resource_group.this.name
+  resource_group_name       = azurerm_resource_group.rg1.name
   virtual_network_name      = module.vnet_right_env_sdgw.vnet.name
   remote_virtual_network_id = module.vnet_right_env_fw.vnet.id
   depends_on = [
@@ -152,8 +152,8 @@ resource "azurerm_virtual_network_peering" "vnet_right_env_sdgw-vnet_right_env_f
 
 resource "azurerm_route_table" "right_env1_sdgw" {
   name                = "${var.name}-right-env1-sdgw"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 }
 
 resource "azurerm_route" "right_env1_sdgw" {
@@ -162,7 +162,7 @@ resource "azurerm_route" "right_env1_sdgw" {
     left = "172.16.0.0/21"
   }
   name                   = each.key
-  resource_group_name    = azurerm_resource_group.this.name
+  resource_group_name    = azurerm_resource_group.rg1.name
   route_table_name       = azurerm_route_table.right_env1_sdgw.name
   address_prefix         = each.value
   next_hop_type          = "VirtualAppliance"

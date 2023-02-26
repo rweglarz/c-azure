@@ -1,7 +1,7 @@
 module "vnet_right_env_fw" {
   source              = "../modules/vnet"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   name          = "${var.name}-right-env-fw"
   address_space = local.vnet_address_space.right_env_fw
@@ -10,7 +10,7 @@ module "vnet_right_env_fw" {
     "mgmt" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.right_env_fw[0], 3, 0)]
       associate_nsg             = true
-      network_security_group_id = module.basic.sg_id["mgmt"]
+      network_security_group_id = module.basic_rg1.sg_id["mgmt"]
     },
     "core" = {
       address_prefixes = [cidrsubnet(local.vnet_address_space.right_env_fw[0], 3, 1)]
@@ -31,8 +31,8 @@ module "vnet_right_env_fw" {
 
 resource "azurerm_public_ip" "right_env_fw_asr" {
   name                = "${var.name}-right-env-fw-asr"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -40,8 +40,8 @@ resource "azurerm_public_ip" "right_env_fw_asr" {
 
 resource "azurerm_route_server" "right_env_fw" {
   name                             = "${var.name}-right-env_fw"
-  resource_group_name              = azurerm_resource_group.this.name
-  location                         = azurerm_resource_group.this.location
+  resource_group_name              = azurerm_resource_group.rg1.name
+  location                         = azurerm_resource_group.rg1.location
   sku                              = "Standard"
   public_ip_address_id             = azurerm_public_ip.right_env_fw_asr.id
   subnet_id                        = module.vnet_right_env_fw.subnets["RouteServerSubnet"].id
@@ -59,8 +59,8 @@ resource "azurerm_route_server_bgp_connection" "right_env_fw-right_env_fw1" {
 
 module "right_env_fw1" {
   source              = "../modules/vmseries"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   name  = "${var.name}-right-env-fw1"
   panos = var.fw_version
@@ -102,14 +102,14 @@ module "right_env_fw1" {
 
 resource "azurerm_virtual_network_peering" "vnet_right_hub-vnet_right_env_fw" {
   name                      = "right-hub--right-env_fw"
-  resource_group_name       = azurerm_resource_group.this.name
+  resource_group_name       = azurerm_resource_group.rg1.name
   virtual_network_name      = module.vnet_right_hub.vnet.name
   remote_virtual_network_id = module.vnet_right_env_fw.vnet.id
 }
 
 resource "azurerm_virtual_network_peering" "vnet_right_env_fw-vnet_right_hub" {
   name                      = "right-env-fw--right-hub"
-  resource_group_name       = azurerm_resource_group.this.name
+  resource_group_name       = azurerm_resource_group.rg1.name
   virtual_network_name      = module.vnet_right_env_fw.vnet.name
   remote_virtual_network_id = module.vnet_right_hub.vnet.id
   depends_on = [
@@ -120,8 +120,8 @@ resource "azurerm_virtual_network_peering" "vnet_right_env_fw-vnet_right_hub" {
 
 resource "azurerm_route_table" "right_env_fw_core" {
   name                          = "${var.name}-right-env-fw-core"
-  resource_group_name           = azurerm_resource_group.this.name
-  location                      = azurerm_resource_group.this.location
+  resource_group_name           = azurerm_resource_group.rg1.name
+  location                      = azurerm_resource_group.rg1.location
 }
 
 resource "azurerm_route" "right_hub_env_fw_core" {
@@ -129,7 +129,7 @@ resource "azurerm_route" "right_hub_env_fw_core" {
     left = "172.16.0.0/21"
   }
   name                   = each.key
-  resource_group_name    = azurerm_resource_group.this.name
+  resource_group_name    = azurerm_resource_group.rg1.name
   route_table_name       = azurerm_route_table.right_env_fw_core.name
   address_prefix         = each.value
   next_hop_type          = "VirtualAppliance"

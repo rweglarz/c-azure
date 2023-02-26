@@ -1,21 +1,21 @@
 resource "azurerm_public_ip" "vng_right_c1" {
   name                = "${var.name}-right-vng-c1"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
   allocation_method   = "Dynamic"
 }
 
 resource "azurerm_public_ip" "vng_right_c2" {
   name                = "${var.name}-right-vng-c2"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
   allocation_method   = "Dynamic"
 }
 
 resource "azurerm_virtual_network_gateway" "right" {
   name                = "${var.name}-right"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   type     = "Vpn"
   vpn_type = "RouteBased"
@@ -56,8 +56,8 @@ resource "azurerm_virtual_network_gateway" "right" {
 
 resource "azurerm_local_network_gateway" "right_left_u_fw1" {
   name                = "${var.name}-right--left-u-fw1"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   gateway_address = local.public_ips["left_u_ipsec_fw1"][0]
   bgp_settings {
@@ -68,8 +68,8 @@ resource "azurerm_local_network_gateway" "right_left_u_fw1" {
 
 resource "azurerm_local_network_gateway" "right_left_u_fw2" {
   name                = "${var.name}-right--left-u-fw2"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   gateway_address = local.public_ips["left_u_ipsec_fw2"][0]
   bgp_settings {
@@ -80,8 +80,8 @@ resource "azurerm_local_network_gateway" "right_left_u_fw2" {
 
 resource "azurerm_virtual_network_gateway_connection" "right_left_u_1" {
   name                = "${var.name}-right-left-u-1"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   type                       = "IPsec"
   virtual_network_gateway_id = azurerm_virtual_network_gateway.right.id
@@ -99,8 +99,8 @@ resource "azurerm_virtual_network_gateway_connection" "right_left_u_1" {
 
 resource "azurerm_virtual_network_gateway_connection" "right_left_u_2" {
   name                = "${var.name}-right-left-u-2"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   type                       = "IPsec"
   virtual_network_gateway_id = azurerm_virtual_network_gateway.right.id
@@ -119,8 +119,8 @@ resource "azurerm_virtual_network_gateway_connection" "right_left_u_2" {
 
 resource "azurerm_local_network_gateway" "right_left_b_fw1" {
   name                = "${var.name}-right--left-b-fw1"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   gateway_address = local.public_ips["left_b_ipsec_fw1"][0]
   bgp_settings {
@@ -131,8 +131,8 @@ resource "azurerm_local_network_gateway" "right_left_b_fw1" {
 
 resource "azurerm_local_network_gateway" "right_left_b_fw2" {
   name                = "${var.name}-right--left-b-fw2"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   gateway_address = local.public_ips["left_b_ipsec_fw2"][0]
   bgp_settings {
@@ -143,8 +143,8 @@ resource "azurerm_local_network_gateway" "right_left_b_fw2" {
 
 resource "azurerm_virtual_network_gateway_connection" "right_left_b_1" {
   name                = "${var.name}-right-left-b-1"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   type                       = "IPsec"
   virtual_network_gateway_id = azurerm_virtual_network_gateway.right.id
@@ -162,8 +162,8 @@ resource "azurerm_virtual_network_gateway_connection" "right_left_b_1" {
 
 resource "azurerm_virtual_network_gateway_connection" "right_left_b_2" {
   name                = "${var.name}-right-left-b-2"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   type                       = "IPsec"
   virtual_network_gateway_id = azurerm_virtual_network_gateway.right.id

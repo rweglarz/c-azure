@@ -1,7 +1,7 @@
 module "vnet_right_hub" {
   source              = "../modules/vnet"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   name          = "${var.name}-right-hub"
   address_space = local.vnet_address_space.right_hub
@@ -10,7 +10,7 @@ module "vnet_right_hub" {
     "mgmt" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.right_hub[0], 3, 0)]
       associate_nsg             = true
-      network_security_group_id = module.basic.sg_id["mgmt"]
+      network_security_group_id = module.basic_rg1.sg_id["mgmt"]
     },
     "data" = {
       address_prefixes = [cidrsubnet(local.vnet_address_space.right_hub[0], 3, 1)]
@@ -63,8 +63,8 @@ module "cfg_right_hub_fw" {
 
 module "right_hub_fw" {
   source              = "../modules/vmseries"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   name  = "${var.name}-right-hub-fw"
   panos = var.fw_version
@@ -95,8 +95,8 @@ module "right_hub_fw" {
 
 resource "azurerm_public_ip" "right_hub_asr" {
   name                = "${var.name}-right-hub-asr"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -104,8 +104,8 @@ resource "azurerm_public_ip" "right_hub_asr" {
 
 resource "azurerm_route_server" "right_hub" {
   name                             = "${var.name}-right-hub"
-  resource_group_name              = azurerm_resource_group.this.name
-  location                         = azurerm_resource_group.this.location
+  resource_group_name              = azurerm_resource_group.rg1.name
+  location                         = azurerm_resource_group.rg1.location
   sku                              = "Standard"
   public_ip_address_id             = azurerm_public_ip.right_hub_asr.id
   subnet_id                        = module.vnet_right_hub.subnets["RouteServerSubnet"].id
@@ -122,8 +122,8 @@ resource "azurerm_route_server_bgp_connection" "right_hub-right_env_fw1" {
 
 resource "azurerm_route_table" "right_hub_gateway_subnet" {
   name                          = "${var.name}-right-hub-gateway-subnet"
-  resource_group_name           = azurerm_resource_group.this.name
-  location                      = azurerm_resource_group.this.location
+  resource_group_name           = azurerm_resource_group.rg1.name
+  location                      = azurerm_resource_group.rg1.location
   disable_bgp_route_propagation = true
 }
 
@@ -132,7 +132,7 @@ resource "azurerm_route" "right_hub_gateway_subnet" {
     envs = "10.0.0.0/8"
   }
   name                   = each.key
-  resource_group_name    = azurerm_resource_group.this.name
+  resource_group_name    = azurerm_resource_group.rg1.name
   route_table_name       = azurerm_route_table.right_hub_gateway_subnet.name
   address_prefix         = each.value
   next_hop_type          = "VirtualAppliance"

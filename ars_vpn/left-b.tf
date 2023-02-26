@@ -1,7 +1,7 @@
 module "vnet_left_b_hub" {
   source              = "../modules/vnet"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg2.name
+  location            = azurerm_resource_group.rg2.location
 
   name          = "${var.name}-left-b-hub"
   address_space = local.vnet_address_space.left_b_hub
@@ -10,7 +10,7 @@ module "vnet_left_b_hub" {
     "mgmt" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.left_b_hub[0], 3, 0)]
       associate_nsg             = true
-      network_security_group_id = module.basic.sg_id["mgmt"]
+      network_security_group_id = module.basic_rg2.sg_id["mgmt"]
     },
     "data" = {
       address_prefixes = [cidrsubnet(local.vnet_address_space.left_b_hub[0], 3, 1)]
@@ -31,8 +31,8 @@ module "ilb_left_b_hub" {
   source = "../modules/ilb"
 
   name                = "${var.name}-left-b-hub"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg2.name
+  location            = azurerm_resource_group.rg2.location
   subnet_id           = module.vnet_left_b_hub.subnets["data"].id
   private_ip_address  = local.private_ips.left_b_hub_ilb["obew"]
 }
@@ -100,8 +100,8 @@ module "cfg_left_b_hub_fw" {
 
 module "left_b_hub_fw" {
   source              = "../modules/vmseries"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg2.name
+  location            = azurerm_resource_group.rg2.location
 
   name  = "${var.name}-left-b-hub-fw"
   panos = var.fw_version
@@ -177,8 +177,8 @@ module "cfg_left_b_ipsec_fw1" {
 
 module "left_b_ipsec_fw1" {
   source              = "../modules/vmseries"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg2.name
+  location            = azurerm_resource_group.rg2.location
 
   name  = "${var.name}-left-b-ipsec-fw1"
   panos = var.fw_version
@@ -255,8 +255,8 @@ module "cfg_left_b_ipsec_fw2" {
 
 module "left_b_ipsec_fw2" {
   source              = "../modules/vmseries"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg2.name
+  location            = azurerm_resource_group.rg2.location
 
   name  = "${var.name}-left-b-ipsec-fw2"
   panos = var.fw_version
@@ -365,8 +365,8 @@ module "tunnel-left_b_ipsec_fw2-vng_right_c2" {
 
 resource "azurerm_public_ip" "left_b_hub_asr" {
   name                = "${var.name}-left-b-hub-asr"
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.rg2.name
+  location            = azurerm_resource_group.rg2.location
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -374,8 +374,8 @@ resource "azurerm_public_ip" "left_b_hub_asr" {
 
 resource "azurerm_route_server" "left_b_hub" {
   name                             = "${var.name}-left-b-hub"
-  resource_group_name              = azurerm_resource_group.this.name
-  location                         = azurerm_resource_group.this.location
+  resource_group_name              = azurerm_resource_group.rg2.name
+  location                         = azurerm_resource_group.rg2.location
   sku                              = "Standard"
   public_ip_address_id             = azurerm_public_ip.left_b_hub_asr.id
   subnet_id                        = module.vnet_left_b_hub.subnets["RouteServerSubnet"].id
@@ -400,8 +400,8 @@ resource "azurerm_route_server_bgp_connection" "left_b_hub-left_b_ipsec_fw2" {
 
 resource "azurerm_route_table" "left_b_hub_private" {
   name                          = "${var.name}-left-b-hub-private"
-  resource_group_name           = azurerm_resource_group.this.name
-  location                      = azurerm_resource_group.this.location
+  resource_group_name           = azurerm_resource_group.rg2.name
+  location                      = azurerm_resource_group.rg2.location
   disable_bgp_route_propagation = true
 }
 
@@ -411,7 +411,7 @@ resource "azurerm_route" "left_b_hub_private" {
     srv2 = local.vnet_address_space["left_b_srv2"][0],
   }
   name                   = each.key
-  resource_group_name    = azurerm_resource_group.this.name
+  resource_group_name    = azurerm_resource_group.rg2.name
   route_table_name       = azurerm_route_table.left_b_hub_private.name
   address_prefix         = each.value
   next_hop_type          = "VirtualAppliance"
