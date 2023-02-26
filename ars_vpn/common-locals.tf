@@ -17,8 +17,6 @@ locals {
       obew   = cidrhost(module.vnet_left_u_hub.subnets["data"].address_prefixes[0], 4),
     }
     left_u_hub_fw = {
-      mgmt_ip   = cidrhost(module.vnet_left_u_hub.subnets["mgmt"].address_prefixes[0], 5),
-      eth1_1_ip = cidrhost(module.vnet_left_u_hub.subnets["data"].address_prefixes[0], 5),
       eth1_1_gw = cidrhost(module.vnet_left_u_hub.subnets["data"].address_prefixes[0], 1),
     }
     left_u_ipsec_fw1 = {
@@ -41,8 +39,6 @@ locals {
       obew   = cidrhost(module.vnet_left_b_hub.subnets["data"].address_prefixes[0], 4),
     }
     left_b_hub_fw = {
-      mgmt_ip   = cidrhost(module.vnet_left_b_hub.subnets["mgmt"].address_prefixes[0], 5),
-      eth1_1_ip = cidrhost(module.vnet_left_b_hub.subnets["data"].address_prefixes[0], 5),
       eth1_1_gw = cidrhost(module.vnet_left_b_hub.subnets["data"].address_prefixes[0], 1),
     }
     left_b_ipsec_fw1 = {

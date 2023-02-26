@@ -80,7 +80,8 @@ module "cfg_left_u_hub_fw" {
 
   interfaces = {
     "ethernet1/1" = {
-      static_ips = [format("%s/%s", local.private_ips.left_u_hub_fw["eth1_1_ip"], local.subnet_prefix_length)]
+      enable_dhcp               = true
+      create_dhcp_default_route = true
 
       zone               = "data"
       management_profile = "hc-azure"
@@ -111,16 +112,14 @@ module "left_u_hub_fw" {
 
   interfaces = {
     mgmt = {
-      device_index       = 0
-      public_ip          = true
-      subnet_id          = module.vnet_left_u_hub.subnets["mgmt"].id
-      private_ip_address = local.private_ips.left_u_hub_fw["mgmt_ip"]
+      device_index = 0
+      public_ip    = true
+      subnet_id    = module.vnet_left_u_hub.subnets["mgmt"].id
     }
     data = {
-      device_index       = 1
-      public_ip          = true
-      subnet_id          = module.vnet_left_u_hub.subnets["data"].id
-      private_ip_address = local.private_ips.left_u_hub_fw["eth1_1_ip"]
+      device_index = 1
+      public_ip    = true
+      subnet_id    = module.vnet_left_u_hub.subnets["data"].id
 
       load_balancer_backend_address_pool_id = module.ilb_left_u_hub.backend_address_pool_ids["obew"]
     }

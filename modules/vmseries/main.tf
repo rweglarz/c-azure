@@ -21,8 +21,8 @@ resource "azurerm_network_interface" "this" {
   ip_configuration {
     name                          = "primary"
     subnet_id                     = each.value.subnet_id
-    private_ip_address_allocation = "Static"
-    private_ip_address            = each.value.private_ip_address
+    private_ip_address_allocation = contains(keys(each.value), "private_ip_address") ? "Static" : "Dynamic"
+    private_ip_address            = lookup(each.value, "private_ip_address", null)
     primary                       = true
     public_ip_address_id          = lookup(each.value, "public_ip", false) == true ? azurerm_public_ip.this[each.key].id : null
   }
