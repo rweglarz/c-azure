@@ -89,7 +89,7 @@ module "right_hub_fw" {
 
   bootstrap_options = merge(
     var.bootstrap_options["common"],
-    var.bootstrap_options["right_hub_fw"],
+    local.bootstrap_options["right_hub_fw"],
   )
 }
 

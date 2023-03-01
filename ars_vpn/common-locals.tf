@@ -14,7 +14,7 @@ locals {
   }
   private_ips = {
     left_u_hub_ilb = {
-      obew   = cidrhost(module.vnet_left_u_hub.subnets["data"].address_prefixes[0], 4),
+      obew = cidrhost(module.vnet_left_u_hub.subnets["data"].address_prefixes[0], 4),
     }
     left_u_hub_fw = {
       eth1_1_gw = cidrhost(module.vnet_left_u_hub.subnets["data"].address_prefixes[0], 1),
@@ -36,7 +36,7 @@ locals {
       tun11_ip  = "169.254.21.3"
     }
     left_b_hub_ilb = {
-      obew   = cidrhost(module.vnet_left_b_hub.subnets["data"].address_prefixes[0], 4),
+      obew = cidrhost(module.vnet_left_b_hub.subnets["data"].address_prefixes[0], 4),
     }
     left_b_hub_fw = {
       eth1_1_gw = cidrhost(module.vnet_left_b_hub.subnets["data"].address_prefixes[0], 1),
@@ -107,5 +107,31 @@ locals {
       azurerm_virtual_network_gateway.right.bgp_settings[0].peering_addresses[0].tunnel_ip_addresses[0],
       azurerm_virtual_network_gateway.right.bgp_settings[0].peering_addresses[1].tunnel_ip_addresses[0],
     ]
+  }
+  bootstrap_options = {
+    left_u_hub_fw = {
+      tplname = module.cfg_left_u_hub_fw.template_name
+    }
+    left_b_hub_fw = {
+      tplname = module.cfg_left_b_hub_fw.template_name
+    }
+    left_u_ipsec_fw1 = {
+      tplname = module.cfg_left_u_ipsec_fw1.template_name
+    }
+    left_u_ipsec_fw2 = {
+      tplname = module.cfg_left_u_ipsec_fw2.template_name
+    }
+    left_b_ipsec_fw1 = {
+      tplname = module.cfg_left_b_ipsec_fw1.template_name
+    }
+    left_b_ipsec_fw2 = {
+      tplname = module.cfg_left_b_ipsec_fw2.template_name
+    }
+    right_hub_fw = {
+      tplname = module.cfg_right_hub_fw.template_name
+    }
+    right_env_fw1 = {
+      tplname = module.cfg_right_env_fw1.template_name
+    }
   }
 }

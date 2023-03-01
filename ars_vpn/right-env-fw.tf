@@ -95,7 +95,7 @@ module "right_env_fw1" {
 
   bootstrap_options = merge(
     var.bootstrap_options["common"],
-    var.bootstrap_options["right_env_fw1"],
+    local.bootstrap_options["right_env_fw1"],
   )
 }
 

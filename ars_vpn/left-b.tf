@@ -129,7 +129,7 @@ module "left_b_hub_fw" {
 
   bootstrap_options = merge(
     var.bootstrap_options["common"],
-    var.bootstrap_options["left_b_hub_fw"],
+    local.bootstrap_options["left_b_hub_fw"],
   )
 }
 
@@ -209,7 +209,7 @@ module "left_b_ipsec_fw1" {
 
   bootstrap_options = merge(
     var.bootstrap_options["common"],
-    var.bootstrap_options["left_b_ipsec_fw1"],
+    local.bootstrap_options["left_b_ipsec_fw1"],
   )
 }
 
@@ -287,7 +287,7 @@ module "left_b_ipsec_fw2" {
 
   bootstrap_options = merge(
     var.bootstrap_options["common"],
-    var.bootstrap_options["left_b_ipsec_fw2"],
+    local.bootstrap_options["left_b_ipsec_fw2"],
   )
 }
 
