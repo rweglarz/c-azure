@@ -77,7 +77,6 @@ module "sdwan_spoke1_fw" {
 
   bootstrap_options = merge(
     var.bootstrap_options["common"],
-    var.bootstrap_options["pan_pub"],
     var.bootstrap_options["sdwan_spoke1"],
   )
 }

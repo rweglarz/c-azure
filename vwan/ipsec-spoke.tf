@@ -127,7 +127,6 @@ module "ipsec_spoke1_fw" {
 
   bootstrap_options = merge(
     var.bootstrap_options["common"],
-    var.bootstrap_options["pan_pub"],
     var.bootstrap_options["ipsec_spoke1_fw"],
   )
 }

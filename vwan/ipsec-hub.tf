@@ -221,7 +221,6 @@ module "ipsec_hub1_fw1" {
 
   bootstrap_options = merge(
     var.bootstrap_options["common"],
-    var.bootstrap_options["pan_pub"],
     var.bootstrap_options["ipsec_hub1_fw1"],
   )
 }
@@ -259,7 +258,6 @@ module "ipsec_hub1_fw2" {
 
   bootstrap_options = merge(
     var.bootstrap_options["common"],
-    var.bootstrap_options["pan_pub"],
     var.bootstrap_options["ipsec_hub1_fw2"],
   )
 }
