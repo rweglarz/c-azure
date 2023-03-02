@@ -43,41 +43,42 @@ locals {
 
 
 module "sdwan_spoke1_fw" {
-  source = "github.com/PaloAltoNetworks/terraform-azurerm-vmseries-modules//modules/vmseries"
+  source = "../modules/vmseries"
 
   location            = azurerm_resource_group.rg2.location
   resource_group_name = azurerm_resource_group.rg2.name
   name                = "${local.dname}-sdwan-spoke1-fw"
   username            = var.username
   password            = var.password
-  img_version         = var.fw_version
-  img_sku             = "byol"
-  interfaces = [
-    {
+  interfaces = {
+    mgmt = {
+      device_index       = 0
       name               = "${local.dname}-sdwan-spoke1-fw-mgmt"
       subnet_id          = azurerm_subnet.sdwan_spoke1_mgmt.id
       private_ip_address = local.sdwan_spoke1_fw["mgmt_ip"]
-      create_public_ip   = true
-    },
-    {
+      public_ip          = true
+    }
+    internet = {
+      device_index         = 1
       name                 = "${local.dname}-sdwan-spoke1-fw-internet"
       subnet_id            = azurerm_subnet.sdwan_spoke1_internet.id
       private_ip_address   = local.sdwan_spoke1_fw["eth1_1_ip"]
       enable_ip_forwarding = true
-      create_public_ip     = true
-    },
-    {
+      public_ip            = true
+    }
+    private = {
+      device_index         = 2
       name                 = "${local.dname}-sdwan-spoke1-fw-private"
       subnet_id            = azurerm_subnet.sdwan_spoke1_private.id
       private_ip_address   = local.sdwan_spoke1_fw["eth1_2_ip"]
       enable_ip_forwarding = true
-    },
-  ]
+    }
+  }
 
-  bootstrap_options = join(";", concat(
-    [for k, v in var.bootstrap_options["common"] : "${k}=${v}"],
-    [for k, v in var.bootstrap_options["pan_pub"] : "${k}=${v}"],
-    [for k, v in var.bootstrap_options["sdwan_spoke1"] : "${k}=${v}"],
-  ))
+  bootstrap_options = merge(
+    var.bootstrap_options["common"],
+    var.bootstrap_options["pan_pub"],
+    var.bootstrap_options["sdwan_spoke1"],
+  )
 }
 

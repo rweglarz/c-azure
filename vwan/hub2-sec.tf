@@ -98,32 +98,32 @@ resource "azurerm_subnet_network_security_group_association" "hub2_sec_mgmt" {
 
 
 module "hub2_sec_fw" {
-  source = "github.com/PaloAltoNetworks/terraform-azurerm-vmseries-modules//modules/vmseries"
+  source = "../modules/vmseries"
 
   location            = azurerm_resource_group.rg2.location
   resource_group_name = azurerm_resource_group.rg2.name
   name                = "${local.dname}-hub2-sec-fw"
   username            = var.username
   password            = var.password
-  img_version         = var.fw_version
-  img_sku             = "byol"
-  interfaces = [
-    {
-      name             = "${local.dname}-hub2-sec-fw-mgmt"
-      subnet_id        = azurerm_subnet.hub2_sec_mgmt.id
-      create_public_ip = true
-    },
-    {
+  interfaces = {
+    mgmt = {
+      device_index = 0
+      name         = "${local.dname}-hub2-sec-fw-mgmt"
+      subnet_id    = azurerm_subnet.hub2_sec_mgmt.id
+      public_ip    = true
+    }
+    data = {
+      device_index         = 1
       name                 = "${local.dname}-hub2-sec-fw-data"
       subnet_id            = azurerm_subnet.hub2_sec_data.id
       private_ip_address   = cidrhost(azurerm_subnet.hub2_sec_data.address_prefixes[0], 5)
       enable_ip_forwarding = true
-    },
-  ]
+    }
+  }
 
-  bootstrap_options = join(";", concat(
-    [for k, v in var.bootstrap_options["common"] : "${k}=${v}"],
-    [for k, v in var.bootstrap_options["pan_pub"] : "${k}=${v}"],
-    [for k, v in var.bootstrap_options["hub2"] : "${k}=${v}"],
-  ))
+  bootstrap_options = merge(
+    var.bootstrap_options["common"],
+    var.bootstrap_options["pan_pub"],
+    var.bootstrap_options["hub2"],
+  )
 }
