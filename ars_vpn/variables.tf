@@ -29,7 +29,7 @@ variable "subscription" {
 }
 
 variable "fw_version" {
-  default = "10.1.7"
+  default = null
 }
 
 variable "psk" {
