@@ -110,28 +110,28 @@ locals {
   }
   bootstrap_options = {
     left_u_hub_fw = {
-      tplname = module.cfg_left_u_hub_fw.template_name
+      tplname = panos_panorama_template_stack.azure_left_u_hub_fw.name
     }
     left_b_hub_fw = {
-      tplname = module.cfg_left_b_hub_fw.template_name
+      tplname = panos_panorama_template_stack.azure_left_b_hub_fw.name
     }
     left_u_ipsec_fw1 = {
-      tplname = module.cfg_left_u_ipsec_fw1.template_name
+      tplname = panos_panorama_template_stack.azure_left_u_ipsec_fw1.name
     }
     left_u_ipsec_fw2 = {
-      tplname = module.cfg_left_u_ipsec_fw2.template_name
+      tplname = panos_panorama_template_stack.azure_left_u_ipsec_fw2.name
     }
     left_b_ipsec_fw1 = {
-      tplname = module.cfg_left_b_ipsec_fw1.template_name
+      tplname = panos_panorama_template_stack.azure_left_b_ipsec_fw1.name
     }
     left_b_ipsec_fw2 = {
-      tplname = module.cfg_left_b_ipsec_fw2.template_name
+      tplname = panos_panorama_template_stack.azure_left_b_ipsec_fw2.name
     }
     right_hub_fw = {
-      tplname = module.cfg_right_hub_fw.template_name
+      tplname = panos_panorama_template_stack.azure_right_hub_fw.name
     }
     right_env_fw1 = {
-      tplname = module.cfg_right_env_fw1.template_name
+      tplname = panos_panorama_template_stack.azure_right_env_fw1.name
     }
   }
 }
