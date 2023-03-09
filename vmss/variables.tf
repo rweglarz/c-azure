@@ -20,7 +20,7 @@ variable "tmp_ips" {
 
 variable "fw_version" {
   type    = string
-  default = "10.1.7"
+  default = "10.1.9"
 }
 
 variable "fw_instances_bnd" {
