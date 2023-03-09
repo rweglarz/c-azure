@@ -5,6 +5,18 @@ data "azurerm_subscriptions" "azsub" {
   display_name_contains = "AzureSEEMEA"
 }
 
+terraform {
+  required_providers {
+    panos = {
+      source = "PaloAltoNetworks/panos"
+    }
+  }
+}
+
+provider "panos" {
+  json_config_file = "panorama_creds.json"
+}
+
 resource "azurerm_resource_group" "rg" {
   name     = var.name
   location = "West Europe"

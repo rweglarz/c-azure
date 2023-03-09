@@ -61,8 +61,8 @@ resource "azurerm_linux_virtual_machine_scale_set" "bnd" {
     storage_account_type = "Standard_LRS"
   }
 
-  custom_data = base64encode(join("\n", compact(concat(
-    [for k, v in var.bootstrap_options_bnd : "${k}=${v}"],
+  custom_data = base64encode(join(";", compact(concat(
+    [for k, v in local.bootstrap_options_bnd : "${k}=${v}"],
   ))))
 
   depends_on = [

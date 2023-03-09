@@ -37,11 +37,18 @@ variable "instance_type" {
   default = "Standard_D3_v2"
 }
 
-variable "bootstrap_options_bnd" {
-  type = map(string)
-}
-variable "bootstrap_options_byol" {
-  type = map(string)
+variable "bootstrap_options" {
+  type = map(map(string))
+  default = {
+    common = {
+      dhcp-accept-server-hostname = "yes"
+    }
+    bnd = {
+    }
+    byol = {
+      #authcodes =
+    }
+  }
 }
 
 variable "username" {
