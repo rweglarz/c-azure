@@ -9,6 +9,7 @@ module "srv_sec" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.this.public_key
   security_group      = module.basic.sg_id["mgmt"]
+  associate_nsg       = true
 }
 
 module "srv_spoke_a_1" {
@@ -22,6 +23,7 @@ module "srv_spoke_a_1" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.this.public_key
   security_group      = module.basic.sg_id["mgmt"]
+  associate_nsg       = true
 }
 
 module "srv_spoke_a_2" {
@@ -35,6 +37,7 @@ module "srv_spoke_a_2" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.this.public_key
   security_group      = module.basic.sg_id["mgmt"]
+  associate_nsg       = true
 }
 
 
@@ -49,6 +52,7 @@ module "srv_spoke_b_1" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.this.public_key
   security_group      = module.basic.sg_id["mgmt"]
+  associate_nsg       = true
 }
 
 
