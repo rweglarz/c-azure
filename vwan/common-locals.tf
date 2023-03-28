@@ -4,6 +4,7 @@ locals {
     ipsec_hub1   = [cidrsubnet(var.hub1_cidr, 4, 2)]
     ipsec_hub2   = [cidrsubnet(var.hub2_cidr, 4, 2)]
     ipsec_spoke1 = [cidrsubnet(var.ext_spokes_cidr, 4, 2)]
+    sdwan_spoke1 = [cidrsubnet(var.ext_spokes_cidr, 4, 1)]
   }
 
   public_ip = {
@@ -51,5 +52,10 @@ locals {
       local_ip         = local.public_ip.aws_fw1[1]
       peer_ip          = local.public_ip.hub1_vpn1[1]
     },
+  }
+  bootstrap_options = {
+    sdwan_spoke1_fw = {
+      tplname = panos_panorama_template_stack.azure_vwan_sdwan_spoke1_fw.name
+    }
   }
 }

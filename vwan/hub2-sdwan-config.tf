@@ -7,7 +7,7 @@ resource "panos_panorama_template_stack" "azure_vwan_hub2_sdwan_fw1" {
   default_vsys = "vsys1"
   templates = [
     panos_panorama_template.azure_vwan_hub2_sdwan.name,
-    "sdwan",
+    "sdwan-1isp",
     "vm common",
   ]
   description = "pat:acp"
@@ -18,7 +18,7 @@ resource "panos_panorama_template_stack" "azure_vwan_hub2_sdwan_fw2" {
   default_vsys = "vsys1"
   templates = [
     panos_panorama_template.azure_vwan_hub2_sdwan.name,
-    "sdwan",
+    "sdwan-1isp",
     "vm common",
   ]
   description = "pat:acp"

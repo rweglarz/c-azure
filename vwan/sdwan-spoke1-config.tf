@@ -7,7 +7,7 @@ resource "panos_panorama_template_stack" "azure_vwan_sdwan_spoke1_fw" {
   default_vsys = "vsys1"
   templates = [
     panos_panorama_template.azure_vwan_sdwan_spoke1_fw.name,
-    "sdwan",
+    "sdwan-2isp",
     "vm common",
   ]
   description = "pat:acp"
@@ -35,6 +35,14 @@ resource "panos_panorama_template_variable" "azure_vwan_sdwan_spoke1_fw-eth1_2_i
   type           = "ip-netmask"
   value          = format("%s/%s", local.sdwan_spoke1_fw["eth1_2_ip"], local.subnet_prefix_length)
 }
+
+resource "panos_panorama_template_variable" "azure_vwan_sdwan_spoke1_fw-eth1_2_gw" {
+  template_stack = panos_panorama_template_stack.azure_vwan_sdwan_spoke1_fw.name
+  name           = "$eth1_2_gw"
+  type           = "ip-netmask"
+  value          = local.sdwan_spoke1_fw["eth1_2_gw"]
+}
+
 
 resource "panos_panorama_template_variable" "azure_vwan_sdwan_spoke1_fw-lo1_ip" {
   template_stack = panos_panorama_template_stack.azure_vwan_sdwan_spoke1_fw.name
