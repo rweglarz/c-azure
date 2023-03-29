@@ -125,7 +125,7 @@ variable "dns_zone_name" {
 
 variable "fw_version" {
   type    = string
-  default = "10.1.7"
+  default = null
 }
 
 variable "pl-mgmt-csp_nat_ips" {
