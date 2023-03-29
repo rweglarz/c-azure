@@ -89,6 +89,7 @@ module "hub2_sdwan_fw1" {
   }
 
   bootstrap_options = merge(
+    local.bootstrap_options["hub2_sdwan_fw1"],
     var.bootstrap_options["common"],
     var.bootstrap_options["hub2_sdwan_fw1"],
   )
@@ -128,6 +129,7 @@ module "hub2_sdwan_fw2" {
   }
 
   bootstrap_options = merge(
+    local.bootstrap_options["hub2_sdwan_fw2"],
     var.bootstrap_options["common"],
     var.bootstrap_options["hub2_sdwan_fw2"],
   )

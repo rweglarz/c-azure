@@ -54,6 +54,12 @@ locals {
     },
   }
   bootstrap_options = {
+    hub2_sdwan_fw1 = {
+      tplname = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw1.name
+    }
+    hub2_sdwan_fw2 = {
+      tplname = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw2.name
+    }
     sdwan_spoke1_fw = {
       tplname = panos_panorama_template_stack.azure_vwan_sdwan_spoke1_fw.name
     }
