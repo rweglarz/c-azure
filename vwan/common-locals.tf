@@ -13,8 +13,8 @@ locals {
       one([for k, v in module.vm-fw-1.public_ips : v if length(regexall("isp2", k)) > 0]),
     ],
     hub1_vpn1 = [
-      tolist(azurerm_vpn_gateway.hub1-vpn1.bgp_settings[0].instance_0_bgp_peering_address[0].tunnel_ips)[0],
-      tolist(azurerm_vpn_gateway.hub1-vpn1.bgp_settings[0].instance_1_bgp_peering_address[0].tunnel_ips)[0],
+      [for ip in azurerm_vpn_gateway.hub1-vpn1.bgp_settings[0].instance_0_bgp_peering_address[0].tunnel_ips: ip if cidrhost("${ip}/12",0)!=cidrhost("172.16.0.0/12",0)][0],
+      [for ip in azurerm_vpn_gateway.hub1-vpn1.bgp_settings[0].instance_1_bgp_peering_address[0].tunnel_ips: ip if cidrhost("${ip}/12",0)!=cidrhost("172.16.0.0/12",0)][0],
     ]
     ipsec_hub1_fw1 = [
       one([for k, v in module.ipsec_hub1_fw1.public_ips : v if length(regexall("internet", k)) > 0]),
