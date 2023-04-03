@@ -53,10 +53,29 @@ variable "panorama_version" {
   default = "10.2.3"
 }
 
-# variable "panorama1_ip" {
-#   type = string
-# }
-# variable "panorama2_ip" {
-#   type = string
-# }
+
+variable "asn" {
+  default = {
+    vng = "65515"
+    pa  = "65534"
+  }
+}
+
+variable "psk" {
+  default = null
+}
+
+variable "prisma_access_pub_ips" {
+  default = [
+    "198.51.100.1",
+    "198.51.100.2",
+  ]
+}
+
+variable "prisma_access_bgp_ips" {
+  default = [
+    "169.254.22.2",
+    "169.254.22.6"
+  ]
+}
 
