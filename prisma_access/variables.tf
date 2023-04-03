@@ -53,12 +53,6 @@ variable "panorama_version" {
   default = "10.2.3"
 }
 
-# variable "panorama1_ip" {
-#   type = string
-# }
-# variable "panorama2_ip" {
-#   type = string
-# }
 
 variable "asn" {
   default = {
