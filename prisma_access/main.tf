@@ -18,6 +18,20 @@ resource "azurerm_ssh_public_key" "this" {
   public_key          = file("~/.ssh/id_rsa.pub")
 }
 
+terraform {
+  required_providers {
+    panos = {
+      source = "PaloAltoNetworks/panos"
+    }
+  }
+}
+
+
+provider "panos" {
+  json_config_file = "panorama-creds.json"
+}
+
+
 module "basic" {
   source = "../modules/basic"
   name   = var.name
@@ -30,7 +44,8 @@ module "basic" {
   )
   split_route_tables = {
     internal = {
-      nh = azurerm_lb.fw_int.frontend_ip_configuration[1].private_ip_address
+      nh                            = azurerm_lb.fw_int.frontend_ip_configuration[1].private_ip_address
+      disable_bgp_route_propagation = true
     }
   }
 }

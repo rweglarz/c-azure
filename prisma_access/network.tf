@@ -106,3 +106,32 @@ resource "azurerm_subnet_nat_gateway_association" "internet" {
 output "nat_gw_ip" {
   value = azurerm_public_ip.ngw.ip_address
 }
+
+resource "azurerm_subnet_route_table_association" "panorama" {
+  subnet_id      = module.vnet_panorama.subnets["panorama"].id
+  route_table_id = module.basic.route_table_id["private-via-fw"]["internal"]
+}
+
+resource "azurerm_route_table" "vng" {
+  name                = "${var.name}-vng"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+}
+
+resource "azurerm_route" "vng_routes" {
+  for_each = {
+    pan  = local.vnet_address_space["panorama"][0],
+    app1 = "10.1.1.0/24"
+  }
+  name                   = each.key
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.vng.name
+  address_prefix         = each.value
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = azurerm_lb.fw_int.frontend_ip_configuration[1].private_ip_address
+}
+
+resource "azurerm_subnet_route_table_association" "appgw" {
+  subnet_id      = module.vnet_sec.subnets["GatewaySubnet"].id
+  route_table_id = azurerm_route_table.vng.id
+}
