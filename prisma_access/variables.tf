@@ -49,10 +49,16 @@ variable "password" {
 }
 
 variable "panorama_version" {
-  type = string
+  type    = string
   default = "10.2.3"
 }
 
+# variable "panorama1_ip" {
+#   type = string
+# }
+# variable "panorama2_ip" {
+#   type = string
+# }
 
 variable "asn" {
   default = {
@@ -79,3 +85,9 @@ variable "prisma_access_bgp_ips" {
   ]
 }
 
+variable "dns_zone_rg" {
+  type = string
+}
+variable "dns_zone_name" {
+  type = string
+}
