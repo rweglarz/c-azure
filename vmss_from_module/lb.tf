@@ -81,7 +81,7 @@ resource "azurerm_lb_rule" "fw_ext_1" {
   loadbalancer_id                = azurerm_lb.fw_ext.id
   frontend_ip_configuration_name = "ext-1"
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.fw_ext.id]
-  probe_id                       = azurerm_lb_probe.fw_ext[each.key].id
+  probe_id                       = azurerm_lb_probe.fw_ext["54321"].id
 
   enable_floating_ip    = true
   disable_outbound_snat = true
@@ -101,7 +101,7 @@ resource "azurerm_lb_rule" "fw_ext_2" {
   loadbalancer_id                = azurerm_lb.fw_ext.id
   frontend_ip_configuration_name = "ext-2"
   backend_address_pool_ids       = [azurerm_lb_backend_address_pool.fw_ext.id]
-  probe_id                       = azurerm_lb_probe.fw_ext[each.key].id
+  probe_id                       = azurerm_lb_probe.fw_ext["54321"].id
 
   enable_floating_ip    = true
   disable_outbound_snat = true
