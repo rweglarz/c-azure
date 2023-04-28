@@ -8,6 +8,7 @@ resource "panos_panorama_template_stack" "this" {
     "azure-2-if",
     "vm common"
   ]
+  description = "pat:acp"
 
   lifecycle { create_before_destroy = true }
 }
@@ -119,7 +120,7 @@ resource "panos_panorama_service_object" "hc" {
 resource "panos_panorama_nat_rule_group" "this" {
   device_group = data.panos_device_group.this.name
   rule {
-    name = "inbound pub hc snat"
+    name = "inbound pub hc dnat"
     original_packet {
       source_zones          = ["public"]
       destination_zone      = "public"
@@ -139,7 +140,7 @@ resource "panos_panorama_nat_rule_group" "this" {
     }
   }
   rule {
-    name = "inbound prv hc snat"
+    name = "inbound prv hc dnat"
     original_packet {
       source_zones          = ["private"]
       destination_zone      = "private"
