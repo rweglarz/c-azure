@@ -100,13 +100,27 @@ resource "azurerm_application_gateway" "appgw_regular" {
   dynamic "rewrite_rule_set" {
     for_each = var.tier == "Standard_v2" ? [1] : []
     content {
-      name = "xff-remove-port"
+      name = "xff-extra-ip"
       rewrite_rule {
         name          = "r1"
         rule_sequence = 1
         request_header_configuration {
           header_name  = "X-Forwarded-For"
           header_value = "192.0.2.1,{var_add_x_forwarded_for_proxy}"
+        }
+      }
+    }
+  }
+  dynamic "rewrite_rule_set" {
+    for_each = var.tier == "Standard_v2" ? [1] : []
+    content {
+      name = "xff"
+      rewrite_rule {
+        name          = "r1"
+        rule_sequence = 1
+        request_header_configuration {
+          header_name  = "X-Forwarded-For"
+          header_value = "{var_add_x_forwarded_for_proxy}"
         }
       }
     }
