@@ -9,6 +9,7 @@ module "hub1_sec_spoke1_h" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.rg1.public_key
   security_group      = azurerm_network_security_group.rg1_mgmt.id
+  associate_nsg       = true
 }
 
 module "hub1_spoke1_h" {
@@ -22,6 +23,7 @@ module "hub1_spoke1_h" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.rg1.public_key
   security_group      = azurerm_network_security_group.rg1_mgmt.id
+  associate_nsg       = true
 }
 
 module "hub1_spoke2_h" {
@@ -35,5 +37,6 @@ module "hub1_spoke2_h" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.rg1.public_key
   security_group      = azurerm_network_security_group.rg1_mgmt.id
+  associate_nsg       = true
 }
 
