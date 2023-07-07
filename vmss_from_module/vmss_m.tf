@@ -1,22 +1,57 @@
+resource "azurerm_application_insights" "vmss" {
+  name                = "${var.name}-app-insights-vmss"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  application_type    = "other"
+}
+
+
 module "vmss" {
-  # this was at commit 435bff6
-  source = "github.com/PaloAltoNetworks/terraform-azurerm-vmseries-modules//modules/vmss"
+  name = var.name
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-vmseries-modules//modules/vmss?ref=v1.0.2"
 
   location                = azurerm_resource_group.rg.location
   resource_group_name     = azurerm_resource_group.rg.name
-  name_prefix             = var.name
+  disable_password_authentication = false
   password                = var.password #default username panadmin
-  subnet_mgmt             = module.vnet_sec.subnets["mgmt"]
-  subnet_private          = module.vnet_sec.subnets["private"]
-  subnet_public           = module.vnet_sec.subnets["public"]
-  create_mgmt_pip         = false
-  private_backend_pool_id = azurerm_lb_backend_address_pool.fw_int.id
-  public_backend_pool_id  = azurerm_lb_backend_address_pool.fw_ext.id
+  interfaces = [
+    {
+      name       = "mgmt"
+      subnet_id  =  module.vnet_sec.subnets["mgmt"].id
+      create_pip = false
+      lb_backend_pool_ids = []
+      appgw_backend_pool_ids = []
+    },
+    {
+      name                = "public"
+      subnet_id           =  module.vnet_sec.subnets["public"].id
+      create_pip = false
+      lb_backend_pool_ids = [
+        azurerm_lb_backend_address_pool.fw_ext.id
+      ]
+      appgw_backend_pool_ids = [
+        one([for i in module.appgw1.backend_address_pools: i.id if strcontains(i.name, "dummy")]),
+        one([for i in module.appgw2.backend_address_pools: i.id if strcontains(i.name, "dummy")]),
+      ]
+    },
+    {
+      name      = "private"
+      subnet_id =  module.vnet_sec.subnets["private"].id
+      create_pip = false
+      lb_backend_pool_ids = [
+        azurerm_lb_backend_address_pool.fw_int.id
+      ]
+      appgw_backend_pool_ids = []
+    },
+  ]
   bootstrap_options = join(",", compact(concat(
     [for k, v in var.bootstrap_options : "${k}=${v}"],
   )))
+
   img_sku     = "byol"
-  img_version = "10.1.9" #otherwise it is 9.1.3
+  img_version = "10.1.9" #otherwise it is 10.1.0
+
+  application_insights_id = azurerm_application_insights.vmss.id
   autoscale_metrics = {
     panSessionActive = {
       scaleout_threshold = 500
@@ -26,7 +61,7 @@ module "vmss" {
 }
 
 
-output "metric_key" {
-  value     = module.vmss.metrics_instrumentation_key
-  sensitive = true
-}
+# output "metric_key" {
+#   value     = module.vmss.metrics_instrumentation_key
+#   sensitive = true
+# }

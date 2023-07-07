@@ -93,7 +93,7 @@ resource "panos_security_rule_group" "this" {
     name                  = "appgws"
     source_zones          = ["public"]
     source_addresses      = [
-      module.vnet_sec.subnets.appgw.address_prefixes[0],
+      module.vnet_sec.subnets.appgw1.address_prefixes[0],
       module.vnet_sec.subnets.appgw2.address_prefixes[0],
     ]
     source_users          = ["any"]
