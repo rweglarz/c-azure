@@ -1,4 +1,5 @@
 module "vmss" {
+  # this was at commit 435bff6
   source = "github.com/PaloAltoNetworks/terraform-azurerm-vmseries-modules//modules/vmss"
 
   location                = azurerm_resource_group.rg.location
