@@ -74,6 +74,18 @@ resource "azurerm_application_gateway" "appgw_regular" {
     request_timeout       = 60
   }
 
+  dynamic "backend_http_settings" {
+    for_each = var.virtual_hosts
+    content {
+      name                  = backend_http_settings.key
+      cookie_based_affinity = "Disabled"
+      path                  = "/"
+      port                  = try(backend_http_settings.value.backend_port, 80)
+      protocol              = "Http"
+      request_timeout       = 10
+    }
+  }
+
   dynamic "http_listener" {
     for_each = var.virtual_hosts
     content {
@@ -92,7 +104,7 @@ resource "azurerm_application_gateway" "appgw_regular" {
       rule_type                  = "Basic"
       http_listener_name         = request_routing_rule.key
       backend_address_pool_name  = request_routing_rule.key
-      backend_http_settings_name = "path1a"
+      backend_http_settings_name = request_routing_rule.key
       priority                   = var.tier == "Standard_v2" ? request_routing_rule.value.priority : null
     }
   }
