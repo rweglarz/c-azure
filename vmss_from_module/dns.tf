@@ -8,13 +8,33 @@ resource "azurerm_dns_a_record" "jumphost" {
   ]
 }
 
-resource "azurerm_dns_a_record" "app1" {
-  name                = "vmss-m-app1"
+resource "azurerm_dns_a_record" "app11" {
+  name                = "vmss-m-app11"
   resource_group_name = var.dns_zone_rg
   zone_name           = var.dns_zone_name
   ttl                 = 60
   records = [
-    module.srv_app1.public_ip
+    module.srv_app11.public_ip
+  ]
+}
+
+resource "azurerm_dns_a_record" "app12" {
+  name                = "vmss-m-app12"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 60
+  records = [
+    module.srv_app12.public_ip
+  ]
+}
+
+resource "azurerm_dns_a_record" "db1" {
+  name                = "vmss-m-db1"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 60
+  records = [
+    module.srv_db1.public_ip
   ]
 }
 

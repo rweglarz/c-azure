@@ -180,7 +180,7 @@ resource "panos_panorama_nat_rule_group" "this" {
       }
       destination {
         static_translation {
-          address = module.srv_app1.private_ip_address
+          address = module.srv_app11.private_ip_address
         }
       }
     }

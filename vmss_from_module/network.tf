@@ -38,7 +38,10 @@ module "vnet_app1" {
 
   subnets = {
     "app" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.app1[0], 1, 0)]
+      address_prefixes = [cidrsubnet(local.vnet_address_space.app1[0], 2, 0)]
+    },
+    "db" = {
+      address_prefixes = [cidrsubnet(local.vnet_address_space.app1[0], 2, 1)]
     },
   }
 }
@@ -92,9 +95,55 @@ resource "azurerm_virtual_network_peering" "app2-sec" {
 
 
 
+resource "azurerm_route_table" "app1" {
+  name                = "${var.name}-app1"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+}
+
+resource "azurerm_route" "app1-dg" {
+  name                   = "dg_fw"
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.app1.name
+  address_prefix         = "0.0.0.0/0"
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = azurerm_lb.fw_int.frontend_ip_configuration[0].private_ip_address
+}
+
+locals {
+  mgmt_routes = flatten([
+    for e in var.mgmt_ips : {
+      name = replace(e.cidr, "/\\//", "_")
+      prefix = e.cidr
+      nh   = azurerm_lb.fw_int.frontend_ip_configuration[0].private_ip_address
+    }
+  ])
+}
+
+resource "azurerm_route" "app1-mgmt" {
+  for_each               = { for nh in local.mgmt_routes : nh.name => nh }
+  name                   = each.value.name
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.app1.name
+  address_prefix         = each.value.prefix
+  next_hop_type          = "Internet"
+}
+
+resource "azurerm_route" "app1-apps" {
+  name                   = "app-micro-seg"
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.app1.name
+  address_prefix         = module.vnet_app1.subnets.app.address_prefixes[0]
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = azurerm_lb.fw_int.frontend_ip_configuration[0].private_ip_address
+}
+
+
+
+
 resource "azurerm_subnet_route_table_association" "app1" {
   subnet_id      = module.vnet_app1.subnets["app"].id
-  route_table_id = module.basic.route_table_id["mgmt-via-igw"].ilb
+  route_table_id = azurerm_route_table.app1.id
 }
 
 resource "azurerm_subnet_route_table_association" "app2" {
