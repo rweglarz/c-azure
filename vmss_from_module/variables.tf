@@ -40,13 +40,6 @@ variable "password" {
 }
 
 
-variable "panorama1_ip" {
-  type = string
-}
-variable "panorama2_ip" {
-  type = string
-}
-
 
 variable "pl-mgmt-csp_nat_ips" {
   type = string
