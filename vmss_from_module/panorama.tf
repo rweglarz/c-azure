@@ -89,6 +89,21 @@ resource "panos_security_rule_group" "this" {
     services              = ["any"]
     categories            = ["any"]
     action                = "allow"
+  rule {
+    name                  = "appgws"
+    source_zones          = ["public"]
+    source_addresses      = [
+      module.vnet_sec.subnets.appgw.address_prefixes[0],
+      module.vnet_sec.subnets.appgw2.address_prefixes[0],
+    ]
+    source_users          = ["any"]
+    destination_zones     = ["private"]
+    destination_addresses = ["any"]
+    applications          = ["any"]
+    services              = ["any"]
+    categories            = ["any"]
+    action                = "allow"
+    group                 = "fairly strict"
     log_setting           = "panka"
   }
   rule {
@@ -114,6 +129,22 @@ resource "panos_panorama_service_object" "hc" {
   name             = "tcp-health-check"
   protocol         = "tcp"
   destination_port = 54321
+  lifecycle { create_before_destroy = true }
+}
+
+resource "panos_panorama_service_object" "tcp_81" {
+  device_group     = data.panos_device_group.this.name
+  name             = "tcp-81"
+  protocol         = "tcp"
+  destination_port = 81
+  lifecycle { create_before_destroy = true }
+}
+
+resource "panos_panorama_service_object" "tcp_82" {
+  device_group     = data.panos_device_group.this.name
+  name             = "tcp-82"
+  protocol         = "tcp"
+  destination_port = 82
   lifecycle { create_before_destroy = true }
 }
 
@@ -206,6 +237,56 @@ resource "panos_panorama_nat_rule_group" "this" {
       destination {
         static_translation {
           address = module.srv_app2.private_ip_address
+        }
+      }
+    }
+  }
+  rule {
+    name = "appgw-1"
+    original_packet {
+      source_zones     = ["public"]
+      destination_zone = "public"
+      source_addresses = ["any"]
+      destination_addresses = ["any"]
+      service = panos_panorama_service_object.tcp_81.name
+    }
+    translated_packet {
+      source {
+        dynamic_ip_and_port {
+          interface_address {
+            interface = "ethernet1/2"
+          }
+        }
+      }
+      destination {
+        dynamic_translation {
+          address = module.srv_app11.private_ip_address
+          port = 80
+        }
+      }
+    }
+  }
+  rule {
+    name = "appgw-2"
+    original_packet {
+      source_zones     = ["public"]
+      destination_zone = "public"
+      source_addresses = ["any"]
+      destination_addresses = ["any"]
+      service = panos_panorama_service_object.tcp_82.name
+    }
+    translated_packet {
+      source {
+        dynamic_ip_and_port {
+          interface_address {
+            interface = "ethernet1/2"
+          }
+        }
+      }
+      destination {
+        dynamic_translation {
+          address = module.srv_app2.private_ip_address
+          port = 80
         }
       }
     }

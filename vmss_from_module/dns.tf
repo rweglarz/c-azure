@@ -47,3 +47,23 @@ resource "azurerm_dns_a_record" "app2" {
     module.srv_app2.public_ip
   ]
 }
+
+resource "azurerm_dns_a_record" "appgw1" {
+  name                = "vmss-m-appgw1"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 60
+  records = [
+    module.appgw1.public_ip_address
+  ]
+}
+
+resource "azurerm_dns_a_record" "appgw2" {
+  name                = "vmss-m-appgw2"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 60
+  records = [
+    module.appgw2.public_ip_address
+  ]
+}

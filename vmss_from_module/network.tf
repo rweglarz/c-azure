@@ -25,6 +25,12 @@ module "vnet_sec" {
     "jump" = {
       address_prefixes = [cidrsubnet(local.vnet_address_space.sec[0], 3, 3)]
     },
+    "appgw1" = {
+      address_prefixes = [cidrsubnet(local.vnet_address_space.sec[0], 3, 4)]
+    },
+    "appgw2" = {
+      address_prefixes = [cidrsubnet(local.vnet_address_space.sec[0], 3, 5)]
+    },
   }
 }
 
