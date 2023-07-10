@@ -75,6 +75,7 @@ resource "panos_security_rule_group" "this" {
     applications          = ["any"]
     services              = ["any"]
     categories            = ["any"]
+    group                 = "fairly strict"
     action                = "allow"
     log_setting           = "panka"
   }
@@ -88,7 +89,10 @@ resource "panos_security_rule_group" "this" {
     applications          = ["any"]
     services              = ["any"]
     categories            = ["any"]
+    group                 = "fairly strict"
+    log_setting           = "panka"
     action                = "allow"
+  }
   rule {
     name                  = "appgws"
     source_zones          = ["public"]
