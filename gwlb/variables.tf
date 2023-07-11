@@ -47,3 +47,11 @@ variable "use_fake_gw" {
   type = number
   default = 0
 }
+
+
+variable "dns_zone_rg" {
+  type = string
+}
+variable "dns_zone_name" {
+  type = string
+}
