@@ -44,3 +44,7 @@ output "aks_identities" {
     appgw = module.aks.ingress_application_gateway_identity
   }
 }
+
+output "appgw" {
+  value = module.appgw.public_ip_address
+}
