@@ -47,14 +47,18 @@ resource "azurerm_network_security_group" "mgmt" {
   }
 
   security_rule {
-    name                       = "private"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefixes    = ["172.16.0.0/12"]
+    name                   = "private"
+    priority               = 1001
+    direction              = "Inbound"
+    access                 = "Allow"
+    protocol               = "*"
+    source_port_range      = "*"
+    destination_port_range = "*"
+    source_address_prefixes = [
+      "10.0.0.0/8",
+      "172.16.0.0/12",
+      "192.168.0.0/16",
+    ]
     destination_address_prefix = "*"
   }
 
