@@ -8,10 +8,10 @@ output "sg_id" {
 output "route_table_id" {
   value = {
     mgmt-via-igw = {
-      for rt,v in azurerm_route_table.split_mgmt:  rt => v.id 
+      for rt,v in azurerm_route_table.split_mgmt:  rt => v.id
     }
     private-via-fw = {
-      for rt,v in azurerm_route_table.split_private:  rt => v.id 
+      for rt,v in azurerm_route_table.split_private:  rt => v.id
     }
   }
 }
