@@ -85,3 +85,7 @@ variable "dns_zone_rg" {
 variable "dns_zone_name" {
   type = string
 }
+
+variable "rg_tags" {
+  default = null
+}

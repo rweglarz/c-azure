@@ -8,4 +8,5 @@ module "jumphost" {
   private_ip_address  = cidrhost(module.vnet_sec.subnets["jump"].address_prefixes[0], 5)
   password            = var.password
   public_key          = azurerm_ssh_public_key.this.public_key
+  tags                = var.rg_tags
 }

@@ -9,6 +9,7 @@ data "azurerm_subscriptions" "azsub" {
 resource "azurerm_resource_group" "rg" {
   name     = var.name
   location = "North Europe"
+  tags = var.rg_tags
 }
 
 resource "azurerm_ssh_public_key" "this" {

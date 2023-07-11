@@ -38,6 +38,7 @@ module "panorama" {
       lun : "1"
     }
   }
+  tags = var.rg_tags
 }
 
 output "panorama_ip" {
