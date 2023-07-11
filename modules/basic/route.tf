@@ -88,3 +88,20 @@ resource "azurerm_route" "split_private-192" {
   next_hop_in_ip_address = var.split_route_tables[each.key]["nh"]
 }
 
+resource "azurerm_route_table" "all" {
+  for_each               = var.split_route_tables
+  name                = "${var.name}-all-${each.key}"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  disable_bgp_route_propagation = lookup(each.value, "disable_bgp_route_propagation", false)
+}
+
+resource "azurerm_route" "all-dg" {
+  for_each               = var.split_route_tables
+  name                   = "dg_fw"
+  resource_group_name    = var.resource_group_name
+  route_table_name       = azurerm_route_table.all[each.key].name
+  address_prefix         = "0.0.0.0/0"
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = each.value["nh"]
+}

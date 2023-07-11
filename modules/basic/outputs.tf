@@ -13,5 +13,8 @@ output "route_table_id" {
     private-via-fw = {
       for rt,v in azurerm_route_table.split_private:  rt => v.id
     }
+    all-via-fw = {
+      for rt,v in azurerm_route_table.all:  rt => v.id
+    }
   }
 }
