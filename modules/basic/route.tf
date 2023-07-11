@@ -78,4 +78,13 @@ resource "azurerm_route" "split_private-10" {
   next_hop_in_ip_address = var.split_route_tables[each.key]["nh"]
 }
 
+resource "azurerm_route" "split_private-192" {
+  for_each               = var.split_route_tables
+  name                   = "192.168.0.0_16"
+  resource_group_name    = var.resource_group_name
+  route_table_name       = azurerm_route_table.split_private[each.key].name
+  address_prefix         = "192.168.0.0/16"
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = var.split_route_tables[each.key]["nh"]
+}
 
