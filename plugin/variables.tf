@@ -34,3 +34,11 @@ variable "inb_int_lb" {
 variable "ewo_int_lb" {
   type = string
 }
+
+
+variable "dns_zone_rg" {
+  type = string
+}
+variable "dns_zone_name" {
+  type = string
+}
