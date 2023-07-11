@@ -51,3 +51,8 @@ variable dns_zone_rg {
 variable dns_zone_name {
   type = string
 }
+
+variable fw_prv_ip {
+  type    = string
+  default = null
+}
