@@ -1,4 +1,5 @@
 locals {
+  dns_ttl              = 90
   subnet_prefix_length = 28
   vnet_cidr = {
     hub1            = cidrsubnet(var.region1_cidr, 4, 0)
