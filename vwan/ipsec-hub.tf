@@ -174,7 +174,7 @@ module "cfg_ipsec_hub2_fw2" {
       next_hop    = local.ipsec_hub2_fw2["eth1_2_gw"]
     }
     spoke1 = {
-      destination = "172.16.34.0/24"
+      destination = local.vnet_cidr.ipsec_spoke1
       interface   = "tunnel.22"
     }
     spoke1n = {
@@ -285,7 +285,7 @@ module "tunnel-ipsec_hub2_fw1-ipsec_spoke1_fw" {
         value = "vwan-ipsec-hubs.${var.dns_zone_name}"
       }
       enable_tunnel_monitor         = true
-      tunnel_monitor_destination_ip = "172.16.34.37"
+      tunnel_monitor_destination_ip = local.ipsec_spoke1_fw["eth1_2_ip"]
       #tunnel_monitor_source_ip  = 
       template            = module.cfg_ipsec_hub2_fw1.template_name
       enable_passive_mode = false
@@ -327,7 +327,7 @@ module "tunnel-ipsec_hub2_fw2-ipsec_spoke1_fw" {
         value = "vwan-ipsec-hubs.${var.dns_zone_name}"
       }
       enable_tunnel_monitor         = true
-      tunnel_monitor_destination_ip = "172.16.34.37"
+      tunnel_monitor_destination_ip = local.ipsec_spoke1_fw["eth1_2_ip"]
       template                      = module.cfg_ipsec_hub2_fw2.template_name
       enable_passive_mode           = false
     }
