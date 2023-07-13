@@ -4,21 +4,21 @@ module "ipsec_spoke1" {
   location            = azurerm_resource_group.rg2.location
 
   name          = "${local.dname}-ipsec-spoke1"
-  address_space = local.vnet_address_space.ipsec_spoke1
+  address_space = [local.vnet_cidr.ipsec_spoke1]
 
   subnets = {
     "mgmt" = {
-      address_prefixes          = [cidrsubnet(local.vnet_address_space.ipsec_spoke1[0], 4, 0)]
+      address_prefixes          = [cidrsubnet(local.vnet_cidr.ipsec_spoke1, 4, 0)]
       network_security_group_id = azurerm_network_security_group.rg2_mgmt.id
       associate_nsg             = true
     },
     "internet" = {
-      address_prefixes          = [cidrsubnet(local.vnet_address_space.ipsec_spoke1[0], 4, 1)]
+      address_prefixes          = [cidrsubnet(local.vnet_cidr.ipsec_spoke1, 4, 1)]
       network_security_group_id = azurerm_network_security_group.rg2_all.id
       associate_nsg             = true
     },
     "private" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.ipsec_spoke1[0], 4, 2)]
+      address_prefixes = [cidrsubnet(local.vnet_cidr.ipsec_spoke1, 4, 2)]
     },
   }
 }

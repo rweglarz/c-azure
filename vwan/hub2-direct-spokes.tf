@@ -1,29 +1,38 @@
-resource "azurerm_virtual_network" "hub2_spoke1" {
-  name                = "${local.dname}-hub2-spoke1"
-  resource_group_name = azurerm_resource_group.rg2.name
-  location            = azurerm_resource_group.rg2.location
-  address_space       = [cidrsubnet(var.hub2_cidr, 4, 3)]
+module "hub2_spoke1" {
+  source              = "../modules/vnet"
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
+
+  name          = "${local.dname}-hub2-spoke1"
+  address_space = [local.vnet_cidr.hub2_spoke1]
+
+  subnets = {
+    "s1" = {
+      idx                       = 0
+      network_security_group_id = azurerm_network_security_group.rg1_mgmt.id
+      associate_nsg             = true
+    },
+    "s2" = {
+      idx                       = 1
+      network_security_group_id = azurerm_network_security_group.rg1_mgmt.id
+      associate_nsg             = true
+    },
+  }
 }
 
-resource "azurerm_subnet" "hub2_spoke1_s1" {
-  name                 = "${local.dname}-hub2-spoke1-s1"
-  resource_group_name  = azurerm_resource_group.rg2.name
-  virtual_network_name = azurerm_virtual_network.hub2_spoke1.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub2_spoke1.address_space[0], 4, 1)]
-}
+module "hub2_spoke2" {
+  source              = "../modules/vnet"
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
+  name          = "${local.dname}-hub2-spoke2"
+  address_space = [local.vnet_cidr.hub2_spoke2]
 
-
-resource "azurerm_virtual_network" "hub2_spoke2" {
-  name                = "${local.dname}-hub2-spoke2"
-  resource_group_name = azurerm_resource_group.rg2.name
-  location            = azurerm_resource_group.rg2.location
-  address_space       = [cidrsubnet(var.hub2_cidr, 4, 4)]
-}
-
-resource "azurerm_subnet" "hub2_spoke2_s1" {
-  name                 = "${local.dname}-hub2-spoke2-s1"
-  resource_group_name  = azurerm_resource_group.rg2.name
-  virtual_network_name = azurerm_virtual_network.hub2_spoke2.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.hub2_spoke2.address_space[0], 4, 1)]
+  subnets = {
+    "s1" = {
+      idx                       = 0
+      network_security_group_id = azurerm_network_security_group.rg1_mgmt.id
+      associate_nsg             = true
+    },
+  }
 }
