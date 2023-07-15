@@ -194,28 +194,28 @@ resource "panos_panorama_bgp_peer" "azure_vwan_hub2_sdwan_fw-hub2_i2" {
   multi_hop               = 1
 }
 
-resource "panos_panorama_bgp_peer" "azure_vwan_hub4_sdwan_fw-hub2_i1" {
+resource "panos_panorama_bgp_peer" "azure_vwan_hub4_sdwan_fw-hub4_i1" {
   template_stack          = panos_panorama_template_stack.azure_vwan_hub4_sdwan_fw.name
-  name                    = "hub2_i1"
+  name                    = "hub4_i1"
   virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.azure_vwan_hub4_sdwan_fw.name
-  peer_as                 = azurerm_virtual_hub.hub2.virtual_router_asn
+  peer_as                 = azurerm_virtual_hub.hub4.virtual_router_asn
   local_address_interface = "ethernet1/2"
   local_address_ip        = "$eth1_2_ip"
-  peer_address_ip         = azurerm_virtual_hub.hub2.virtual_router_ips[0]
+  peer_address_ip         = azurerm_virtual_hub.hub4.virtual_router_ips[0]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
 
-resource "panos_panorama_bgp_peer" "azure_vwan_hub4_sdwan_fw-hub2_i2" {
+resource "panos_panorama_bgp_peer" "azure_vwan_hub4_sdwan_fw-hub4_i2" {
   template_stack          = panos_panorama_template_stack.azure_vwan_hub4_sdwan_fw.name
-  name                    = "hub2_i2"
+  name                    = "hub4_i2"
   virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.azure_vwan_hub4_sdwan_fw.name
-  peer_as                 = azurerm_virtual_hub.hub2.virtual_router_asn
+  peer_as                 = azurerm_virtual_hub.hub4.virtual_router_asn
   local_address_interface = "ethernet1/2"
   local_address_ip        = "$eth1_2_ip"
-  peer_address_ip         = azurerm_virtual_hub.hub2.virtual_router_ips[1]
+  peer_address_ip         = azurerm_virtual_hub.hub4.virtual_router_ips[1]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
