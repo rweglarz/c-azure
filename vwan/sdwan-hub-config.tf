@@ -122,7 +122,7 @@ resource "panos_panorama_static_route_ipv4" "azure_vwan_hub4_sdwan_fw-hub2" {
   template_stack = panos_panorama_template_stack.azure_vwan_hub4_sdwan_fw.name
   virtual_router = "vr1"
   name           = "hub4"
-  destination    = azurerm_virtual_hub.hub2.address_prefix
+  destination    = azurerm_virtual_hub.hub4.address_prefix
   next_hop       = local.hub4_sdwan_fw["eth1_2_gw"]
   interface      = "ethernet1/2"
 }
