@@ -221,3 +221,26 @@ resource "panos_panorama_bgp_peer" "azure_vwan_hub4_sdwan_fw-hub4_i2" {
 }
 
 
+resource "panos_panorama_bgp_import_rule_group" "azure_vwan_hub2_sdwan_fw" {
+  template_stack          = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw.name
+  virtual_router = "vr1"
+  rule {
+      name = "r1"
+      used_by = [panos_panorama_bgp_peer_group.azure_vwan_hub2_sdwan_fw.name]
+      community_type = "overwrite"
+      community_value = "49320:64799"
+  }
+  lifecycle { create_before_destroy = true }
+}
+
+resource "panos_panorama_bgp_import_rule_group" "azure_vwan_hub4_sdwan_fw" {
+  template_stack          = panos_panorama_template_stack.azure_vwan_hub4_sdwan_fw.name
+  virtual_router = "vr1"
+  rule {
+      name = "r1"
+      used_by = [panos_panorama_bgp_peer_group.azure_vwan_hub4_sdwan_fw.name]
+      community_type = "overwrite"
+      community_value = "49320:64800"
+  }
+  lifecycle { create_before_destroy = true }
+}
