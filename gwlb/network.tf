@@ -1,41 +1,77 @@
-resource "azurerm_virtual_network" "sec" {
-  name                = "${var.name}-sec"
+module "vnet_sec" {
+  source              = "../modules/vnet"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  address_space       = [cidrsubnet(var.vpc_cidr, 4, 0)]
+
+  name          = "${var.name}-sec"
+  address_space = local.vnet_address_space.sec
+
+  subnets = {
+    "mgmt" = {
+      address_prefixes          = [cidrsubnet(local.vnet_address_space.sec[0], 3, 0)]
+      associate_nsg             = true
+      network_security_group_id = module.basic.sg_id["mgmt"]
+    },
+    "public" = {
+      address_prefixes          = [cidrsubnet(local.vnet_address_space.sec[0], 3, 1)]
+      associate_nsg             = true
+      network_security_group_id = module.basic.sg_id["wide-open"]
+    },
+    "private" = {
+      address_prefixes = [cidrsubnet(local.vnet_address_space.sec[0], 3, 2)]
+      # associate_nsg             = true
+      # network_security_group_id = module.basic.sg_id["wide-open"]
+    },
+    "gwlb" = {
+      address_prefixes = [cidrsubnet(local.vnet_address_space.sec[0], 3, 3)]
+      associate_nsg             = true
+      network_security_group_id = module.basic.sg_id["wide-open"]
+    },
+  }
 }
-resource "azurerm_virtual_network" "app" {
-  name                = "${var.name}-app"
+
+module "vnet_app1" {
+  source              = "../modules/vnet"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  address_space       = [cidrsubnet(var.vpc_cidr, 4, 1)]
+
+  name          = "${var.name}-app1"
+  address_space = local.vnet_address_space.app1
+
+  subnets = {
+    "frontend" = {
+      idx = 0
+      associate_nsg             = true
+      network_security_group_id = module.basic.sg_id["wide-open"]
+    },
+    "backend" = {
+      idx = 1
+      associate_nsg             = true
+      network_security_group_id = module.basic.sg_id["wide-open"]
+    },
+    "db" = {
+      idx = 2
+      associate_nsg             = true
+      network_security_group_id = module.basic.sg_id["mgmt"]
+    },
+  }
 }
 
-resource "azurerm_subnet" "mgmt" {
-  name                 = "${var.name}-sec-mgmt"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.sec.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.sec.address_space[0], 4, 0)]
-}
-resource "azurerm_subnet" "data" {
-  name                 = "${var.name}-sec"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.sec.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.sec.address_space[0], 4, 1)]
+module "vnet_sa" {
+  source              = "../modules/vnet"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  name          = "${var.name}-sa"
+  address_space = local.vnet_address_space.sa
+
+  subnets = {
+    "s1" = {
+      idx = 0
+    },
+  }
 }
 
-resource "azurerm_subnet" "app" {
-  name                 = "${var.name}-app"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.app.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.app.address_space[0], 4, 0)]
-}
-resource "azurerm_subnet" "fake-gw" {
-  name                 = "${var.name}-fake-gw"
-  resource_group_name  = azurerm_resource_group.rg.name
-  virtual_network_name = azurerm_virtual_network.app.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.app.address_space[0], 4, 1)]
-}
 
 
 resource "azurerm_public_ip" "this" {
@@ -59,7 +95,7 @@ resource "azurerm_nat_gateway_public_ip_association" "this" {
   public_ip_address_id = azurerm_public_ip.this.id
 }
 resource "azurerm_subnet_nat_gateway_association" "this" {
-  subnet_id      = azurerm_subnet.mgmt.id
+  subnet_id      = module.vnet_sec.subnets["mgmt"].id
   nat_gateway_id = azurerm_nat_gateway.this.id
 }
 
@@ -70,36 +106,27 @@ output "natgateway" {
 
 
 
-resource "azurerm_virtual_network_peering" "p1-a" {
-  name                      = "${var.name}-sec-spoke"
+resource "azurerm_virtual_network_peering" "sec-app1" {
+  name                      = "${var.name}-sec-app1"
   resource_group_name       = azurerm_resource_group.rg.name
-  virtual_network_name      = azurerm_virtual_network.sec.name
-  remote_virtual_network_id = azurerm_virtual_network.app.id
+  virtual_network_name      = module.vnet_sec.name
+  remote_virtual_network_id = module.vnet_app1.id
 }
-resource "azurerm_virtual_network_peering" "p1-b" {
-  name                      = "${var.name}-spoke-sec"
+resource "azurerm_virtual_network_peering" "app1-sec" {
+  name                      = "${var.name}-app1-sec"
   resource_group_name       = azurerm_resource_group.rg.name
-  virtual_network_name      = azurerm_virtual_network.app.name
-  remote_virtual_network_id = azurerm_virtual_network.sec.id
+  virtual_network_name      = module.vnet_app1.name
+  remote_virtual_network_id = module.vnet_sec.id
   allow_forwarded_traffic   = true
 }
 
 
-resource "azurerm_route_table" "app" {
-  name                = "${var.name}-app-via-fake"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+resource "azurerm_subnet_route_table_association" "app1_frontend" {
+  subnet_id      = module.vnet_app1.subnets["frontend"].id
+  route_table_id = module.basic.route_table_id["private-via-fw"].ilb
 }
-resource "azurerm_route" "app-dg" {
-  count                  = var.use_fake_gw
-  name                   = "dg_fake"
-  resource_group_name    = azurerm_resource_group.rg.name
-  route_table_name       = azurerm_route_table.app.name
-  address_prefix         = "0.0.0.0/0"
-  next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = azurerm_network_interface.fake-gw.private_ip_address
-}
-resource "azurerm_subnet_route_table_association" "app-dg" {
-  subnet_id      = azurerm_subnet.app.id
-  route_table_id = azurerm_route_table.app.id
+
+resource "azurerm_subnet_route_table_association" "app1_backend" {
+  subnet_id      = module.vnet_app1.subnets["backend"].id
+  route_table_id = module.basic.route_table_id["all-via-fw"].ilb
 }

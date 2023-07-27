@@ -1,11 +1,15 @@
+variable "azure_subscription" {
+  type = string
+}
+
 variable "name" {
   description = "Name/Prefix of the deployment"
   type        = string
 }
-variable "vpc_cidr" {
+variable "vnet_address_space" {
   description = "vpc cidr"
   type        = string
-  default     = "172.30.0.0/16"
+  default     = "172.30.0.0/20"
 }
 
 variable "mgmt_ips" {
@@ -20,6 +24,7 @@ variable "tmp_ips" {
 
 variable "fw_ver" {
   type = string
+  default = "10.1.9"
 }
 
 variable "instance_type" {

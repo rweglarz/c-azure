@@ -1,70 +1,78 @@
-resource "azurerm_linux_virtual_machine_scale_set" "this" {
-  name                = "${var.name}-fw"
-  resource_group_name = azurerm_resource_group.rg.name
+resource "azurerm_application_insights" "vmss" {
+  name                = "${var.name}-app-insights-vmss"
   location            = azurerm_resource_group.rg.location
-  sku                 = var.instance_type
-  instances           = 2
+  resource_group_name = azurerm_resource_group.rg.name
+  application_type    = "other"
+}
 
-  disable_password_authentication = true
-  admin_username                  = var.username
-  admin_ssh_key {
-    public_key = azurerm_ssh_public_key.rwe.public_key
-    username   = var.username
-  }
 
-  network_interface {
-    name                          = "mgmt"
-    primary                       = true
-    enable_ip_forwarding          = false
-    enable_accelerated_networking = false
+module "vmss" {
+  name = var.name
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-vmseries-modules//modules/vmss?ref=v1.0.3"
 
-    ip_configuration {
-      name      = "pri"
-      primary   = true
-      subnet_id = azurerm_subnet.mgmt.id
+  location                = azurerm_resource_group.rg.location
+  resource_group_name     = azurerm_resource_group.rg.name
+  disable_password_authentication = false
+  password                = var.password #default username panadmin
+  interfaces = [
+    {
+      name       = "mgmt"
+      subnet_id  =  module.vnet_sec.subnets["mgmt"].id
+      create_pip = false
+      lb_backend_pool_ids = []
+      appgw_backend_pool_ids = []
+    },
+    {
+      name                = "public"
+      subnet_id           =  module.vnet_sec.subnets["public"].id
+      create_pip = false
+      lb_backend_pool_ids = [
+        azurerm_lb_backend_address_pool.fw_ext.id
+      ]
+      appgw_backend_pool_ids = []
+    },
+    {
+      name      = "private"
+      subnet_id =  module.vnet_sec.subnets["private"].id
+      create_pip = false
+      lb_backend_pool_ids = [
+        azurerm_lb_backend_address_pool.fw_int.id
+      ]
+      appgw_backend_pool_ids = []
+    },
+    {
+      name      = "gwlb"
+      subnet_id =  module.vnet_sec.subnets["gwlb"].id
+      create_pip = false
+      lb_backend_pool_ids = [
+        azurerm_lb_backend_address_pool.fw_gwlb.id
+      ]
+      appgw_backend_pool_ids = []
+    },
+  ]
+  bootstrap_options = join(",", compact(concat(
+    [for k, v in var.bootstrap_options : "${k}=${v}"],
+  )))
+
+  img_sku     = "byol"
+  img_version = "10.1.9" #otherwise it is 10.1.0
+
+  application_insights_id = azurerm_application_insights.vmss.id
+  autoscale_metrics = {
+    panSessionActive = {
+      scaleout_threshold = 500
+      scalein_threshold  = 100
     }
   }
-  network_interface {
-      name                          = "eth-1-1"
-      primary                       = false
-      enable_ip_forwarding          = true
-      enable_accelerated_networking = true
-
-      ip_configuration {
-        name      = "pri"
-        primary   = true
-        subnet_id = azurerm_subnet.data.id
-
-        load_balancer_backend_address_pool_ids = [
-          azurerm_lb_backend_address_pool.gwlb.id,
-        ] 
-        //gateway_load_balancer_frontend_ip_configuration_id = azurerm_lb.gwlb.frontend_ip_configuration[0].id
-      }
-  }
-
-  plan {
-    name      = "byol"
-    publisher = "paloaltonetworks"
-    product   = "vmseries-flex"
-  }
-
-  source_image_reference {
-    publisher = "paloaltonetworks"
-    offer     = "vmseries-flex"
-    sku       = "byol"
-    version   = var.fw_ver
-  }
-  os_disk {
-    caching = "ReadWrite"
-    //  storage_account_type = "Premium_LRS"
-    storage_account_type = "Standard_LRS"
-  }
-
-  custom_data = base64encode(join("\n", compact(concat(
-    [for k, v in var.bootstrap_options : "${k}=${v}"],
-  ))))
 
   depends_on = [
     azurerm_subnet_nat_gateway_association.this,
   ]
 }
+
+
+# output "metric_key" {
+#   value     = module.vmss.metrics_instrumentation_key
+#   sensitive = true
+# }
+

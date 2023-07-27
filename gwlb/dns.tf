@@ -4,6 +4,16 @@ resource "azurerm_dns_a_record" "jumphost" {
   zone_name           = var.dns_zone_name
   ttl                 = 60
   records = [
-    azurerm_public_ip.jumphost.ip_address
+    module.jumphost.public_ip
+  ]
+}
+
+resource "azurerm_dns_a_record" "sa" {
+  name                = "gwlb-srv-sa"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 60
+  records = [
+    module.srv_sa.public_ip
   ]
 }

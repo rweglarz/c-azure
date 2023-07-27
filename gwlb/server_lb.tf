@@ -12,7 +12,7 @@ resource "azurerm_lb" "srv" {
 
     public_ip_address_id = azurerm_public_ip.srv.id
 
-    gateway_load_balancer_frontend_ip_configuration_id  = azurerm_lb.gwlb.frontend_ip_configuration[0].id
+    gateway_load_balancer_frontend_ip_configuration_id  = azurerm_lb.fw_gwlb.frontend_ip_configuration[0].id
   }
 }
 
@@ -47,6 +47,7 @@ resource "azurerm_lb_rule" "srv_r1" {
   frontend_port = 80
   backend_port  = 80
 }
+
 resource "azurerm_lb_rule" "srv_r2" {
   name = "${var.name}-srv-r2"
 
@@ -61,6 +62,7 @@ resource "azurerm_lb_rule" "srv_r2" {
   frontend_port = 443
   backend_port  = 443
 }
+
 resource "azurerm_lb_backend_address_pool" "srv" {
   name            = "${var.name}-srv"
   loadbalancer_id = azurerm_lb.srv.id
