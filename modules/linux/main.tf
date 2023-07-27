@@ -20,6 +20,8 @@ resource "azurerm_network_interface" "this" {
     private_ip_address_allocation = "Static"
     private_ip_address            = var.private_ip_address
     public_ip_address_id          = azurerm_public_ip.this.id
+
+    gateway_load_balancer_frontend_ip_configuration_id = var.gwlb_fe_id
   }
   tags = var.tags
 }

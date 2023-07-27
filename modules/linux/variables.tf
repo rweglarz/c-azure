@@ -56,3 +56,7 @@ variable "enable_ip_forwarding" {
 variable "tags" {
   default = null
 }
+
+variable "gwlb_fe_id" {
+  default = null
+}
