@@ -62,6 +62,7 @@ resource "panos_panorama_bgp" "azure_vwan_sdwan_spoke1_fw" {
   template_stack = panos_panorama_template_stack.azure_vwan_sdwan_spoke1_fw.name
   virtual_router = "vr1"
   install_route  = true
+  always_compare_med = true
 
   router_id = var.router_ids["sdwan_spoke1_fw"]
   as_number = var.asn["sdwan_spoke1_fw"]
