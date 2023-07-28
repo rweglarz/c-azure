@@ -5,13 +5,19 @@ resource "azurerm_virtual_network" "this" {
   address_space       = var.address_space
 }
 
+locals {
+  extra_mask_bits = {
+    for k, v in var.subnets: k => lookup(v, "subnet_mask_length", var.subnet_mask_length) - tonumber(split("/", azurerm_virtual_network.this.address_space[0])[1])
+  }
+}
+
 resource "azurerm_subnet" "this" {
   for_each = var.subnets
 
   name                 = each.key
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.this.name
-  address_prefixes     = each.value.address_prefixes
+  address_prefixes     = try(each.value.address_prefixes, [cidrsubnet(azurerm_virtual_network.this.address_space[0], local.extra_mask_bits[each.key], each.value.idx)])
 }
 
 
