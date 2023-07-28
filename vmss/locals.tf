@@ -1,4 +1,5 @@
 locals {
+  dns_ttl = 150
   bootstrap_options_built = merge(
     var.panorama1_ip != "" ? { panorama-server = var.panorama1_ip } : {},
     var.panorama2_ip != "" ? { panorama-server-2 = var.panorama2_ip } : {},
