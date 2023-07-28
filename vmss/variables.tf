@@ -60,10 +60,12 @@ variable "password" {
 
 
 variable "panorama1_ip" {
-  type = string
+  type    = string
+  default = ""
 }
 variable "panorama2_ip" {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "dns_zone_rg" {
