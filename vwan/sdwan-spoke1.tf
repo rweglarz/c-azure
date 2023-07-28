@@ -25,6 +25,9 @@ module "sdwan_spoke1" {
     "private" = {
       address_prefixes = [cidrsubnet(local.vnet_cidr.sdwan_spoke1, 4, 3)]
     },
+    "s1" = {
+      address_prefixes = [cidrsubnet(local.vnet_cidr.sdwan_spoke1, 4, 4)]
+    },
   }
 }
 
