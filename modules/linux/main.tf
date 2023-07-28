@@ -1,4 +1,6 @@
 resource "azurerm_public_ip" "this" {
+  count               = var.associate_public_ip ? 1 : 0
+
   name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -19,7 +21,7 @@ resource "azurerm_network_interface" "this" {
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.private_ip_address
-    public_ip_address_id          = azurerm_public_ip.this.id
+    public_ip_address_id          = try(azurerm_public_ip.this[0].id, null)
 
     gateway_load_balancer_frontend_ip_configuration_id = var.gwlb_fe_id
   }

@@ -60,3 +60,7 @@ variable "tags" {
 variable "gwlb_fe_id" {
   default = null
 }
+
+variable "associate_public_ip" {
+  default = true
+}
