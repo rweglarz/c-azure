@@ -130,3 +130,6 @@ variable "pl-mgmt-csp_nat_ips" {
   type = string
 }
 
+variable "cloud_ngfw_ips" {
+  type = map 
+}
