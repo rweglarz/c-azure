@@ -5,3 +5,7 @@ output "public_ip" {
 output "private_ip_address" {
   value = azurerm_network_interface.this.ip_configuration[0].private_ip_address
 }
+
+output "network_interface_id" {
+  value = azurerm_network_interface.this.id
+}
