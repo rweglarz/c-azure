@@ -67,6 +67,7 @@ resource "azurerm_virtual_hub_connection" "hub2-hub2_spoke1" {
   name                      = "${local.dname}-hub2-spoke1"
   virtual_hub_id            = azurerm_virtual_hub.hub2.id
   remote_virtual_network_id = module.hub2_spoke1.vnet.id
+  internet_security_enabled = var.internet_security_enabled
   depends_on = [
     azurerm_virtual_hub_connection.hub1-hub1_sec
   ]
@@ -76,6 +77,7 @@ resource "azurerm_virtual_hub_connection" "hub2-hub2_spoke2" {
   name                      = "${local.dname}-hub2-spoke2"
   virtual_hub_id            = azurerm_virtual_hub.hub1.id
   remote_virtual_network_id = module.hub2_spoke2.vnet.id
+  internet_security_enabled = var.internet_security_enabled
   depends_on = [
     azurerm_virtual_hub_connection.hub2-hub2_spoke1
   ]
@@ -85,6 +87,7 @@ resource "azurerm_virtual_hub_connection" "hub4-hub4_spoke1" {
   name                      = "${local.dname}-hub4-spoke1"
   virtual_hub_id            = azurerm_virtual_hub.hub4.id
   remote_virtual_network_id = module.hub4_spoke1.vnet.id
+  internet_security_enabled = var.internet_security_enabled
   depends_on = [
     azurerm_virtual_hub_connection.hub2-hub2_spoke2
   ]
@@ -94,6 +97,7 @@ resource "azurerm_virtual_hub_connection" "hub4-hub4_spoke2" {
   name                      = "${local.dname}-hub4-spoke2"
   virtual_hub_id            = azurerm_virtual_hub.hub4.id
   remote_virtual_network_id = module.hub4_spoke2.vnet.id
+  internet_security_enabled = var.internet_security_enabled
   depends_on = [
     azurerm_virtual_hub_connection.hub2-hub2_spoke1
   ]

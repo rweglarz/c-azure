@@ -133,3 +133,8 @@ variable "pl-mgmt-csp_nat_ips" {
 variable "cloud_ngfw_ips" {
   type = map 
 }
+
+variable "internet_security_enabled" {
+  description = "default route propagation"
+  default     = true
+}
