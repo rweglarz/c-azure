@@ -50,7 +50,7 @@ module "vmss" {
       appgw_backend_pool_ids = []
     },
   ]
-  bootstrap_options = join(",", compact(concat(
+  bootstrap_options = join(";", compact(concat(
     [for k, v in var.bootstrap_options : "${k}=${v}"],
   )))
 
