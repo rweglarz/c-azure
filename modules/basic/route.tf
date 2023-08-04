@@ -28,6 +28,11 @@ locals {
       }
     ]
   ])
+  rt_mgmt  = {for e in var.mgmt_cidrs : e => {
+      name = replace(e, "/\\//", "_")
+      prefix = e
+    }
+  }
 }
 
 resource "azurerm_route" "split_mgmt-mgmt" {
@@ -88,7 +93,7 @@ resource "azurerm_route" "split_private-192" {
   next_hop_in_ip_address = var.split_route_tables[each.key]["nh"]
 }
 
-resource "azurerm_route_table" "all" {
+resource "azurerm_route_table" "all_fw" {
   for_each               = var.split_route_tables
   name                = "${var.name}-all-${each.key}"
   resource_group_name = var.resource_group_name
@@ -96,12 +101,43 @@ resource "azurerm_route_table" "all" {
   disable_bgp_route_propagation = lookup(each.value, "disable_bgp_route_propagation", false)
 }
 
-resource "azurerm_route" "all-dg" {
+resource "azurerm_route" "all_fw-dg" {
   for_each               = var.split_route_tables
   name                   = "dg_fw"
   resource_group_name    = var.resource_group_name
-  route_table_name       = azurerm_route_table.all[each.key].name
+  route_table_name       = azurerm_route_table.all_fw[each.key].name
   address_prefix         = "0.0.0.0/0"
   next_hop_type          = "VirtualAppliance"
   next_hop_in_ip_address = each.value["nh"]
+}
+
+
+resource "azurerm_route_table" "all" {
+  name                = "${var.name}-all"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+}
+
+resource "azurerm_route" "all-dg" {
+  name                   = "dg_fw"
+  resource_group_name    = var.resource_group_name
+  route_table_name       = azurerm_route_table.all.name
+  address_prefix         = "0.0.0.0/0"
+  next_hop_type          = "Internet"
+}
+
+
+resource "azurerm_route_table" "mgmt" {
+  name                = "${var.name}-only-mgmt"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+}
+
+resource "azurerm_route" "mgmt-mgmt" {
+  for_each               = local.rt_mgmt
+  name                   = each.value.name
+  resource_group_name    = var.resource_group_name
+  route_table_name       = azurerm_route_table.mgmt.name
+  address_prefix         = each.value.prefix
+  next_hop_type          = "Internet"
 }

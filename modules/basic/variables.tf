@@ -16,4 +16,5 @@ variable "mgmt_cidrs" {
 
 variable "split_route_tables" {
   description = "mgmt ips route to internet"
+  default = {}
 }
