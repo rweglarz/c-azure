@@ -75,7 +75,7 @@ resource "azurerm_virtual_hub_connection" "hub2-hub2_spoke1" {
 
 resource "azurerm_virtual_hub_connection" "hub2-hub2_spoke2" {
   name                      = "${local.dname}-hub2-spoke2"
-  virtual_hub_id            = azurerm_virtual_hub.hub1.id
+  virtual_hub_id            = azurerm_virtual_hub.hub2.id
   remote_virtual_network_id = module.hub2_spoke2.vnet.id
   internet_security_enabled = var.internet_security_enabled
   depends_on = [
