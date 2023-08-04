@@ -53,3 +53,6 @@ resource "azurerm_lb_backend_address_pool" "fw_gwlb" {
   }
 }
 
+output "gateway_load_balancer_frontend_ip_configuration_id" {
+  value = azurerm_lb.fw_gwlb.frontend_ip_configuration[0].id
+}
