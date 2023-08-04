@@ -138,3 +138,7 @@ variable "internet_security_enabled" {
   description = "default route propagation"
   default     = true
 }
+
+variable "gateway_load_balancer_frontend_ip_configuration_id" {
+  default = null
+}

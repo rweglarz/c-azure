@@ -68,16 +68,15 @@ resource "azurerm_dns_a_record" "hub4_spoke1_h" {
   ]
 }
 
-resource "azurerm_dns_a_record" "hub4_spoke2_h" {
-  name                = "vwan-hub4-spoke2"
+resource "azurerm_dns_a_record" "hub4_spoke2_h_prv" {
+  name                = "vwan-hub4-spoke2-prv"
   resource_group_name = var.dns_zone_rg
   zone_name           = var.dns_zone_name
   ttl                 = local.dns_ttl
   records = [
-    module.hub4_spoke2_h.public_ip
+    module.hub4_spoke2_h_prv.public_ip
   ]
 }
-
 
 resource "azurerm_dns_a_record" "hub2_sdwan_fw" {
   name                = "vwan-hub2-sdwan-fw"
@@ -150,5 +149,13 @@ resource "azurerm_dns_a_record" "ipsec_hubs" {
   ]
 }
 
-
+resource "azurerm_dns_a_record" "hub4_ext_lb" {
+  name                = "vwan-hub4-ext-lb"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = 60
+  records = [
+    azurerm_public_ip.hub4_ext_lb.ip_address
+  ]
+}
 

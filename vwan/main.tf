@@ -52,3 +52,22 @@ resource "azurerm_ssh_public_key" "rg2" {
   public_key          = file("~/.ssh/id_rsa.pub")
 }
 
+
+module "basic_rg1" {
+  source = "../modules/basic"
+  name   = var.name
+
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
+  mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
+}
+
+module "basic_rg2" {
+  source = "../modules/basic"
+  name   = var.name
+
+  resource_group_name = azurerm_resource_group.rg2.name
+  location            = azurerm_resource_group.rg2.location
+  mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
+}
+
