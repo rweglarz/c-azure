@@ -10,6 +10,10 @@ resource "azurerm_resource_group" "rg" {
   location = "Central US"
 }
 
+provider "aws" {
+  region = "eu-central-1"
+}
+
 
 resource "azurerm_ssh_public_key" "rwe" {
   name                = "rweglarz"

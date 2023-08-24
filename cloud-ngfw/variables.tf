@@ -47,4 +47,11 @@ variable "cloud_ngfw_internal_ip" {
   default = "172.30.64.4"
 }
 
+variable "cloud_ngfw_public_ip" {
+  type = string
+}
+
+variable "pl-mgmt-csp_nat_ips" {
+  type = string
+}
 
