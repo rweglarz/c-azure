@@ -41,7 +41,7 @@ resource "aws_ec2_managed_prefix_list_entry" "ipsec_hub1_fw2" {
 }
 
 resource "aws_ec2_managed_prefix_list_entry" "cloud_ngfw_ips" {
-  for_each       = var.cloud_ngfw_ips
+  for_each       = var.cloud_ngfw_public_ips
   cidr           = "${each.value}/32"
   prefix_list_id = var.pl-mgmt-csp_nat_ips
   description    = "azure-${local.dname}-cloud-ngfw-${each.key}"

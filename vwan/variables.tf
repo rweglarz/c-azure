@@ -130,10 +130,6 @@ variable "pl-mgmt-csp_nat_ips" {
   type = string
 }
 
-variable "cloud_ngfw_ips" {
-  type = map 
-}
-
 variable "internet_security_enabled" {
   description = "default route propagation"
   default     = true
@@ -141,4 +137,14 @@ variable "internet_security_enabled" {
 
 variable "gateway_load_balancer_frontend_ip_configuration_id" {
   default = null
+}
+
+variable "cloud_ngfw_private_ips" {
+  default = {
+    hub2 = "172.16.4.228"
+  }
+}
+
+variable "cloud_ngfw_public_ips" {
+  type = map
 }

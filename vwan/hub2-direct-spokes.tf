@@ -36,3 +36,28 @@ module "hub2_spoke2" {
     },
   }
 }
+
+resource "azurerm_route_table" "hub2_spoke1" {
+  name                = "${var.name}-hub2-spoke1"
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
+}
+
+resource "azurerm_route" "hub2_spoke1-local" {
+  name = "local"
+  resource_group_name    = azurerm_resource_group.rg1.name
+  route_table_name       = azurerm_route_table.hub2_spoke1.name
+  address_prefix         = module.hub2_spoke1.vnet.address_space[0]
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = var.cloud_ngfw_private_ips.hub2
+}
+
+resource "azurerm_subnet_route_table_association" "hub2_spoke1_s1" {
+  subnet_id      = module.hub2_spoke1.subnets["s1"].id
+  route_table_id = azurerm_route_table.hub2_spoke1.id
+}
+
+resource "azurerm_subnet_route_table_association" "hub2_spoke1_s2" {
+  subnet_id      = module.hub2_spoke1.subnets["s2"].id
+  route_table_id = azurerm_route_table.hub2_spoke1.id
+}
