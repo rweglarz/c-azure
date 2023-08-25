@@ -32,10 +32,12 @@ locals {
 resource "azurerm_resource_group" "rg1" {
   name     = "${local.dname}-rg1"
   location = var.region1
+  tags     = var.tags
 }
 resource "azurerm_resource_group" "rg2" {
   name     = "${local.dname}-rg2"
   location = var.region2
+  tags     = var.tags
 }
 
 

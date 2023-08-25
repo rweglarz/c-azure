@@ -139,6 +139,10 @@ variable "gateway_load_balancer_frontend_ip_configuration_id" {
   default = null
 }
 
+variable "tags" {
+  default = {}
+}
+
 variable "cloud_ngfw_private_ips" {
   default = {
     hub2 = "172.16.4.228"
