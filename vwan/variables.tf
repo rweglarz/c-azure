@@ -149,6 +149,6 @@ variable "cloud_ngfw_private_ips" {
   }
 }
 
-variable "cloud_ngfw_public_ips" {
+variable "cloud_ngfw_panorama_config" {
   type = map
 }
