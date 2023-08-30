@@ -12,6 +12,11 @@ module "hub4_spoke1" {
       network_security_group_id = azurerm_network_security_group.rg2_mgmt.id
       associate_nsg             = true
     },
+    "s2" = {
+      idx                       = 1
+      network_security_group_id = azurerm_network_security_group.rg2_mgmt.id
+      associate_nsg             = true
+    },
   }
 }
 
