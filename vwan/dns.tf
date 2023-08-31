@@ -179,3 +179,42 @@ resource "azurerm_dns_a_record" "hub4_ext_lb" {
   ]
 }
 
+
+resource "azurerm_private_dns_zone" "this" {
+  name                = "vwan.test"
+  resource_group_name = azurerm_resource_group.rg1.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "this" {
+  for_each = {
+     hub2_spoke1  = module.hub2_spoke1.id,
+     hub2_spoke2  = module.hub2_spoke2.id,
+     hub4_spoke1  = module.hub4_spoke1.id,
+     hub4_spoke2  = module.hub4_spoke2.id,
+     sdwan_spoke1 = module.sdwan_spoke1.id,
+  }
+  name                  = each.key
+  resource_group_name   = azurerm_resource_group.rg1.name
+  private_dns_zone_name = azurerm_private_dns_zone.this.name
+  virtual_network_id    = each.value
+}
+
+resource "azurerm_private_dns_a_record" "this" {
+  for_each = {
+    hub2-spoke1-s1  = module.hub2_spoke1_s1_h.private_ip_address,
+    hub2-spoke1-s2  = module.hub2_spoke1_s2_h.private_ip_address,
+    hub2-spoke2     = module.hub2_spoke2_h.private_ip_address,
+    hub4-spoke1-s1  = module.hub4_spoke1_s1_h.private_ip_address,
+    hub4-spoke1-s2  = module.hub4_spoke1_s2_h.private_ip_address,
+    hub4-spoke2-prv = module.hub4_spoke2_h_prv.private_ip_address,
+    hub4-spoke2-pub = module.hub4_spoke2_h_pub.private_ip_address,
+    sdwan-spoke1    = module.sdwan_spoke1_h.private_ip_address,
+  }
+  name                = each.key
+  resource_group_name = azurerm_resource_group.rg1.name
+  zone_name           = azurerm_private_dns_zone.this.name
+  ttl                 = local.dns_ttl
+  records = [
+    each.value
+  ]
+}
