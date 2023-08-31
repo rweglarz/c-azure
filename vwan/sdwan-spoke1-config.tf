@@ -67,3 +67,12 @@ resource "panos_panorama_bgp" "azure_vwan_sdwan_spoke1_fw" {
   router_id = var.router_ids["sdwan_spoke1_fw"]
   as_number = var.asn["sdwan_spoke1_fw"]
 }
+
+resource "panos_panorama_static_route_ipv4" "azure_vwan_sdwan_spoke1_fw-prv" {
+  template_stack = panos_panorama_template_stack.azure_vwan_sdwan_spoke1_fw.name
+  virtual_router = "vr1"
+  name           = "prv"
+  destination    = module.sdwan_spoke1.vnet.address_space[0]
+  next_hop       = local.sdwan_spoke1_fw["eth1_3_gw"]
+  interface      = "ethernet1/3"
+}
