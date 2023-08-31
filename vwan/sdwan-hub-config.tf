@@ -244,3 +244,38 @@ resource "panos_panorama_bgp_import_rule_group" "azure_vwan_hub4_sdwan_fw" {
   }
   lifecycle { create_before_destroy = true }
 }
+
+
+resource "panos_panorama_bgp_export_rule_group" "azure_vwan_hub2_sdwan_fw" {
+  template_stack          = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw.name
+  virtual_router = "vr1"
+  rule {
+    name = "r1"
+    match_address_prefix {
+      prefix = local.vnet_cidr.sdwan_spoke1
+      exact  = false
+    }
+    match_route_table   = "unicast"
+    action              = "allow"
+    used_by = [panos_panorama_bgp_peer_group.azure_vwan_hub2_sdwan_fw.name]
+  }
+
+  lifecycle { create_before_destroy = true }
+}
+
+resource "panos_panorama_bgp_export_rule_group" "azure_vwan_hub4_sdwan_fw" {
+  template_stack          = panos_panorama_template_stack.azure_vwan_hub4_sdwan_fw.name
+  virtual_router = "vr1"
+  rule {
+    name = "r1"
+    match_address_prefix {
+      prefix = local.vnet_cidr.sdwan_spoke1
+      exact  = false
+    }
+    match_route_table   = "unicast"
+    action              = "allow"
+    used_by = [panos_panorama_bgp_peer_group.azure_vwan_hub4_sdwan_fw.name]
+  }
+
+  lifecycle { create_before_destroy = true }
+}
