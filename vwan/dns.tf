@@ -118,6 +118,16 @@ resource "azurerm_dns_a_record" "sdwan_spoke1_fw" {
   ]
 }
 
+resource "azurerm_dns_a_record" "sdwan_spoke1_h" {
+  name                = "vwan-sdwan-spoke1"
+  resource_group_name = var.dns_zone_rg
+  zone_name           = var.dns_zone_name
+  ttl                 = local.dns_ttl
+  records = [
+    module.sdwan_spoke1_h.public_ip,
+  ]
+}
+
 resource "azurerm_dns_a_record" "ipsec_hub2_fw1" {
   name                = "vwan-ipsec-hub2-fw1"
   resource_group_name = var.dns_zone_rg
