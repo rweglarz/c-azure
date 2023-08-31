@@ -42,6 +42,16 @@ module "hub4_spoke2" {
   }
 }
 
+resource "azurerm_subnet_route_table_association" "hub4_spoke1_s1" {
+  subnet_id      = module.hub4_spoke1.subnets["s1"].id
+  route_table_id = module.basic_rg2.route_table_id["only-mgmt-via-igw"].igw
+}
+
+resource "azurerm_subnet_route_table_association" "hub4_spoke1_s2" {
+  subnet_id      = module.hub4_spoke1.subnets["s2"].id
+  route_table_id = module.basic_rg2.route_table_id["only-mgmt-via-igw"].igw
+}
+
 resource "azurerm_subnet_route_table_association" "hub4_spoke2_s1" {
   subnet_id      = module.hub4_spoke2.subnets["s1"].id
   route_table_id = module.basic_rg2.route_table_id["only-mgmt-via-igw"].igw

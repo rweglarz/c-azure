@@ -61,3 +61,8 @@ resource "azurerm_subnet_route_table_association" "hub2_spoke1_s2" {
   subnet_id      = module.hub2_spoke1.subnets["s2"].id
   route_table_id = azurerm_route_table.hub2_spoke1.id
 }
+
+resource "azurerm_subnet_route_table_association" "hub2_spoke2_s1" {
+  subnet_id      = module.hub2_spoke2.subnets["s1"].id
+  route_table_id = module.basic_rg1.route_table_id["only-mgmt-via-igw"].igw
+}
