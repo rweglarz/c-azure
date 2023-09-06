@@ -42,6 +42,7 @@ resource "azurerm_public_ip" "hub4_fw" {
   location            = azurerm_resource_group.rg2.location
   allocation_method   = "Static"
   sku                 = "Standard"
+  zones               = [1,2,3]
 }
 
 resource "azurerm_palo_alto_virtual_network_appliance" "hub4" {
