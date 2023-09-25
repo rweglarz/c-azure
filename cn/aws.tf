@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_ec2_managed_prefix_list_entry" "panka" {
-  cidr           = "${azurerm_public_ip.ngw.ip_address}/32"
+  cidr           = "${azurerm_public_ip.natgw.ip_address}/32"
   prefix_list_id = var.pl-mgmt-csp_nat_ips
   description    = "${var.name}-azure-cn"
 }

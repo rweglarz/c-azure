@@ -3,8 +3,9 @@ variable "name" {
   type = string
 }
 variable "vnet_cidr" {
-  description = "vpc cidr"
-  type = string
+  description = "vnet cidr"
+  type        = string
+  default     = "172.29.0.0/19"
 }
 
 variable panorama1_ip {
@@ -38,11 +39,6 @@ variable "password" {
 
 variable "pl-mgmt-csp_nat_ips" {
   type = string
-}
-
-variable "kubernetes_version" {
-  type = string
-  default = "1.23.8"
 }
 
 variable dns_zone_rg {
