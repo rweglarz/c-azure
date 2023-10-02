@@ -42,16 +42,10 @@ variable "dns_zone_name" {
   type = string
 }
 
-variable "cloud_ngfw_internal_ip" {
-  type  = string
-  default = "172.30.64.4"
-}
-
-variable "cloud_ngfw_public_ip" {
-  type = string
-}
-
 variable "pl-mgmt-csp_nat_ips" {
   type = string
 }
 
+variable "cloud_ngfw_panorama_config" {
+  type = string
+}

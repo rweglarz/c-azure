@@ -10,12 +10,33 @@ resource "azurerm_subnet" "public" {
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.sec.name
   address_prefixes     = [cidrsubnet(azurerm_virtual_network.sec.address_space[0], 2, 0)]
+
+  delegation {
+    name = "public"
+    service_delegation {
+      name = "PaloAltoNetworks.Cloudngfw/firewalls"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
 }
+
 resource "azurerm_subnet" "private" {
   name                 = "${var.name}-private"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.sec.name
   address_prefixes     = [cidrsubnet(azurerm_virtual_network.sec.address_space[0], 2, 1)]
+
+  delegation {
+    name = "private"
+    service_delegation {
+      name = "PaloAltoNetworks.Cloudngfw/firewalls"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
 }
 
 
@@ -31,12 +52,3 @@ resource "azurerm_subnet_network_security_group_association" "sec-public" {
 }
 
 
-
-resource "azurerm_public_ip" "dnatip" {
-  count = 2
-  name                 = "${var.name}-cngfw-dnat-${count.index}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  allocation_method   = "Static"
-  sku                 = "Standard"
-}
