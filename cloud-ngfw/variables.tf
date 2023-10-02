@@ -49,3 +49,8 @@ variable "pl-mgmt-csp_nat_ips" {
 variable "cloud_ngfw_panorama_config" {
   type = string
 }
+
+variable "cloud_ngfw_public_egress_ip_number" {
+  type    = number
+  default = 0
+}
