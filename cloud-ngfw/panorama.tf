@@ -2,7 +2,7 @@ resource "panos_address_object" "cngfw" {
   device_group  = local.cngfw.device_group
 
   name  = "cngfw standalone"
-  value = azurerm_public_ip.cloudngfw.ip_address
+  value = azurerm_public_ip.cloud_ngfw.ip_address
 
   lifecycle { create_before_destroy = true }
 }
