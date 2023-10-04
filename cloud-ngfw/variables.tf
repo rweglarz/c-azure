@@ -6,6 +6,12 @@ variable "name" {
   description = "Name/Prefix of the deployment"
   type        = string
 }
+
+variable "region" {
+  type    = string
+  default = "West Europe"
+}
+
 variable "sec_vpc_cidr" {
   description = "vpc cidr"
   type        = string

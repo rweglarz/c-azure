@@ -7,7 +7,7 @@ data "azurerm_subscriptions" "azsub" {
 
 resource "azurerm_resource_group" "rg" {
   name     = var.name
-  location = "Central US"
+  location = var.region
 }
 
 provider "aws" {
