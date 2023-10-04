@@ -53,7 +53,9 @@ variable "pl-mgmt-csp_nat_ips" {
 }
 
 variable "cloud_ngfw_panorama_config" {
-  type = string
+  description = "if null, will deploy cloud-ngfw managed by local rulestack"
+  type        = string
+  default     = null
 }
 
 variable "cloud_ngfw_public_egress_ip_number" {

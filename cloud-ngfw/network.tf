@@ -61,7 +61,7 @@ resource "azurerm_route" "dg-via-cloud-ngfw" {
   route_table_name       = azurerm_route_table.via-fw.name
   address_prefix         = "0.0.0.0/0"
   next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = azurerm_palo_alto_next_generation_firewall_virtual_network_panorama.this.network_profile[0].vnet_configuration[0].ip_of_trust_for_user_defined_routes
+  next_hop_in_ip_address = local.cngfw.private_ip
 }
 
 

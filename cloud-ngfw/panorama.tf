@@ -1,4 +1,5 @@
 resource "panos_address_object" "cngfw" {
+  count = var.cloud_ngfw_panorama_config!=null ? 1 : 0
   device_group  = local.cngfw.device_group
 
   name  = "cngfw standalone"
@@ -9,6 +10,7 @@ resource "panos_address_object" "cngfw" {
 
 
 resource "panos_security_rule_group" "this" {
+  count = var.cloud_ngfw_panorama_config!=null ? 1 : 0
   device_group  = local.cngfw.device_group
 
   rule {
@@ -20,7 +22,7 @@ resource "panos_security_rule_group" "this" {
     source_users          = ["any"]
     destination_zones     = ["Private"]
     destination_addresses = [
-      panos_address_object.cngfw.name
+      panos_address_object.cngfw[0].name
     ]
     applications          = ["any"]
     services              = ["any"]
