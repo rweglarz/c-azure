@@ -7,15 +7,6 @@ resource "panos_address_object" "cngfw" {
   lifecycle { create_before_destroy = true }
 }
 
-resource "panos_panorama_service_object" "hc" {
-  device_group  = local.cngfw.device_group
-  name             = "tcp-health-check"
-  protocol         = "tcp"
-  destination_port = 54321
-  lifecycle { create_before_destroy = true }
-}
-
-
 
 resource "panos_security_rule_group" "this" {
   device_group  = local.cngfw.device_group
