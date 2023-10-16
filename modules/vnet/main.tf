@@ -18,6 +18,7 @@ resource "azurerm_subnet" "this" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = try(each.value.address_prefixes, [cidrsubnet(azurerm_virtual_network.this.address_space[0], local.extra_mask_bits[each.key], each.value.idx)])
+  service_endpoints    = try(each.value.service_endpoints, [])
 }
 
 
