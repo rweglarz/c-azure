@@ -28,6 +28,9 @@ module "net" {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.net[0], 4, 0)]
       associate_nsg             = true
       network_security_group_id = module.basic.sg_id["mgmt"]
+      service_endpoints = [
+        "Microsoft.Storage"
+      ]
     },
     "internet" = {
       address_prefixes = [cidrsubnet(local.vnet_address_space.net[0], 4, 1)]
