@@ -75,6 +75,10 @@ resource "azurerm_linux_virtual_machine" "this" {
     storage_account_type = "Standard_LRS"
   }
 
+  boot_diagnostics {
+    storage_account_uri = null
+  }
+
   custom_data = base64encode(join("\n", concat(
     [for k, v in var.bootstrap_options : "${k}=${v}"],
   )))
