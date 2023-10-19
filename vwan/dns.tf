@@ -189,6 +189,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "this" {
   for_each = {
      hub2_spoke1  = module.hub2_spoke1.id,
      hub2_spoke2  = module.hub2_spoke2.id,
+     hub2_dns     = module.hub2_dns.id,
      hub4_spoke1  = module.hub4_spoke1.id,
      hub4_spoke2  = module.hub4_spoke2.id,
      sdwan_spoke1 = module.sdwan_spoke1.id,

@@ -11,6 +11,7 @@ locals {
     hub2_spoke2     = cidrsubnet(var.region1_cidr, 5, 5*2 + 1)
     ipsec_hub2      = cidrsubnet(var.region1_cidr, 4, 6)
     hub2_sdwan      = cidrsubnet(var.region1_cidr, 4, 7)
+    hub2_dns        = cidrsubnet(var.region1_cidr, 4, 8)
 
     hub3            = cidrsubnet(var.region2_cidr, 4, 0)
     hub4            = cidrsubnet(var.region2_cidr, 4, 4)

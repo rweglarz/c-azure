@@ -30,6 +30,12 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama" "hub2
 
   panorama_base64_config = var.cloud_ngfw_panorama_config.hub2
 
+  dns_settings {
+    dns_servers = [
+      azurerm_private_dns_resolver_inbound_endpoint.hub2.ip_configurations[0].private_ip_address,
+    ]
+  }
+
   depends_on = [
     aws_ec2_managed_prefix_list_entry.cloud_ngfw_hub2
   ]

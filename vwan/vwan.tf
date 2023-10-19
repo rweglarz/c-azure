@@ -113,6 +113,15 @@ resource "azurerm_virtual_hub_connection" "hub2-hub2_ipsec" {
   ]
 }
 
+resource "azurerm_virtual_hub_connection" "hub2-hub2_dns" {
+  name                      = "${local.dname}-hub2-dns"
+  virtual_hub_id            = azurerm_virtual_hub.hub2.id
+  remote_virtual_network_id = module.hub2_dns.vnet.id
+  depends_on = [
+    azurerm_virtual_hub_connection.hub2-hub2_ipsec
+  ]
+}
+
 
 resource "azurerm_virtual_hub_route_table_route" "hub1-hub1_sec_spokes" {
   route_table_id = azurerm_virtual_hub.hub1.default_route_table_id
@@ -125,7 +134,7 @@ resource "azurerm_virtual_hub_route_table_route" "hub1-hub1_sec_spokes" {
   next_hop_type = "ResourceId"
   next_hop      = azurerm_virtual_hub_connection.hub1-hub1_sec.id
   depends_on = [
-    azurerm_virtual_hub_connection.hub2-hub2_ipsec
+    azurerm_virtual_hub_connection.hub2-hub2_dns
   ]
 }
 

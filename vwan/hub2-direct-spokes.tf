@@ -6,6 +6,10 @@ module "hub2_spoke1" {
   name          = "${local.dname}-hub2-spoke1"
   address_space = [local.vnet_cidr.hub2_spoke1]
 
+  dns_servers = [
+    azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama.hub2.network_profile[0].ip_of_trust_for_user_defined_routes
+  ]
+
   subnets = {
     "s1" = {
       idx                       = 0
