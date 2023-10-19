@@ -209,6 +209,11 @@ resource "azurerm_private_dns_a_record" "this" {
     hub4-spoke2-prv = module.hub4_spoke2_h_prv.private_ip_address,
     hub4-spoke2-pub = module.hub4_spoke2_h_pub.private_ip_address,
     sdwan-spoke1    = module.sdwan_spoke1_h.private_ip_address,
+    sdwan-hub2      = module.hub2_sdwan_fw.private_ip_list.private[0],
+    sdwan-hub4      = module.hub4_sdwan_fw.private_ip_list.private[0],
+    aws-internal    = module.vm-fw-1.private_ip_list.priv[0],
+    ipsec-hub2-fw1  = module.ipsec_hub2_fw1.private_ip_list.private[0],
+    ipsec-hub2-fw2  = module.ipsec_hub2_fw2.private_ip_list.private[0],
   }
   name                = each.key
   resource_group_name = azurerm_resource_group.rg1.name
