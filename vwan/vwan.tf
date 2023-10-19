@@ -105,7 +105,7 @@ resource "azurerm_virtual_hub_connection" "hub4-hub4_spoke2" {
 
 
 resource "azurerm_virtual_hub_connection" "hub2-hub2_ipsec" {
-  name                      = "${local.dname}-hub1-ipsec"
+  name                      = "${local.dname}-hub2-ipsec"
   virtual_hub_id            = azurerm_virtual_hub.hub2.id
   remote_virtual_network_id = module.ipsec_hub2.vnet.id
   depends_on = [
