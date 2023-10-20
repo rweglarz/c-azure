@@ -35,3 +35,19 @@ variable "managed_by_agic" {
   description = "managed by aks / agic"
   default = false
 }
+
+variable "use_https" {
+  default = false
+}
+
+variable "ssl_certificate_data" {
+  default = null
+}
+
+variable "ssl_certificate_pass" {
+  default = null
+}
+
+variable "trusted_root_certificate_data" {
+  default = null
+}

@@ -35,10 +35,10 @@ resource "azurerm_application_gateway" "appgw_regular" {
     for_each = var.use_public_ip ? [1] : []
     content {
       name = "public"
-      port = 80
+      port = var.use_https ? 443 : 80
     }
   }
-
+  
   frontend_ip_configuration {
     name                          = "private"
     subnet_id                     = var.subnet_id
@@ -77,12 +77,13 @@ resource "azurerm_application_gateway" "appgw_regular" {
   dynamic "backend_http_settings" {
     for_each = var.virtual_hosts
     content {
-      name                  = backend_http_settings.key
-      cookie_based_affinity = "Disabled"
-      path                  = "/"
-      port                  = try(backend_http_settings.value.backend_port, 80)
-      protocol              = "Http"
-      request_timeout       = 10
+      name                           = backend_http_settings.key
+      cookie_based_affinity          = "Disabled"
+      path                           = "/"
+      port                           = try(backend_http_settings.value.backend_port, var.use_https ? 443 : 80)
+      protocol                       = var.use_https ? "Https" : "Http"
+      request_timeout                = 10
+      trusted_root_certificate_names = var.use_https ? ["trusted-root"] : []
     }
   }
 
@@ -92,8 +93,9 @@ resource "azurerm_application_gateway" "appgw_regular" {
       name                           = http_listener.key
       frontend_ip_configuration_name = var.use_public_ip ? "public" : "private"
       frontend_port_name             = var.use_public_ip ? "public" : "private"
-      protocol                       = "Http"
+      protocol                       = var.use_https ? "Https" : "Http"
       host_names                     = var.tier == "Standard_v2" ? http_listener.value.host_names : null
+      ssl_certificate_name           = var.use_https ? "inbound-cert" : null
     }
   }
 
@@ -135,6 +137,23 @@ resource "azurerm_application_gateway" "appgw_regular" {
           header_value = "{var_add_x_forwarded_for_proxy}"
         }
       }
+    }
+  }
+
+  dynamic "ssl_certificate" {
+    for_each = var.use_https ? [1] : []
+    content {
+      name     = "inbound-cert"
+      data     = var.ssl_certificate_data
+      password = var.ssl_certificate_pass
+    }
+  }
+
+  dynamic "trusted_root_certificate" {
+    for_each = var.use_https ? [1] : []
+    content {
+      name = "trusted-root"
+      data = var.trusted_root_certificate_data
     }
   }
 }
