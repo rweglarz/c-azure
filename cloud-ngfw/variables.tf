@@ -58,7 +58,17 @@ variable "cloud_ngfw_panorama_config" {
   default     = null
 }
 
+variable "cloud_ngfw_public_ingress_ip_number" {
+  type    = number
+  default = 2
+  validation {
+    condition     = var.cloud_ngfw_public_ingress_ip_number >= 2
+    error_message = "2 services are eposed by default"
+  }
+}
+
 variable "cloud_ngfw_public_egress_ip_number" {
   type    = number
   default = 0
+  description = "additional IPs used for outbound"
 }

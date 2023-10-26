@@ -17,7 +17,25 @@ resource "azurerm_palo_alto_local_rulestack_rule" "inbound_app1" {
     cidrs = ["any"]
   }
   destination {
-    cidrs = ["${azurerm_public_ip.cloud_ngfw.ip_address}/32"]
+    cidrs = ["${azurerm_public_ip.cloud_ngfw[0].ip_address}/32"]
+  }
+  applications    = ["any"]
+  protocol        = "TCP:80"
+  logging_enabled = true
+}
+
+resource "azurerm_palo_alto_local_rulestack_rule" "inbound_app2" {
+  name         = "inbound-app2"
+  rulestack_id = azurerm_palo_alto_local_rulestack.this.id
+  priority     = 1002
+  action       = "Allow"
+
+
+  source {
+    cidrs = ["any"]
+  }
+  destination {
+    cidrs = ["${azurerm_public_ip.cloud_ngfw[1].ip_address}/32"]
   }
   applications    = ["any"]
   protocol        = "TCP:80"

@@ -1,4 +1,6 @@
 resource "azurerm_public_ip" "cloud_ngfw" {
+  count  = var.cloud_ngfw_public_ingress_ip_number
+
   resource_group_name    = azurerm_resource_group.rg.name
   location               = azurerm_resource_group.rg.location
 
@@ -29,10 +31,8 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
   panorama_base64_config = var.cloud_ngfw_panorama_config
 
   network_profile {
-    public_ip_address_ids = [
-      azurerm_public_ip.cloud_ngfw.id
-    ]
-    egress_nat_ip_address_ids = var.cloud_ngfw_public_egress_ip_number > 0 ? azurerm_public_ip.cloud_ngfw_snat[*].id : [azurerm_public_ip.cloud_ngfw.id]
+    public_ip_address_ids     = azurerm_public_ip.cloud_ngfw[*].id
+    egress_nat_ip_address_ids = var.cloud_ngfw_public_egress_ip_number > 0 ? azurerm_public_ip.cloud_ngfw_snat[*].id : []
 
     vnet_configuration {
       virtual_network_id  = azurerm_virtual_network.sec.id
@@ -44,11 +44,23 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
     name = "app01-srv1"
     protocol = "TCP"
     frontend_config {
-      public_ip_address_id = azurerm_public_ip.cloud_ngfw.id
+      public_ip_address_id = azurerm_public_ip.cloud_ngfw[0].id
       port = 80
     }
     backend_config {
       public_ip_address = module.app01_srv1.private_ip_address
+      port = 80
+    }
+  }
+  destination_nat {
+    name = "app02-srv1"
+    protocol = "TCP"
+    frontend_config {
+      public_ip_address_id = azurerm_public_ip.cloud_ngfw[1].id
+      port = 80
+    }
+    backend_config {
+      public_ip_address = module.app02_srv1.private_ip_address
       port = 80
     }
   }
@@ -67,10 +79,8 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_local_rules
   rulestack_id           = azurerm_palo_alto_local_rulestack.this.id
 
   network_profile {
-    public_ip_address_ids = [
-      azurerm_public_ip.cloud_ngfw.id
-    ]
-    egress_nat_ip_address_ids = var.cloud_ngfw_public_egress_ip_number > 0 ? azurerm_public_ip.cloud_ngfw_snat[*].id : [azurerm_public_ip.cloud_ngfw.id]
+    public_ip_address_ids     = azurerm_public_ip.cloud_ngfw[*].id
+    egress_nat_ip_address_ids = var.cloud_ngfw_public_egress_ip_number > 0 ? azurerm_public_ip.cloud_ngfw_snat[*].id : []
 
     vnet_configuration {
       virtual_network_id  = azurerm_virtual_network.sec.id
@@ -82,11 +92,23 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_local_rules
     name = "app01-srv1"
     protocol = "TCP"
     frontend_config {
-      public_ip_address_id = azurerm_public_ip.cloud_ngfw.id
+      public_ip_address_id = azurerm_public_ip.cloud_ngfw[0].id
       port = 80
     }
     backend_config {
       public_ip_address = module.app01_srv1.private_ip_address
+      port = 80
+    }
+  }
+  destination_nat {
+    name = "app02-srv1"
+    protocol = "TCP"
+    frontend_config {
+      public_ip_address_id = azurerm_public_ip.cloud_ngfw[1].id
+      port = 80
+    }
+    backend_config {
+      public_ip_address = module.app02_srv1.private_ip_address
       port = 80
     }
   }
@@ -104,5 +126,5 @@ locals {
 }
 
 output "cngfw_public_ip" {
-  value = azurerm_public_ip.cloud_ngfw.ip_address
+  value = azurerm_public_ip.cloud_ngfw[*].ip_address
 }
