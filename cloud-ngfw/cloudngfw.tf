@@ -48,7 +48,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
       port = 80
     }
     backend_config {
-      public_ip_address = module.app01_srv1.private_ip_address
+      public_ip_address = module.app01_srv[0].private_ip_address
       port = 80
     }
   }
@@ -60,7 +60,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
       port = 80
     }
     backend_config {
-      public_ip_address = module.app02_srv1.private_ip_address
+      public_ip_address = module.app02_srv[0].private_ip_address
       port = 80
     }
   }
@@ -96,7 +96,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_local_rules
       port = 80
     }
     backend_config {
-      public_ip_address = module.app01_srv1.private_ip_address
+      public_ip_address = module.app01_srv[0].private_ip_address
       port = 80
     }
   }
@@ -108,7 +108,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_local_rules
       port = 80
     }
     backend_config {
-      public_ip_address = module.app02_srv1.private_ip_address
+      public_ip_address = module.app02_srv[0].private_ip_address
       port = 80
     }
   }

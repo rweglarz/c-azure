@@ -72,3 +72,13 @@ variable "cloud_ngfw_public_egress_ip_number" {
   default = 0
   description = "additional IPs used for outbound"
 }
+
+variable "server_count" {
+  type    = number
+  default = 1
+}
+
+variable "server_size" {
+  type    = string
+  default = null
+}
