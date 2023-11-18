@@ -32,7 +32,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
 
   network_profile {
     public_ip_address_ids     = azurerm_public_ip.cloud_ngfw[*].id
-    egress_nat_ip_address_ids = var.cloud_ngfw_public_egress_ip_number > 0 ? azurerm_public_ip.cloud_ngfw_snat[*].id : []
+    egress_nat_ip_address_ids = var.cloud_ngfw_public_egress_ip_number > 0 ? azurerm_public_ip.cloud_ngfw_snat[*].id : null
 
     vnet_configuration {
       virtual_network_id  = azurerm_virtual_network.sec.id
@@ -80,7 +80,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_local_rules
 
   network_profile {
     public_ip_address_ids     = azurerm_public_ip.cloud_ngfw[*].id
-    egress_nat_ip_address_ids = var.cloud_ngfw_public_egress_ip_number > 0 ? azurerm_public_ip.cloud_ngfw_snat[*].id : []
+    egress_nat_ip_address_ids = var.cloud_ngfw_public_egress_ip_number > 0 ? azurerm_public_ip.cloud_ngfw_snat[*].id : null
 
     vnet_configuration {
       virtual_network_id  = azurerm_virtual_network.sec.id
