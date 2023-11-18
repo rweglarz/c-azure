@@ -26,6 +26,7 @@ variable "resource_group_name" {
 variable "size" {
   type    = string
   default = "Standard_DS1_v2"
+  nullable = false
 }
 
 variable "public_key" {
