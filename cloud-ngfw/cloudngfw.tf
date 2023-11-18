@@ -4,7 +4,7 @@ resource "azurerm_public_ip" "cloud_ngfw" {
   resource_group_name    = azurerm_resource_group.rg.name
   location               = azurerm_resource_group.rg.location
 
-  name              = "${var.name}-cngfw"
+  name              = "${var.name}-cngfw-${count.index}"
   allocation_method = "Static"
   sku               = "Standard"
   zones             = [1, 2, 3]
