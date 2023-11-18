@@ -40,6 +40,7 @@ module "fw" {
   password            = var.password
   img_version         = coalesce(each.value.fw_ver, var.fw_version)
   img_sku             = "byol"
+  vm_size             = try(each.value.vm_size, "Standard_D3_v2")
   interfaces = [
     {
       name             = "${var.name}-${each.key}-mgmt"
