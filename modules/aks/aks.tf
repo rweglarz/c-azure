@@ -12,8 +12,8 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   network_profile {
-    network_plugin = "azure"
-    outbound_type  = var.outbound_type
+    network_plugin      = var.network_plugin
+    outbound_type       = var.outbound_type
   }
 
   default_node_pool {

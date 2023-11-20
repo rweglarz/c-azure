@@ -34,6 +34,10 @@ variable "outbound_type" {
   }
 }
 
+variable "network_plugin" {
+  default = "azure"
+}
+
 variable "node_count" {
   default = 2
 }
