@@ -24,3 +24,7 @@ variable "subnet_mask_length" {
 variable "dns_servers" {
   default = []
 }
+
+variable "bgp_community" {
+  default = null
+}
