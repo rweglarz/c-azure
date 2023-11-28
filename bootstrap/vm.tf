@@ -10,9 +10,13 @@ module "bs" {
   storage_allow_vnet_subnet_ids = [
     module.net.subnets.mgmt.id
   ]
-  storage_allow_inbound_public_ips = [
-    for k,v in var.mgmt_ips: v.cidr if (!contains(["255.255.255.255","255.255.255.254"], cidrnetmask(v.cidr)))
+  storage_allow_inbound_public_ips = concat(
+    [for k,v in var.mgmt_ips: v.cidr if (!contains(["255.255.255.255","255.255.255.254"], cidrnetmask(v.cidr)))],
+    [
+      "20.105.209.72",   #serial console west-europe
+      "52.146.139.220",  #serial console west-europe
   ]
+  )
 }
 
 locals {
