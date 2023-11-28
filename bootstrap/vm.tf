@@ -15,7 +15,7 @@ module "bs" {
     [
       "20.105.209.72",   #serial console west-europe
       "52.146.139.220",  #serial console west-europe
-  ]
+    ]
   )
 }
 
