@@ -80,7 +80,7 @@ output "bs" {
       "access-key=${module.bs[k].storage_account.primary_access_key}",
       "file-share=${module.bs[k].storage_share.name}",
       "share-directory=None"
-    ] : null, []),
+    ] : [], []),
   ))}
   sensitive = true
 }
