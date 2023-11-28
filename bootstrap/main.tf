@@ -10,6 +10,9 @@ data "azurerm_subscriptions" "azsub" {
 resource "azurerm_resource_group" "this" {
   name     = var.name
   location = var.region
+  tags = {
+    StoreStatus = "DND"
+  }
 }
 
 resource "azurerm_ssh_public_key" "this" {
