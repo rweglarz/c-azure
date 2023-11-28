@@ -42,6 +42,9 @@ module "fw" {
   name                = "${var.name}-${each.key}"
   username            = var.username
   password            = var.password
+  ssh_keys            = [
+    file("/Users/rweglarz/.ssh/id_rsa.pub")
+  ]
   img_version         = coalesce(each.value.fw_ver, var.fw_version)
   img_sku             = "byol"
   vm_size             = try(each.value.vm_size, "Standard_D3_v2")
