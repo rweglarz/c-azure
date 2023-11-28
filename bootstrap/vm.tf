@@ -48,6 +48,7 @@ module "fw" {
   img_version         = coalesce(each.value.fw_ver, var.fw_version)
   img_sku             = "byol"
   vm_size             = try(each.value.vm_size, "Standard_D3_v2")
+  custom_image_id     = try(each.value.custom_image_id, null)
   interfaces = [
     {
       name             = "${var.name}-${each.key}-mgmt"
