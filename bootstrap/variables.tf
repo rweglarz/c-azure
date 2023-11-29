@@ -40,3 +40,7 @@ variable "dns_zone_rg" {
 variable "dns_zone_name" {
   type = string
 }
+
+variable "firewall-template-parking" {
+  description = "not used, just to store some examples"
+}
