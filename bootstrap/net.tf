@@ -25,7 +25,7 @@ module "net" {
 
   subnets = {
     "mgmt" = {
-      address_prefixes          = [cidrsubnet(local.vnet_address_space.net[0], 4, 0)]
+      address_prefixes          = [cidrsubnet(local.vnet_address_space.net[0], 2, 0)]
       associate_nsg             = true
       network_security_group_id = module.basic.sg_id["mgmt"]
       service_endpoints = [
@@ -33,10 +33,10 @@ module "net" {
       ]
     },
     "internet" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.net[0], 4, 1)]
+      address_prefixes = [cidrsubnet(local.vnet_address_space.net[0], 2, 1)]
     },
     "private" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.net[0], 4, 2)]
+      address_prefixes = [cidrsubnet(local.vnet_address_space.net[0], 2, 2)]
     },
   }
 }
