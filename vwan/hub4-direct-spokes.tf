@@ -5,6 +5,7 @@ module "hub4_spoke1" {
 
   name          = "${local.dname}-hub4-spoke1"
   address_space = [local.vnet_cidr.hub4_spoke1]
+  bgp_community = "12076:20041"
 
   subnets = {
     "s1" = {
@@ -27,6 +28,7 @@ module "hub4_spoke2" {
 
   name          = "${local.dname}-hub4-spoke2"
   address_space = [local.vnet_cidr.hub4_spoke2]
+  bgp_community = "12076:20042"
 
   subnets = {
     "s1" = {
