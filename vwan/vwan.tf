@@ -20,9 +20,6 @@ resource "azurerm_virtual_hub" "hub2" {
   location            = var.region1
   virtual_wan_id      = azurerm_virtual_wan.vwan1.id
   address_prefix      = local.vnet_cidr.hub2
-  tags = {
-    hubSaaSPreview = "true"
-  }
 }
 
 resource "azurerm_virtual_hub" "hub3" {
@@ -39,9 +36,6 @@ resource "azurerm_virtual_hub" "hub4" {
   location            = var.region2
   virtual_wan_id      = azurerm_virtual_wan.vwan1.id
   address_prefix      = local.vnet_cidr.hub4
-  tags = {
-    hubSaaSPreview = "true"
-  }
 }
 
 
