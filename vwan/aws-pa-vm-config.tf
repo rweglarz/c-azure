@@ -19,6 +19,18 @@ resource "panos_panorama_management_profile" "aws_ping" {
   }
 }
 
+resource "panos_panorama_management_profile" "aws_ssh" {
+  template   = panos_panorama_template.aws.name
+
+  name = "ssh"
+  ping = true
+  ssh  = true
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "panos_panorama_ethernet_interface" "aws_eth1_1" {
   template   = panos_panorama_template.aws.name
   name       = "ethernet1/1"
@@ -39,7 +51,7 @@ resource "panos_panorama_ethernet_interface" "aws_eth1_3" {
   vsys       = "vsys1"
   mode       = "layer3"
   static_ips = [local.ip_mask["priv"][0]]
-  management_profile = panos_panorama_management_profile.aws_ping.name
+  management_profile = panos_panorama_management_profile.aws_ssh.name
 }
 
 resource "panos_panorama_tunnel_interface" "aws_tun10" {
