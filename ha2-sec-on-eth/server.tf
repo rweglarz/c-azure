@@ -113,6 +113,7 @@ module "srv0" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.rwe.public_key
   security_group      = azurerm_network_security_group.mgmt.id
+  associate_nsg       = true
 }
 
 module "srv1" {
@@ -126,6 +127,7 @@ module "srv1" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.rwe.public_key
   security_group      = azurerm_network_security_group.mgmt.id
+  associate_nsg       = true
 }
 
 module "srv5" {
@@ -139,6 +141,7 @@ module "srv5" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.rwe.public_key
   security_group      = azurerm_network_security_group.mgmt.id
+  associate_nsg       = true
 }
 
 module "srv6" {
@@ -152,4 +155,5 @@ module "srv6" {
   password            = var.password
   public_key          = azurerm_ssh_public_key.rwe.public_key
   security_group      = azurerm_network_security_group.mgmt.id
+  associate_nsg       = true
 }
