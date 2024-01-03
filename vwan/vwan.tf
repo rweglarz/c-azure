@@ -47,7 +47,7 @@ resource "azurerm_virtual_hub_connection" "hub1-hub1_sec" {
     static_vnet_route {
       name = "hub1 sec spokes via nva"
       address_prefixes = [
-        cidrsubnet(var.region1_cidr, 2, 1)
+        cidrsubnet(var.region1_cidr, 2, 0)
       ]
       next_hop_ip_address = cidrhost(module.hub1_sec.subnets.data.address_prefixes[0], 5)
     }
