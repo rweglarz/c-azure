@@ -309,3 +309,20 @@ resource "panos_panorama_bgp_peer" "tun21" {
   multi_hop               = 1
 }
 
+resource "panos_panorama_bgp_export_rule_group" "aws_vr1_bgp_ex" {
+  template                = panos_panorama_template.aws.name
+  virtual_router = "vr1"
+  rule {
+    name = "r1"
+    match_address_prefix {
+      prefix = module.vpc-fw-1.vpc.cidr_block
+      exact  = false
+    }
+    match_route_table   = "unicast"
+    action              = "allow"
+    used_by             = [panos_panorama_bgp_peer_group.aws-vr1-g1.name]
+  }
+
+  lifecycle { create_before_destroy = true }
+}
+
