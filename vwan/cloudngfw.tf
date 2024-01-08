@@ -37,7 +37,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama" "hub2
   }
 
   depends_on = [
-    aws_ec2_managed_prefix_list_entry.cloud_ngfw_hub2
+    aws_ec2_managed_prefix_list_entry.cloud_ngfws
   ]
 }
 
@@ -75,6 +75,6 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama" "hub4
   panorama_base64_config = var.cloud_ngfw_panorama_config.hub4
 
   depends_on = [
-    aws_ec2_managed_prefix_list_entry.cloud_ngfw_hub4
+    aws_ec2_managed_prefix_list_entry.cloud_ngfws
   ]
 }
