@@ -199,3 +199,7 @@ output "vmseries1_management_ip" {
   value = azurerm_public_ip.mgmt[1].ip_address
 }
 
+output "public_ip_untrust" {
+  value = azurerm_public_ip.untrust[*].ip_address
+}
+
