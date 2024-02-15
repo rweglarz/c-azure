@@ -35,7 +35,9 @@ resource "panos_panorama_ethernet_interface" "azure_ha2_eth1_2" {
   vsys     = "vsys1"
   mode     = "layer3"
   static_ips = [
-    "${azurerm_network_interface.data[1].ip_configuration[1].private_ip_address}/28"
+    "${local.fw_ip.public.fws}/${local.subnet_mask_length}",
+    "${local.fw_ip.public.fw0}/32",
+    "${local.fw_ip.public.fw1}/32",
   ]
   enable_dhcp = false
 
@@ -54,8 +56,8 @@ resource "panos_panorama_loopback_interface" "azure_ha2_lo2" {
   template = panos_panorama_template.azure_ha2.name
   name     = "loopback.2"
   static_ips = [
-    "${azurerm_network_interface.data[1].ip_configuration[0].private_ip_address}/32",
-    "${azurerm_network_interface.data[4].ip_configuration[0].private_ip_address}/32",
+    # "${local.fw_ip.public.fw0}/32",
+    # "${local.fw_ip.public.fw1}/32",
   ]
   management_profile = panos_panorama_management_profile.azure_ha2_ping.name
 }
@@ -67,7 +69,9 @@ resource "panos_panorama_ethernet_interface" "azure_ha2_eth1_3" {
   vsys        = "vsys1"
   mode        = "layer3"
   static_ips  = [
-    "${azurerm_network_interface.data[2].ip_configuration[1].private_ip_address}/28",
+    "${local.fw_ip.private.fws}/${local.subnet_mask_length}",
+    "${local.fw_ip.private.fw0}/32",
+    "${local.fw_ip.private.fw1}/32",
   ]
   enable_dhcp = false
 
@@ -78,24 +82,24 @@ resource "panos_panorama_loopback_interface" "azure_ha2_lo3" {
   template = panos_panorama_template.azure_ha2.name
   name     = "loopback.3"
   static_ips = [
-    "${azurerm_network_interface.data[2].ip_configuration[0].private_ip_address}/32",
-    "${azurerm_network_interface.data[5].ip_configuration[0].private_ip_address}/32",
+    # "${local.fw_ip.private.fw0}/32",
+    # "${local.fw_ip.private.fw1}/32",
   ]
   management_profile = panos_panorama_management_profile.azure_ha2_ping.name
 }
 
-resource "panos_zone" "azure_ha2_internet" {
+resource "panos_zone" "azure_ha2_public" {
   template = panos_panorama_template.azure_ha2.name
-  name     = "internet"
+  name     = "public"
   mode     = "layer3"
   interfaces = [
     panos_panorama_ethernet_interface.azure_ha2_eth1_2.name,
     panos_panorama_loopback_interface.azure_ha2_lo2.name,
   ]
 }
-resource "panos_zone" "azure_ha2_servers" {
+resource "panos_zone" "azure_ha2_private" {
   template = panos_panorama_template.azure_ha2.name
-  name     = "servers"
+  name     = "private"
   mode     = "layer3"
   interfaces = [
     panos_panorama_ethernet_interface.azure_ha2_eth1_3.name,
@@ -115,9 +119,9 @@ resource "panos_virtual_router" "ha2_vr1" {
 resource "panos_panorama_static_route_ipv4" "ha2_vr1_dg" {
   template       = panos_panorama_template.azure_ha2.name
   virtual_router = panos_virtual_router.ha2_vr1.name
-  name           = "internet"
+  name           = "public"
   destination    = "0.0.0.0/0"
-  next_hop       = cidrhost(azurerm_subnet.data[1].address_prefixes[0], 1)
+  next_hop       = cidrhost(module.vnet_sec.subnets.public.address_prefixes[0], 1)
   interface      = panos_panorama_ethernet_interface.azure_ha2_eth1_2.name
 }
 resource "panos_panorama_static_route_ipv4" "ha2_vr1_private" {
@@ -125,7 +129,7 @@ resource "panos_panorama_static_route_ipv4" "ha2_vr1_private" {
   virtual_router = panos_virtual_router.ha2_vr1.name
   name           = "private"
   destination    = "172.16.0.0/12"
-  next_hop       = cidrhost(azurerm_subnet.data[2].address_prefixes[0], 1)
+  next_hop       = cidrhost(module.vnet_sec.subnets.private.address_prefixes[0], 1)
   interface      = panos_panorama_ethernet_interface.azure_ha2_eth1_3.name
 }
 
@@ -147,25 +151,25 @@ resource "panos_panorama_template_variable" "ha0-ha2_local_ip" {
   template_stack = panos_panorama_template_stack.azure_ha2_0.name
   name           = "$ha2-local-ip"
   type           = "ip-netmask"
-  value          = azurerm_network_interface.data[0].ip_configuration[0].private_ip_address
+  value          = local.fw_ip.ha2.fw0
 }
 resource "panos_panorama_template_variable" "ha1-ha2_local_ip" {
   template_stack = panos_panorama_template_stack.azure_ha2_1.name
   name           = "$ha2-local-ip"
   type           = "ip-netmask"
-  value          = azurerm_network_interface.data[3].ip_configuration[0].private_ip_address
+  value          = local.fw_ip.ha2.fw1
 }
 resource "panos_panorama_template_variable" "ha0-ha2_gw" {
   template_stack = panos_panorama_template_stack.azure_ha2_0.name
   name           = "$ha2-gw"
   type           = "ip-netmask"
-  value          = cidrhost(azurerm_subnet.data[0].address_prefixes[0], 1)
+  value          = cidrhost(module.vnet_sec.subnets.ha2.address_prefixes[0], 1)
 }
 resource "panos_panorama_template_variable" "ha1-ha2_gw" {
   template_stack = panos_panorama_template_stack.azure_ha2_1.name
   name           = "$ha2-gw"
   type           = "ip-netmask"
-  value          = cidrhost(azurerm_subnet.data[0].address_prefixes[0], 1)
+  value          = cidrhost(module.vnet_sec.subnets.ha2.address_prefixes[0], 1)
 }
 
 /*
@@ -188,16 +192,16 @@ resource "panos_panorama_ike_gateway" "ha1z_ha2z" {
   template      = panos_panorama_template.ha1z.name
   name          = "ha2z"
   peer_ip_type  = "ip"
-  peer_ip_value = one([for k, v in module.fw-ha2z_a.public_ips : v if length(regexall("internet", k)) > 0])
+  peer_ip_value = one([for k, v in module.fw-ha2z_a.public_ips : v if length(regexall("public", k)) > 0])
 
   interface           = "ethernet1/2"
   pre_shared_key      = "secret"
   ikev1_exchange_mode = "main"
 
   local_id_type  = "ipaddr"
-  local_id_value = one([for k, v in module.fw-ha1z_a.public_ips : v if length(regexall("internet", k)) > 0])
+  local_id_value = one([for k, v in module.fw-ha1z_a.public_ips : v if length(regexall("public", k)) > 0])
   peer_id_type   = "ipaddr"
-  peer_id_value  = one([for k, v in module.fw-ha2z_a.public_ips : v if length(regexall("internet", k)) > 0])
+  peer_id_value  = one([for k, v in module.fw-ha2z_a.public_ips : v if length(regexall("public", k)) > 0])
 
   enable_nat_traversal              = true
   nat_traversal_keep_alive          = 10
@@ -232,26 +236,78 @@ resource "panos_panorama_management_profile" "ha1z_ping" {
   ping     = true
 }
 
+*/
+
+locals {
+  device_group = "azure-ha"
+}
 
 
-resource "panos_security_rule_group" "ha1z_ipsec" {
+resource "panos_panorama_address_object" "public_shared_internal_ip" {
+  device_group = local.device_group
+  name         = "shared-pub-0"
+  value        = local.fw_ip.public.fws
+
+  lifecycle { create_before_destroy = true }
+}
+
+
+resource "panos_security_rule_group" "this" {
+  device_group = local.device_group
   position_keyword = "bottom"
-  device_group     = "azure-ha1z"
+
   rule {
-    name                  = "ipsec ping allow"
+    name                  = "inbound ssh"
     audit_comment         = ""
-    source_zones          = ["any"]
+    source_zones          = ["public"]
     source_addresses      = ["any"]
     source_users          = ["any"]
-    destination_zones     = ["any"]
-    destination_addresses = ["any"]
+    destination_zones     = ["private"]
+    destination_addresses = [panos_panorama_address_object.public_shared_internal_ip.name]
     applications = [
-      "ipsec",
-      "ping",
+      "ssh",
     ]
     services   = ["application-default"]
     categories = ["any"]
     action     = "allow"
   }
+
+  depends_on = [ panos_panorama_address_object.public_shared_internal_ip ]
+
+  lifecycle { create_before_destroy = true }
 }
-*/
+
+
+resource panos_panorama_nat_rule_group "this" {
+  device_group = local.device_group
+  position_keyword = "bottom"
+
+  rule {
+    name = "inbound ssh nat"
+    original_packet {
+      source_zones          = ["public"]
+      destination_zone      = "public"
+      source_addresses      = ["any"]
+      destination_addresses = [panos_panorama_address_object.public_shared_internal_ip.name]
+    }
+    translated_packet {
+      source {
+        # dynamic_ip_and_port {
+        #   translated_address {
+        #     translated_addresses = [local.fw_ip.private.fws]
+        #   }
+        # }
+      }
+      destination {
+        dynamic_translation {
+          address = module.sec-srv5.private_ip_address
+          port    = 22
+        }
+      }
+    }
+  }
+
+  depends_on = [ panos_panorama_address_object.public_shared_internal_ip ]
+
+  lifecycle { create_before_destroy = true }
+}

@@ -1,4 +1,27 @@
-# Public IP Address:
+locals {
+  subnet_mask_length = 27
+  fw_ip = {
+    mgmt = {
+      fw0 = cidrhost(module.vnet_sec.subnets.mgmt.address_prefixes[0], 4 + 0),
+      fw1 = cidrhost(module.vnet_sec.subnets.mgmt.address_prefixes[0], 4 + 1),
+    }
+    ha2 = {
+      fw0 = cidrhost(module.vnet_sec.subnets.ha2.address_prefixes[0], 4 + 0),
+      fw1 = cidrhost(module.vnet_sec.subnets.ha2.address_prefixes[0], 4 + 1),
+    }
+    public = {
+      fw0 = cidrhost(module.vnet_sec.subnets.public.address_prefixes[0], 4 + 0),
+      fw1 = cidrhost(module.vnet_sec.subnets.public.address_prefixes[0], 4 + 1),
+      fws = cidrhost(module.vnet_sec.subnets.public.address_prefixes[0], 4 + 2),
+    }
+    private = {
+      fw0 = cidrhost(module.vnet_sec.subnets.private.address_prefixes[0], 4 + 0),
+      fw1 = cidrhost(module.vnet_sec.subnets.private.address_prefixes[0], 4 + 1),
+      fws = cidrhost(module.vnet_sec.subnets.private.address_prefixes[0], 4 + 2),
+    }
+  }
+}
+
 resource "azurerm_public_ip" "mgmt" {
   count               = 2
   name                = "${var.name}-mgmt-${count.index}"
@@ -6,162 +29,132 @@ resource "azurerm_public_ip" "mgmt" {
   location            = azurerm_resource_group.rg.location
   allocation_method   = "Static"
   sku                 = "Standard"
-  zones               = [1, 2, 3]
+  zones               = toset(var.availabilty_zones)
 }
 
-# Network Interface:
 resource "azurerm_network_interface" "mgmt" {
   count                = 2
-  name                 = "${var.name}-mgmt-${count.index}"
+  name                 = "${var.name}-fw${count.index}-mgmt"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
   enable_ip_forwarding = false
 
   ip_configuration {
-    name                          = "ipconfig1"
-    subnet_id                     = azurerm_subnet.mgmt.id
+    name                          = "primary"
+    subnet_id                     = module.vnet_sec.subnets.mgmt.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = cidrhost(azurerm_subnet.mgmt.address_prefixes[0], 4 + count.index)
+    private_ip_address            = local.fw_ip.mgmt["fw${count.index}"]
     public_ip_address_id          = azurerm_public_ip.mgmt[count.index].id
   }
 }
 
-resource "azurerm_network_security_group" "mgmt" {
-  name                = "${var.name}-nsg-mgmt"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+resource "azurerm_network_interface" "ha2" {
+  count                = 2
+  name                 = "${var.name}-fw${count.index}-ha2"
+  resource_group_name  = azurerm_resource_group.rg.name
+  location             = azurerm_resource_group.rg.location
 
-  security_rule {
-    name                    = "management-inbound"
-    priority                = 1000
-    direction               = "Inbound"
-    access                  = "Allow"
-    protocol                = "Tcp"
-    source_port_range       = "*"
-    destination_port_ranges = ["443", "22"]
-    source_address_prefixes = concat(
-      [for r in var.mgmt_ips : "${r.cidr}"]
-    )
-    destination_address_prefix = "*"
-  }
-}
-
-resource "azurerm_network_interface_security_group_association" "mgmt" {
-  count                     = 2
-  network_interface_id      = azurerm_network_interface.mgmt[count.index].id
-  network_security_group_id = azurerm_network_security_group.mgmt.id
-}
-
-resource "azurerm_public_ip" "untrust" {
-  count               = 1
-  name                = "${var.name}-untrust-${count.index}"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  allocation_method   = "Static"
-  sku                 = "Standard"
-  zones               = [1, 2, 3]
-}
-
-# Network Interface
-# id fw nic pub
-# 0  0  0   0 2
-# 1  0  1    
-# 2  0  2
-# 3  1  0   1 3
-# 4  1  1
-# 5  1  2
-resource "azurerm_network_interface" "data" {
-  count                         = 2 * 3
-  name                          = "${var.name}-fw${(count.index - (count.index % 3)) / 3}-nic${count.index % 3}"
-  location                      = azurerm_resource_group.rg.location
-  resource_group_name           = azurerm_resource_group.rg.name
   enable_ip_forwarding          = true
   enable_accelerated_networking = true
 
   ip_configuration {
     name                          = "primary"
-    subnet_id                     = azurerm_subnet.data[count.index % 3].id
+    subnet_id                     = module.vnet_sec.subnets.ha2.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = cidrhost(azurerm_subnet.data[count.index % 3].address_prefixes[0], 4 + ((count.index - (count.index % 3)) / 3))
-    primary                       = true
+    private_ip_address            = local.fw_ip.ha2["fw${count.index}"]
   }
-  # 1 and 2 interfaces have one secondary
+}
+
+resource "azurerm_network_interface" "public" {
+  count                = 2
+  name                 = "${var.name}-fw${count.index}-public"
+  resource_group_name  = azurerm_resource_group.rg.name
+  location             = azurerm_resource_group.rg.location
+
+  enable_ip_forwarding          = true
+  enable_accelerated_networking = true
+
+  ip_configuration {
+    name                          = "primary"
+    primary                       = true
+    subnet_id                     = module.vnet_sec.subnets.public.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = local.fw_ip.public["fw${count.index}"]
+  }
   dynamic "ip_configuration" {
-    for_each = [
-      for i in [1] : i
-      if contains([1, 2], count.index)
-    ]
+    for_each = (count.index==0) ? [1]: []
     content {
       name                          = "secondary"
-      subnet_id                     = azurerm_subnet.data[count.index % 3].id
+      subnet_id                     = module.vnet_sec.subnets.public.id
       private_ip_address_allocation = "Static"
-      private_ip_address            = cidrhost(azurerm_subnet.data[count.index % 3].address_prefixes[0], 6)
-      # this public ip will only be applied to first instance on eth1/2==1 data interface
-      public_ip_address_id = (count.index == 1) ? azurerm_public_ip.untrust[0].id : null
+      private_ip_address            = local.fw_ip.public["fws"]
+      public_ip_address_id          = (count.index == 0) ? azurerm_public_ip.untrust[0].id : null
     }
   }
 }
 
-resource "azurerm_network_security_group" "data" {
-  name                = "${var.name}-nsg-data"
+resource "azurerm_network_interface_security_group_association" "public" {
+  count = 2
+  network_interface_id      = azurerm_network_interface.public[count.index].id
+  network_security_group_id = module.basic.sg_id.wide-open
+}
+
+resource "azurerm_network_interface" "private" {
+  count                = 2
+  name                 = "${var.name}-fw${count.index}-private"
+  resource_group_name  = azurerm_resource_group.rg.name
+  location             = azurerm_resource_group.rg.location
+
+  enable_ip_forwarding          = true
+  enable_accelerated_networking = true
+
+  ip_configuration {
+    name                          = "primary"
+    primary                       = true
+    subnet_id                     = module.vnet_sec.subnets.private.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = local.fw_ip.private["fw${count.index}"]
+  }
+  dynamic "ip_configuration" {
+    for_each = (count.index==0) ? [1]: []
+    content {
+      name                          = "secondary-${count.index}"
+      subnet_id                     = module.vnet_sec.subnets.private.id
+      private_ip_address_allocation = "Static"
+      private_ip_address            = local.fw_ip.private["fws"]
+    }
+  }
+}
+
+resource "azurerm_public_ip" "untrust" {
+  count               = 1
+  name                = "${var.name}-fw-untrust-${count.index}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-
-  security_rule {
-    name                       = "data-inbound"
-    priority                   = 1000
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
-
-  security_rule {
-    name                       = "data-outbound"
-    priority                   = 1000
-    direction                  = "Outbound"
-    access                     = "Allow"
-    protocol                   = "*"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  zones               = toset(var.availabilty_zones)
 }
 
-# Network Security Group (Data)
-resource "azurerm_network_interface_security_group_association" "data" {
-  count                     = 2 * 3
-  network_interface_id      = azurerm_network_interface.data[count.index].id
-  network_security_group_id = azurerm_network_security_group.data.id
-}
-
-#----------------------------------------------------------------------------------------------------------------------
-# VM-Series - Virtual Machine
-#----------------------------------------------------------------------------------------------------------------------
 
 resource "azurerm_linux_virtual_machine" "vmseries" {
   count = 2
 
-  name                = "${var.name}-vm-${count.index}"
+  name                = "${var.name}-fw-${count.index}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
+  zone                = var.availabilty_zones[count.index]
   size                = var.instance_type
 
   disable_password_authentication = false
   admin_username                  = var.username
   admin_password                  = var.password
 
-
-  # Network Interfaces:
   network_interface_ids = [
     azurerm_network_interface.mgmt[count.index].id,
-    azurerm_network_interface.data[count.index * 3 + 0].id,
-    azurerm_network_interface.data[count.index * 3 + 1].id,
-    azurerm_network_interface.data[count.index * 3 + 2].id,
+    azurerm_network_interface.ha2[count.index].id,
+    azurerm_network_interface.public[count.index].id,
+    azurerm_network_interface.private[count.index].id,
   ]
 
   plan {
@@ -184,7 +177,6 @@ resource "azurerm_linux_virtual_machine" "vmseries" {
     storage_account_type = "Standard_LRS"
   }
 
-  # Bootstrap Information for Azure:
   custom_data = base64encode(join("\n", compact(concat(
     [for k, v in var.bootstrap_options : "${k}=${v}"],
     ["tplname=azure-ha2-${count.index}"],

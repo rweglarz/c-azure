@@ -1,3 +1,13 @@
+variable "azure_subscription" {
+   type    = string
+   default = "change_me"
+}
+
+variable "region" {
+  type    = string
+  default = "polandcentral"
+}
+
 variable "name" {
   description = "Name/Prefix of the deployment"
   type = string
@@ -5,7 +15,12 @@ variable "name" {
 variable "cidr" {
   description = "vpc cidr"
   type = string
-  default   = "172.29.0.0/23"
+  default   = "172.29.0.0/22"
+}
+
+variable "availabilty_zones" {
+  type = list
+  default = [1, 2]
 }
 
 variable "mgmt_ips" {
