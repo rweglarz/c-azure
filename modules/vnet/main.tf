@@ -50,3 +50,23 @@ resource "azurerm_subnet_network_security_group_association" "this" {
   subnet_id                 = azurerm_subnet.this[each.key].id
   network_security_group_id = each.value.network_security_group_id
 }
+
+
+resource "azurerm_virtual_network_peering" "on_local" {
+  for_each = var.vnet_peering
+
+  name                      = each.value.peer_vnet_name
+  resource_group_name       = var.resource_group_name
+  virtual_network_name      = azurerm_virtual_network.this.name
+  remote_virtual_network_id = each.value.peer_vnet_id
+  allow_forwarded_traffic   = try(each.value.allow_forwarded_traffic, false)
+}
+
+resource "azurerm_virtual_network_peering" "on_remote" {
+  for_each = var.vnet_peering
+
+  name                      = azurerm_virtual_network.this.name
+  resource_group_name       = var.resource_group_name
+  virtual_network_name      = each.value.peer_vnet_name
+  remote_virtual_network_id = azurerm_virtual_network.this.id
+}
