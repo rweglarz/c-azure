@@ -21,6 +21,27 @@ resource "azurerm_vpn_gateway" "hub2" {
 
 
 
+resource "azurerm_vpn_gateway" "hub4" {
+  name                = "${local.dname}-hub4"
+  location            = azurerm_resource_group.rg2.location
+  resource_group_name = azurerm_resource_group.rg2.name
+  virtual_hub_id      = azurerm_virtual_hub.hub4.id
+  bgp_settings {
+    asn         = var.asn.hub4
+    peer_weight = 0
+    instance_0_bgp_peering_address {
+      custom_ips = var.peering_address.hub4_i0
+    }
+    instance_1_bgp_peering_address {
+      custom_ips = var.peering_address.hub4_i1
+    }
+  }
+  depends_on = [ 
+    azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama.hub4
+  ]
+}
+
+
 resource "azurerm_vpn_site" "aws1" {
   name                = "aws1-${random_id.did.hex}"
   location            = azurerm_resource_group.rg1.location

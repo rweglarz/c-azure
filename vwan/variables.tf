@@ -65,6 +65,7 @@ variable "asn" {
     hub2            = 65515 # must be
     hub2_sdwan_fw   = 65021
     hub4_sdwan_fw   = 65022
+    hub4            = 65515 # must be
     ipsec_hub2_fw1  = 65041
     ipsec_hub2_fw2  = 65042
     sdwan_spoke1_fw = 65101
@@ -98,6 +99,14 @@ variable "peering_address" {
     hub2_i1 = [
       "169.254.21.3",
       "169.254.21.4",
+    ],
+    hub4_i0 = [
+      "169.254.21.5",
+      "169.254.21.6",
+    ],
+    hub4_i1 = [
+      "169.254.21.7",
+      "169.254.21.8",
     ],
     ipsec_hub2_fw1-tun21 = [
       "169.254.31.1"
@@ -151,4 +160,8 @@ variable "cloud_ngfw_private_ips" {
 
 variable "cloud_ngfw_panorama_config" {
   type = map
+}
+
+variable "prisma_access" {
+  default = {}
 }

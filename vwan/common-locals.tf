@@ -32,6 +32,10 @@ locals {
       [for ip in azurerm_vpn_gateway.hub2.bgp_settings[0].instance_0_bgp_peering_address[0].tunnel_ips: ip if cidrhost("${ip}/12",0)!=cidrhost("172.16.0.0/12",0)][0],
       [for ip in azurerm_vpn_gateway.hub2.bgp_settings[0].instance_1_bgp_peering_address[0].tunnel_ips: ip if cidrhost("${ip}/12",0)!=cidrhost("172.16.0.0/12",0)][0],
     ]
+    hub4 = [
+      [for ip in azurerm_vpn_gateway.hub4.bgp_settings[0].instance_0_bgp_peering_address[0].tunnel_ips: ip if cidrhost("${ip}/12",0)!=cidrhost("172.16.0.0/12",0)][0],
+      [for ip in azurerm_vpn_gateway.hub4.bgp_settings[0].instance_1_bgp_peering_address[0].tunnel_ips: ip if cidrhost("${ip}/12",0)!=cidrhost("172.16.0.0/12",0)][0],
+    ]
     ipsec_hub2_fw1 = [
       one([for k, v in module.ipsec_hub2_fw1.public_ips : v if length(regexall("internet", k)) > 0]),
     ],
