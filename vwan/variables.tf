@@ -62,7 +62,7 @@ variable "psk" {
 variable "asn" {
   default = {
     aws_fw1         = 65001
-    hub2_vpn1       = 65515
+    hub2            = 65515 # must be
     hub2_sdwan_fw   = 65021
     hub4_sdwan_fw   = 65022
     ipsec_hub2_fw1  = 65041
@@ -91,11 +91,11 @@ variable "peering_address" {
       "169.254.21.11",
       "169.254.21.12",
     ],
-    hub2_vpn1_i0 = [
+    hub2_i0 = [
       "169.254.21.1",
       "169.254.21.2",
     ],
-    hub2_vpn1_i1 = [
+    hub2_i1 = [
       "169.254.21.3",
       "169.254.21.4",
     ],

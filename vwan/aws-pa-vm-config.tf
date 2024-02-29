@@ -110,32 +110,32 @@ resource "panos_virtual_router" "aws-vr1" {
 resource "panos_panorama_static_route_ipv4" "aws-vr1-tun10" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
-  name           = "isp1-i0"
-  destination    = "${var.peering_address.hub2_vpn1_i0[0]}/32"
+  name           = "hub2-i0-0"
+  destination    = "${var.peering_address.hub2_i0[0]}/32"
   interface      = panos_panorama_tunnel_interface.aws_tun10.name
   type           = ""
 }
 resource "panos_panorama_static_route_ipv4" "aws-vr1-tun11" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
-  name           = "isp1-i1"
-  destination    = "${var.peering_address.hub2_vpn1_i0[1]}/32"
+  name           = "hub2-i0-1"
+  destination    = "${var.peering_address.hub2_i0[1]}/32"
   interface      = panos_panorama_tunnel_interface.aws_tun11.name
   type           = ""
 }
 resource "panos_panorama_static_route_ipv4" "aws-vr1-tun20" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
-  name           = "isp2-i0"
-  destination    = "${var.peering_address.hub2_vpn1_i1[0]}/32"
+  name           = "hub2-i1-0"
+  destination    = "${var.peering_address.hub2_i1[0]}/32"
   interface      = panos_panorama_tunnel_interface.aws_tun20.name
   type           = ""
 }
 resource "panos_panorama_static_route_ipv4" "aws-vr1-tun21" {
   template       = panos_panorama_template.aws.name
   virtual_router = panos_virtual_router.aws-vr1.name
-  name           = "isp2-i1"
-  destination    = "${var.peering_address.hub2_vpn1_i1[1]}/32"
+  name           = "hub2-i1-1"
+  destination    = "${var.peering_address.hub2_i1[1]}/32"
   interface      = panos_panorama_tunnel_interface.aws_tun21.name
   type           = ""
 }
@@ -158,8 +158,8 @@ resource "panos_panorama_static_route_ipv4" "aws-vr1-eth1_2-dg" {
 }
 
 
-resource "panos_panorama_ike_gateway" "aws_fw1-hub2_vpn1" {
-  for_each = local.tunnel-aws_fw1-hub2_vpn1
+resource "panos_panorama_ike_gateway" "aws_fw1-hub2" {
+  for_each = local.tunnel-aws_fw1-hub2
 
   template      = panos_panorama_template.aws.name
   name          = each.key
@@ -185,8 +185,8 @@ resource "panos_panorama_ike_gateway" "aws_fw1-hub2_vpn1" {
   dead_peer_detection_retry    = 5
 }
 
-resource "panos_panorama_ipsec_tunnel" "aws_fw1-hub2_vpn1" {
-  for_each = local.tunnel-aws_fw1-hub2_vpn1
+resource "panos_panorama_ipsec_tunnel" "aws_fw1-hub2" {
+  for_each = local.tunnel-aws_fw1-hub2
 
   name             = each.key
   template         = panos_panorama_template.aws.name
@@ -195,7 +195,7 @@ resource "panos_panorama_ipsec_tunnel" "aws_fw1-hub2_vpn1" {
   ak_ike_gateway   = each.key
 
   depends_on = [
-    panos_panorama_ike_gateway.aws_fw1-hub2_vpn1
+    panos_panorama_ike_gateway.aws_fw1-hub2
   ]
 }
 
@@ -265,10 +265,10 @@ resource "panos_panorama_bgp_peer" "tun10" {
   name                    = "tun10"
   virtual_router          = panos_virtual_router.aws-vr1.name
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
-  peer_as                 = var.asn["hub2_vpn1"]
+  peer_as                 = var.asn.hub2
   local_address_interface = panos_panorama_loopback_interface.aws_isp1.name
   local_address_ip        = panos_panorama_loopback_interface.aws_isp1.static_ips[0]
-  peer_address_ip         = var.peering_address.hub2_vpn1_i0[0]
+  peer_address_ip         = var.peering_address.hub2_i0[0]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
@@ -277,10 +277,10 @@ resource "panos_panorama_bgp_peer" "tun11" {
   name                    = "tun11"
   virtual_router          = panos_virtual_router.aws-vr1.name
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
-  peer_as                 = var.asn["hub2_vpn1"]
+  peer_as                 = var.asn.hub2
   local_address_interface = panos_panorama_loopback_interface.aws_isp1.name
   local_address_ip        = panos_panorama_loopback_interface.aws_isp1.static_ips[0]
-  peer_address_ip         = var.peering_address.hub2_vpn1_i0[1]
+  peer_address_ip         = var.peering_address.hub2_i0[1]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
@@ -289,10 +289,10 @@ resource "panos_panorama_bgp_peer" "tun20" {
   name                    = "tun20"
   virtual_router          = panos_virtual_router.aws-vr1.name
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
-  peer_as                 = var.asn["hub2_vpn1"]
+  peer_as                 = var.asn.hub2
   local_address_interface = panos_panorama_loopback_interface.aws_isp2.name
   local_address_ip        = panos_panorama_loopback_interface.aws_isp2.static_ips[0]
-  peer_address_ip         = var.peering_address.hub2_vpn1_i1[0]
+  peer_address_ip         = var.peering_address.hub2_i1[0]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
@@ -301,10 +301,10 @@ resource "panos_panorama_bgp_peer" "tun21" {
   name                    = "tun21"
   virtual_router          = panos_virtual_router.aws-vr1.name
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
-  peer_as                 = var.asn["hub2_vpn1"]
+  peer_as                 = var.asn.hub2
   local_address_interface = panos_panorama_loopback_interface.aws_isp2.name
   local_address_ip        = panos_panorama_loopback_interface.aws_isp2.static_ips[0]
-  peer_address_ip         = var.peering_address.hub2_vpn1_i1[1]
+  peer_address_ip         = var.peering_address.hub2_i1[1]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
