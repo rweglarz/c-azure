@@ -162,6 +162,54 @@ variable "cloud_ngfw_panorama_config" {
   type = map
 }
 
+variable "ssl_certificate_path" {
+  default = null
+}
+
+variable "ssl_certificate_pass" {
+  default = null
+}
+
+variable "trusted_root_certificate_path" {
+  default = null
+}
+
+
+variable "sdwan_announce_dg" {
+  type = bool
+  default = false
+}
+
+
 variable "prisma_access" {
   default = {}
+#   prisma_access = {
+#   pagp1 = {
+#     ipsec_policy = {
+#       # phase1
+#       dh_group = "DHGroup14"
+#       ike_encryption_algorithm = "AES256"
+#       ike_integrity_algorithm = "SHA256"
+#       # phase2
+#       encryption_algorithm  = "AES256"
+#       integrity_algorithm = "SHA256"
+#       pfs_group = "PFS14"
+#       sa_lifetime_sec = 27000
+#       sa_data_size_kb = 2147483647 #max
+#     }
+#     links = {
+#       pri = {
+#         asn = 65534
+#         public_ip = "10.0.0.1"
+#         peering_address = "192.168.255.3"
+#         psk = "qaz123"
+#         protocol = "IKEv1"
+#         connect_to = {
+#           hub2 = {}
+#           hub4 = {}
+#         }
+#       }
+#     }
+#   }
+# }
 }
