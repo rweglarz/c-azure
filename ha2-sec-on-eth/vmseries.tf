@@ -179,7 +179,7 @@ resource "azurerm_linux_virtual_machine" "vmseries" {
 
   custom_data = base64encode(join("\n", compact(concat(
     [for k, v in var.bootstrap_options : "${k}=${v}"],
-    ["tplname=azure-ha2-${count.index}"],
+    ["tplname=${panos_panorama_template_stack.azure_ha2[count.index].name}"],
   ))))
 }
 

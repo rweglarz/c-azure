@@ -1,28 +1,23 @@
 resource "panos_panorama_template" "azure_ha2" {
-  name = "azure-ha2"
+  name = "azure-ha2-${random_id.did.hex}"
+
+  description = "azrg:${var.name}-${random_id.did.hex}"
 }
-resource "panos_panorama_template_stack" "azure_ha2_0" {
-  name         = "azure-ha2-0"
+
+resource "panos_panorama_template_stack" "azure_ha2" {
+  count = 2
+
+  name         = "azure-ha2-${random_id.did.hex}-${count.index}"
   default_vsys = "vsys1"
   templates = [
     panos_panorama_template.azure_ha2.name,
-    "azure-ha2-rg",
+    "azure-ha2-azcreds",
     "vm-ha-ha2-eth1-1",
     "vm common",
   ]
   description = "pat:acp"
 }
-resource "panos_panorama_template_stack" "azure_ha2_1" {
-  name         = "azure-ha2-1"
-  default_vsys = "vsys1"
-  templates = [
-    panos_panorama_template.azure_ha2.name,
-    "azure-ha2-rg",
-    "vm-ha-ha2-eth1-1",
-    "vm common",
-  ]
-  description = "pat:acp"
-}
+
 
 resource "panos_panorama_management_profile" "azure_ha2_ping" {
   template = panos_panorama_template.azure_ha2.name
@@ -135,38 +130,28 @@ resource "panos_panorama_static_route_ipv4" "ha2_vr1_private" {
 
 
 
-resource "panos_panorama_template_variable" "ha0-ha1_peer_ip" {
-  template_stack = panos_panorama_template_stack.azure_ha2_0.name
+resource "panos_panorama_template_variable" "ha1_peer_ip" {
+  count = 2
+
+  template_stack = panos_panorama_template_stack.azure_ha2[count.index].name
   name           = "$ha1-peer-ip"
   type           = "ip-netmask"
-  value          = azurerm_network_interface.mgmt[1].ip_configuration[0].private_ip_address
+  value          = azurerm_network_interface.mgmt[(count.index==0) ? 1 : 0].ip_configuration[0].private_ip_address
 }
-resource "panos_panorama_template_variable" "ha1-ha1_peer_ip" {
-  template_stack = panos_panorama_template_stack.azure_ha2_1.name
-  name           = "$ha1-peer-ip"
-  type           = "ip-netmask"
-  value          = azurerm_network_interface.mgmt[0].ip_configuration[0].private_ip_address
-}
-resource "panos_panorama_template_variable" "ha0-ha2_local_ip" {
-  template_stack = panos_panorama_template_stack.azure_ha2_0.name
+
+resource "panos_panorama_template_variable" "ha2_local_ip" {
+  count = 2
+
+  template_stack = panos_panorama_template_stack.azure_ha2[count.index].name
   name           = "$ha2-local-ip"
   type           = "ip-netmask"
-  value          = local.fw_ip.ha2.fw0
+  value          = (count.index==0) ? local.fw_ip.ha2.fw0 : local.fw_ip.ha2.fw1
 }
-resource "panos_panorama_template_variable" "ha1-ha2_local_ip" {
-  template_stack = panos_panorama_template_stack.azure_ha2_1.name
-  name           = "$ha2-local-ip"
-  type           = "ip-netmask"
-  value          = local.fw_ip.ha2.fw1
-}
+
 resource "panos_panorama_template_variable" "ha0-ha2_gw" {
-  template_stack = panos_panorama_template_stack.azure_ha2_0.name
-  name           = "$ha2-gw"
-  type           = "ip-netmask"
-  value          = cidrhost(module.vnet_sec.subnets.ha2.address_prefixes[0], 1)
-}
-resource "panos_panorama_template_variable" "ha1-ha2_gw" {
-  template_stack = panos_panorama_template_stack.azure_ha2_1.name
+  count = 2
+
+  template_stack = panos_panorama_template_stack.azure_ha2[count.index].name
   name           = "$ha2-gw"
   type           = "ip-netmask"
   value          = cidrhost(module.vnet_sec.subnets.ha2.address_prefixes[0], 1)

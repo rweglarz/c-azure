@@ -20,8 +20,12 @@ provider "panos" {
 }
 
 
+resource "random_id" "did" {
+  byte_length = 3 #to workaround delete recreate cross regions
+}
+
 resource "azurerm_resource_group" "rg" {
-  name     = var.name
+  name     = "${var.name}-${random_id.did.hex}"
   location = var.region
 }
 
