@@ -49,9 +49,11 @@ variable "psk" {
 
 variable "asn" {
   default = {
-    hub1   = 65515 # must be
-    hub2   = 65515 # must be
-    onprem = 65001
+    hub1        = 65515 # must be
+    hub2        = 65515 # must be
+    onprem      = 65001
+    hub1_sdwan1 = 65101
+    hub1_sdwan2 = 65102
   }
 }
 

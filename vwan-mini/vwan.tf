@@ -82,6 +82,24 @@ resource "azurerm_virtual_hub_connection" "hub1-hub1_sec" {
 }
 
 
+
+resource "azurerm_virtual_hub_connection" "hub1-hub1_sdwan" {
+  name                      = "${local.dname}-hub1-sdwan"
+  virtual_hub_id            = azurerm_virtual_hub.hub1.id
+  remote_virtual_network_id = module.vnet_hub1_sdwan.vnet.id
+}
+
+resource "azurerm_virtual_hub_bgp_connection" "hub1_sdwan" {
+  count = 2
+  name                          = "hub1-sdwan-${count.index+1}"
+  virtual_hub_id                = azurerm_virtual_hub.hub1.id
+  virtual_network_connection_id = azurerm_virtual_hub_connection.hub1-hub1_sdwan.id
+  peer_asn                      = count.index==0 ? var.asn.hub1_sdwan1 : var.asn.hub1_sdwan2
+  peer_ip                       = count.index==0 ? local.private_ip.hub1_sdwan1 : local.private_ip.hub1_sdwan2
+}
+
+
+
 resource "azurerm_virtual_hub_connection" "hub2-hub2_spoke1" {
   name                      = "${local.dname}-hub2-spoke1"
   virtual_hub_id            = azurerm_virtual_hub.hub2.id

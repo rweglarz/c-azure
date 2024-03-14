@@ -1,27 +1,5 @@
-module "vnet_onprem" {
-  source              = "../modules/vnet"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-
-  name          = "${local.dname}-onprem"
-  address_space = ["10.0.0.0/24"]
-
-  subnets = {
-    "public" = {
-      idx                       = 0
-      network_security_group_id = module.basic.sg_id.mgmt
-      associate_nsg             = true
-    },
-    "private" = {
-      idx                       = 1
-      network_security_group_id = module.basic.sg_id.wide-open
-      associate_nsg             = true
-    },
-  }
-}
-
-
-data "template_cloudinit_config" "onprem" {
+data "template_cloudinit_config" "hub1_sdwan" {
+  count = 2
   gzip          = true
   base64_encode = true
 
@@ -32,11 +10,7 @@ data "template_cloudinit_config" "onprem" {
       write_files = [
         {
           path    = "/etc/bird/bird.conf"
-          content = templatefile("${path.module}/init/bird.conf.tfpl", local.linux_init_p.onprem)
-        },
-        {
-          path    = "/etc/ipsec.conf"
-          content = templatefile("${path.module}/init/ipsec.conf.tfpl", local.linux_init_p.onprem)
+          content = templatefile("${path.module}/init/bird.conf.tfpl", count.index==0 ? local.linux_init_p.sdwan1 : local.linux_init_p.sdwan1)
         },
         {
           path        = "/var/lib/cloud/scripts/per-once/bird.sh"
@@ -63,7 +37,7 @@ data "template_cloudinit_config" "onprem" {
                   dhcp6      = "no"
                   accept-ra  = "no"
                   interfaces = []
-                  addresses  = local.linux_init_p.onprem.lo_ips
+                  addresses  = count.index==0 ? local.linux_init_p.sdwan1.lo_ips : local.linux_init_p.sdwan2.lo_ips
                 }
               }
             }
@@ -77,23 +51,23 @@ data "template_cloudinit_config" "onprem" {
         "bird",
         "fping",
         "net-tools",
-        "strongswan",
       ]
     })
   }
 }
 
-module "linux_onprem" {
+module "linux_hub1_sdwan" {
+  count = 2
   source = "../modules/linux"
 
-  name                = "${var.name}-onprem"
+  name                = "${var.name}-hub1-sdwan-${count.index}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  subnet_id           = module.vnet_onprem.subnets.public.id
-  private_ip_address  = local.private_ip.onprem
+  subnet_id           = module.vnet_hub1_sdwan.subnets.s0.id
+  private_ip_address  = count.index==0 ? local.private_ip.hub1_sdwan1 : local.private_ip.hub1_sdwan2
   password            = var.password
   public_key          = azurerm_ssh_public_key.this.public_key
 
   enable_ip_forwarding = true
-  custom_data          = data.template_cloudinit_config.onprem.rendered
+  custom_data          = data.template_cloudinit_config.hub1_sdwan[count.index].rendered
 }

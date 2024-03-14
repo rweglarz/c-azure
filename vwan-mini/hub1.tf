@@ -51,6 +51,25 @@ module "vnet_hub1_spoke1" {
   }
 }
 
+
+module "vnet_hub1_sdwan" {
+  source              = "../modules/vnet"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  name          = "${local.dname}-hub1-sdwan"
+  address_space = [local.vnet_cidr.hub1_sdwan]
+
+  subnets = {
+    "s0" = {
+      idx                       = 0
+      network_security_group_id = module.basic.sg_id.mgmt
+      associate_nsg             = true
+    },
+  }
+}
+
+
 resource "azurerm_subnet_route_table_association" "hub1_spoke1" {
   subnet_id      = module.vnet_hub1_spoke1.subnets.s0.id
   route_table_id = module.basic.route_table_id.private-via-fw.hub1

@@ -1,0 +1,33 @@
+# basic configuration
+
+config setup
+        # strictcrlpolicy=yes
+        # uniqueids = no
+
+conn tun0
+  left        = ${local_ip}
+  right       = ${vpn_peer1_ip}
+  leftsubnet  = 0.0.0.0/0
+  rightsubnet = 0.0.0.0/0
+  authby      = psk
+  mark        = 101
+  auto        = route
+  keyexchange = ikev2
+  keyingtries = %forever
+  ike         = aes256-sha1-modp1024
+  esp         = aes256gcm128
+  mobike      = no
+
+conn tun1
+  left        = ${local_ip}
+  right       = ${vpn_peer2_ip}
+  leftsubnet  = 0.0.0.0/0
+  rightsubnet = 0.0.0.0/0
+  authby      = psk
+  mark        = 102
+  auto        = route
+  keyexchange = ikev2
+  keyingtries = %forever
+  ike         = aes256-sha1-modp1024
+  esp         = aes256gcm128
+  mobike      = no
