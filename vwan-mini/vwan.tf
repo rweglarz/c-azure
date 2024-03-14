@@ -64,3 +64,26 @@ resource "azurerm_vpn_gateway_connection" "hub1_onprem" {
     shared_key       = var.psk
   }
 }
+
+
+resource "azurerm_virtual_hub_connection" "hub1-hub1_sec" {
+  name                      = "${local.dname}-hub1-sec"
+  virtual_hub_id            = azurerm_virtual_hub.hub1.id
+  remote_virtual_network_id = module.vnet_hub1_sec.vnet.id
+  routing {
+    static_vnet_route {
+      name = "hub1 sec spokes via nva"
+      address_prefixes = [
+        module.vnet_hub1_spoke1.vnet.address_space[0],
+      ]
+      next_hop_ip_address = local.private_ip.hub1_sec_lb
+    }
+  }
+}
+
+
+resource "azurerm_virtual_hub_connection" "hub2-hub2_spoke1" {
+  name                      = "${local.dname}-hub2-spoke1"
+  virtual_hub_id            = azurerm_virtual_hub.hub2.id
+  remote_virtual_network_id = module.vnet_hub2_spoke1.vnet.id
+}

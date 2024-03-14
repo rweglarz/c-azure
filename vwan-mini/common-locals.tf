@@ -4,9 +4,10 @@ locals {
   vnet_cidr = {
     hub1            = cidrsubnet(var.region_cidr, 4, 0)
     hub1_sec        = cidrsubnet(var.region_cidr, 4, 1)
-    hub1_sec_spoke1 = cidrsubnet(var.region_cidr, 5, 2*2 + 0)
-    hub1_sec_spoke2 = cidrsubnet(var.region_cidr, 5, 2*2 + 1)
+    hub1_spoke1     = cidrsubnet(var.region_cidr, 5, 2*2 + 0)
+    hub1_spoke2     = cidrsubnet(var.region_cidr, 5, 2*2 + 1)
     hub2            = cidrsubnet(var.region_cidr, 4, 4)
+    hub2_spoke1     = cidrsubnet(var.region_cidr, 5, 5*2 + 0)
   }
 
 
@@ -17,7 +18,8 @@ locals {
     ]
   }
   private_ip = {
-    onprem = cidrhost(module.vnet_onprem.subnets.public.address_prefixes[0], 5)
+    onprem      = cidrhost(module.vnet_onprem.subnets.public.address_prefixes[0], 5)
+    hub1_sec_lb = cidrhost(module.vnet_hub1_sec.subnets.private.address_prefixes[0], 5)
   }
   peering_address = {
     hub1 = [

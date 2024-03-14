@@ -62,9 +62,13 @@ variable "dns_zone_name" {
   type = string
 }
 
-variable "fw_version" {
+variable "panos_version" {
   type    = string
-  default = null
+  default = "11.1.2"
+}
+variable "vmss_size" {
+  type    = number
+  default = 1
 }
 
 variable "pl-mgmt-csp_nat_ips" {
