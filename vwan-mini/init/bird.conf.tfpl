@@ -1,0 +1,48 @@
+router id ${local_ip};
+
+log "/var/log/bird/bird.log" all;
+
+debug protocols {events,states};
+
+protocol device {
+  scan time 10;
+  import all;
+}
+protocol direct {
+  interface "db0";
+}
+protocol kernel {
+  export all;
+  import all;
+  scan time 15;
+  learn yes;
+}
+
+protocol bgp peer1 {
+  import filter {
+    accept;
+  };
+  export filter {
+    if (net ~ [10.0.0.0/8+] ) then accept;
+  };
+  multihop;
+  local as ${local_asn};
+  source address ${local_ip};
+  graceful restart on;
+  neighbor ${peer1_ip} as ${peer1_asn};
+}
+
+protocol bgp peer2 {
+  import filter {
+    accept;
+  };
+  export filter {
+    if (net ~ [10.0.0.0/8+] ) then accept;
+  };
+  multihop;
+  local as ${local_asn};
+  source address ${local_ip};
+  graceful restart on;
+  multihop;
+  neighbor ${peer2_ip} as ${peer2_asn};
+}
