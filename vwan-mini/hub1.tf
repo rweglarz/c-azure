@@ -52,6 +52,33 @@ module "vnet_hub1_spoke1" {
 }
 
 
+module "vnet_hub1_spoke2" {
+  source              = "../modules/vnet"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  name          = "${local.dname}-hub1-spoke2"
+  address_space = [local.vnet_cidr.hub1_spoke2]
+
+  subnets = {
+    "s0" = {
+      idx                       = 0
+      network_security_group_id = module.basic.sg_id.mgmt
+      associate_nsg             = true
+    },
+  }
+
+  vnet_peering = {
+    hub1_sec = {
+      peer_vnet_name          = module.vnet_hub1_sec.vnet.name
+      peer_vnet_id            = module.vnet_hub1_sec.vnet.id
+      allow_forwarded_traffic = true
+    }
+  }
+}
+
+
+
 module "vnet_hub1_sdwan" {
   source              = "../modules/vnet"
   resource_group_name = azurerm_resource_group.rg.name
