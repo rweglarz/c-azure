@@ -35,16 +35,10 @@ locals {
     sdwan1 = {
       local_ip  = cidrhost(module.vnet_sdwan.subnets.s0.address_prefixes[0], 6)
       local_asn = var.asn.sdwan1
-      peers = {
-        fw0 = {
-          name = "fw0"
+      peers = { for k,v in module.fw: k => {
+          name = "fw${k}"
           asn = var.asn.fw
-          ip = cidrhost(module.vnet_transit.subnets.tosdwan1.address_prefixes[0], 6 + 0)
-        }
-        fw1 = {
-          name = "fw1"
-          asn = var.asn.fw
-          ip = cidrhost(module.vnet_transit.subnets.tosdwan1.address_prefixes[0], 6 + 1)
+          ip = v.private_ip_list.tosdwan1[0]
         }
       }
       lo_ips = [
@@ -56,16 +50,10 @@ locals {
     sdwan2 = {
       local_ip  = cidrhost(module.vnet_sdwan.subnets.s1.address_prefixes[0], 7)
       local_asn = var.asn.sdwan2
-      peers = {
-        fw0 = {
-          name = "fw0"
+      peers = { for k,v in module.fw: k => {
+          name = "fw${k}"
           asn = var.asn.fw
-          ip = cidrhost(module.vnet_transit.subnets.tosdwan2.address_prefixes[0], 6 + 0)
-        }
-        fw1 = {
-          name = "fw1"
-          asn = var.asn.fw
-          ip = cidrhost(module.vnet_transit.subnets.tosdwan2.address_prefixes[0], 6 + 1)
+          ip = v.private_ip_list.tosdwan2[0]
         }
       }
       lo_ips = [
