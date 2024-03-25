@@ -10,6 +10,9 @@ module "hub1_sec_spoke1_h" {
   public_key          = azurerm_ssh_public_key.rg1.public_key
   security_group      = azurerm_network_security_group.rg1_mgmt.id
   associate_nsg       = true
+  tags = {
+    rwe-region = "region1"
+  }
 }
 
 module "hub2_spoke1_s1_h" {
@@ -24,6 +27,10 @@ module "hub2_spoke1_s1_h" {
   public_key          = azurerm_ssh_public_key.rg1.public_key
   security_group      = azurerm_network_security_group.rg1_mgmt.id
   associate_nsg       = true
+  tags = {
+    rwe-region = "region1"
+    rwe-github = "yes"
+  }
 }
 
 module "hub2_spoke1_s2_h" {
@@ -38,6 +45,9 @@ module "hub2_spoke1_s2_h" {
   public_key          = azurerm_ssh_public_key.rg1.public_key
   security_group      = azurerm_network_security_group.rg1_mgmt.id
   associate_nsg       = true
+  tags = {
+    rwe-region = "region1"
+  }
 }
 
 module "hub2_spoke2_h" {
@@ -52,5 +62,8 @@ module "hub2_spoke2_h" {
   public_key          = azurerm_ssh_public_key.rg1.public_key
   security_group      = azurerm_network_security_group.rg1_mgmt.id
   associate_nsg       = true
+  tags = {
+    rwe-region = "region1"
+  }
 }
 

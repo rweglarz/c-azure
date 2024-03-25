@@ -10,6 +10,9 @@ module "hub4_spoke1_s1_h" {
   public_key          = azurerm_ssh_public_key.rg2.public_key
   security_group      = azurerm_network_security_group.rg2_mgmt.id
   associate_nsg       = true
+  tags = {
+    rwe-region = "region2"
+  }
 }
 
 module "hub4_spoke1_s2_h" {
@@ -24,6 +27,9 @@ module "hub4_spoke1_s2_h" {
   public_key          = azurerm_ssh_public_key.rg2.public_key
   security_group      = azurerm_network_security_group.rg2_mgmt.id
   associate_nsg       = true
+  tags = {
+    rwe-region = "region2"
+  }
 }
 
 module "hub4_spoke2_h_prv" {
@@ -38,6 +44,9 @@ module "hub4_spoke2_h_prv" {
   public_key          = azurerm_ssh_public_key.rg2.public_key
   security_group      = azurerm_network_security_group.rg2_mgmt.id
   associate_nsg       = true
+  tags = {
+    rwe-region = "region2"
+  }
 }
 
 module "hub4_spoke2_h_pub" {
@@ -53,6 +62,9 @@ module "hub4_spoke2_h_pub" {
   security_group      = azurerm_network_security_group.rg2_mgmt.id
   associate_nsg       = true
   associate_public_ip = false
+  tags = {
+    rwe-region = "region2"
+  }
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "hub4_spoke2_pub" {
@@ -73,4 +85,7 @@ module "sdwan_spoke1_h" {
   public_key          = azurerm_ssh_public_key.rg2.public_key
   security_group      = azurerm_network_security_group.rg2_mgmt.id
   associate_nsg       = true
+  tags = {
+    rwe-region = "region2"
+  }
 }
