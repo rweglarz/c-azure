@@ -22,6 +22,33 @@ resource "azurerm_public_ip" "cloud_ngfw_snat" {
   zones             = [1, 2, 3]
 }
 
+locals {
+  cngfw_inbound_nats = {
+    app01-srv1 = {
+      protocol = "TCP"
+      frontend_config = {
+        public_ip_address_id = azurerm_public_ip.cloud_ngfw[0].id
+        port = 80
+      }
+      backend_config = {
+        public_ip_address = module.app01_srv[0].private_ip_address
+        port = 80
+      }
+    }
+    app02-srv1 = {
+      protocol = "TCP"
+      frontend_config = {
+        public_ip_address_id = azurerm_public_ip.cloud_ngfw[1].id
+        port = 80
+      }
+      backend_config = {
+        public_ip_address = module.app02_srv[0].private_ip_address
+        port = 80
+      }
+    }
+  }
+}
+
 
 resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "this" {
   count = var.cloud_ngfw_panorama_config==null ? 0 : 1
@@ -40,28 +67,19 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
       untrusted_subnet_id = azurerm_subnet.public.id
     }
   }
-  destination_nat {
-    name = "app01-srv1"
-    protocol = "TCP"
-    frontend_config {
-      public_ip_address_id = azurerm_public_ip.cloud_ngfw[0].id
-      port = 80
-    }
-    backend_config {
-      public_ip_address = module.app01_srv[0].private_ip_address
-      port = 80
-    }
-  }
-  destination_nat {
-    name = "app02-srv1"
-    protocol = "TCP"
-    frontend_config {
-      public_ip_address_id = azurerm_public_ip.cloud_ngfw[1].id
-      port = 80
-    }
-    backend_config {
-      public_ip_address = module.app02_srv[0].private_ip_address
-      port = 80
+  dynamic destination_nat {
+    for_each = local.cngfw_inbound_nats
+    content {
+      name = destination_nat.key
+      protocol = destination_nat.value.protocol
+      frontend_config {
+        public_ip_address_id = destination_nat.value.frontend_config.public_ip_address_id
+        port = destination_nat.value.frontend_config.port
+      }
+      backend_config {
+        public_ip_address = destination_nat.value.backend_config.public_ip_address
+        port = destination_nat.value.backend_config.port
+      }
     }
   }
 
@@ -88,28 +106,19 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_local_rules
       untrusted_subnet_id = azurerm_subnet.public.id
     }
   }
-  destination_nat {
-    name = "app01-srv1"
-    protocol = "TCP"
-    frontend_config {
-      public_ip_address_id = azurerm_public_ip.cloud_ngfw[0].id
-      port = 80
-    }
-    backend_config {
-      public_ip_address = module.app01_srv[0].private_ip_address
-      port = 80
-    }
-  }
-  destination_nat {
-    name = "app02-srv1"
-    protocol = "TCP"
-    frontend_config {
-      public_ip_address_id = azurerm_public_ip.cloud_ngfw[1].id
-      port = 80
-    }
-    backend_config {
-      public_ip_address = module.app02_srv[0].private_ip_address
-      port = 80
+  dynamic destination_nat {
+    for_each = local.cngfw_inbound_nats
+    content {
+      name = destination_nat.key
+      protocol = destination_nat.value.protocol
+      frontend_config {
+        public_ip_address_id = destination_nat.value.frontend_config.public_ip_address_id
+        port = destination_nat.value.frontend_config.port
+      }
+      backend_config {
+        public_ip_address = destination_nat.value.backend_config.public_ip_address
+        port = destination_nat.value.backend_config.port
+      }
     }
   }
 }
