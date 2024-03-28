@@ -1,3 +1,8 @@
+variable "region" {
+  type    = string
+  default = "polandcentral"
+}
+
 variable "name" {
   description = "Name/Prefix of the deployment"
   type = string
