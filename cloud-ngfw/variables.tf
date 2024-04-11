@@ -9,7 +9,7 @@ variable "name" {
 
 variable "region" {
   type    = string
-  default = "West Europe"
+  default = "North Europe"
 }
 
 variable "sec_vpc_cidr" {
