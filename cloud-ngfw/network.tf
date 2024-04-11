@@ -10,9 +10,10 @@ resource "azurerm_network_security_group" "mgmt" {
     access                  = "Allow"
     protocol                = "Tcp"
     source_port_range       = "*"
-    destination_port_ranges = ["443", "22"]
+    destination_port_range  = "*"
     source_address_prefixes = concat(
-      [for r in var.mgmt_ips : "${r.cidr}"]
+      [for r in var.mgmt_ips : "${r.cidr}"],
+      ["172.16.0.0/12"],
     )
     destination_address_prefix = "*"
   }
