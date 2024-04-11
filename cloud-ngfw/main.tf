@@ -1,12 +1,16 @@
 provider "azurerm" {
   features {}
 }
-data "azurerm_subscriptions" "azsub" {
-  display_name_contains = var.subscription
+
+resource "random_id" "did" {
+  byte_length = 3 #to workaround delete recreate cross regions
+}
+locals {
+  dname = "${var.name}-${random_id.did.hex}"
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = var.name
+  name     = local.dname
   location = var.region
 }
 
