@@ -1,6 +1,22 @@
+terraform {
+  required_providers {
+    panos = {
+      source = "PaloAltoNetworks/panos"
+    }
+    azurerm = {
+      version = "~>3.97"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
+
+provider "panos" {
+  json_config_file = "panorama_creds.json"
+}
+
 
 resource "azurerm_resource_group" "rg" {
   name     = var.name
