@@ -4,7 +4,7 @@ terraform {
       source = "PaloAltoNetworks/panos"
     }
     azurerm = {
-      version = "~>3.97"
+      version = "~>3.105"
     }
   }
 }
