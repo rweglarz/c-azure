@@ -40,12 +40,22 @@ module "appgw1" {
 }
 
 
-output "aks1_identities" {
-  value = {
-    aks = module.aks1.identity
-    appgw = module.aks1.ingress_application_gateway_identity
-  }
+resource "azurerm_role_assignment" "reader" {
+  scope                = azurerm_resource_group.rg.id
+  role_definition_name = "Reader"
+  principal_id         = module.aks1.ingress_application_gateway_identity.object_id
 }
+resource "azurerm_role_assignment" "contributor" {
+  scope                = module.appgw1.id
+  role_definition_name = "Contributor"
+  principal_id         = module.aks1.ingress_application_gateway_identity.object_id
+}
+resource "azurerm_role_assignment" "network_contributor" {
+  scope                = module.vnet_aks.subnets.appgw1.id
+  role_definition_name = "Network Contributor"
+  principal_id         = module.aks1.ingress_application_gateway_identity.object_id
+}
+
 
 output "appgw1" {
   value = module.appgw1.public_ip_address
