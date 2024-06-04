@@ -2,14 +2,16 @@ resource "azurerm_public_ip" "vng_right_c1" {
   name                = "${var.name}-right-vng-c1"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_public_ip" "vng_right_c2" {
   name                = "${var.name}-right-vng-c2"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
-  allocation_method   = "Dynamic"
+  allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_virtual_network_gateway" "right" {
@@ -22,7 +24,7 @@ resource "azurerm_virtual_network_gateway" "right" {
 
   active_active = true
   enable_bgp    = true
-  sku           = "HighPerformance"
+  sku           = "VpnGw1"
 
   ip_configuration {
     name                 = "c1"
