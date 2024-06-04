@@ -56,7 +56,7 @@ locals {
   }
 }
 
-data "template_cloudinit_config" "sdgw" {
+data "cloudinit_config" "sdgw" {
   for_each      = local.sdgw_init_p
   gzip          = true
   base64_encode = true
@@ -128,7 +128,7 @@ module "linux_right_env1_sdgw" {
 
   password    = var.password
   public_key  = azurerm_ssh_public_key.rg1.public_key
-  custom_data = data.template_cloudinit_config.sdgw[each.key].rendered
+  custom_data = data.cloudinit_config.sdgw[each.key].rendered
 }
 
 
