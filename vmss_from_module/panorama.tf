@@ -15,7 +15,7 @@ resource "panos_panorama_template_stack" "this" {
 
 resource "panos_panorama_template_variable" "eth1_1_gw" {
   template_stack = panos_panorama_template_stack.this.name
-  name           = "$eth1-1-gw"
+  name           = "$eth1_1_gw"
   type           = "ip-netmask"
   value          = cidrhost(module.vnet_sec.subnets["public"].address_prefixes[0], 1)
 
@@ -24,7 +24,7 @@ resource "panos_panorama_template_variable" "eth1_1_gw" {
 
 resource "panos_panorama_template_variable" "eth1_2_gw" {
   template_stack = panos_panorama_template_stack.this.name
-  name           = "$eth1-2-gw"
+  name           = "$eth1_2_gw"
   type           = "ip-netmask"
   value          = cidrhost(module.vnet_sec.subnets["private"].address_prefixes[0], 1)
 
@@ -68,28 +68,28 @@ resource "panos_security_rule_group" "this" {
   rule {
     name                  = "ext-1"
     source_zones          = ["public"]
-    source_addresses      = ["company ips"]
+    source_addresses      = ["safe ips"]
     source_users          = ["any"]
     destination_zones     = ["private"]
     destination_addresses = [panos_address_object.pub_ext_1.name]
     applications          = ["any"]
     services              = ["any"]
     categories            = ["any"]
-    group                 = "fairly strict"
+    group                 = "almost default"
     action                = "allow"
     log_setting           = "panka"
   }
   rule {
     name                  = "ext-2"
     source_zones          = ["public"]
-    source_addresses      = ["company ips"]
+    source_addresses      = ["safe ips"]
     source_users          = ["any"]
     destination_zones     = ["private"]
     destination_addresses = [panos_address_object.pub_ext_2.name]
     applications          = ["any"]
     services              = ["any"]
     categories            = ["any"]
-    group                 = "fairly strict"
+    group                 = "almost default"
     log_setting           = "panka"
     action                = "allow"
   }
@@ -107,7 +107,7 @@ resource "panos_security_rule_group" "this" {
     services              = ["any"]
     categories            = ["any"]
     action                = "allow"
-    group                 = "fairly strict"
+    group                 = "almost default"
     log_setting           = "panka"
   }
   rule {
