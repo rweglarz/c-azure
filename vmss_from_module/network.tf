@@ -8,28 +8,28 @@ module "vnet_sec" {
 
   subnets = {
     "mgmt" = {
-      address_prefixes          = [cidrsubnet(local.vnet_address_space.sec[0], 3, 0)]
+      idx                       = 0
       associate_nsg             = true
       network_security_group_id = module.basic.sg_id["mgmt"]
     },
     "public" = {
-      address_prefixes          = [cidrsubnet(local.vnet_address_space.sec[0], 3, 1)]
+      idx                       = 1
       associate_nsg             = true
       network_security_group_id = module.basic.sg_id["wide-open"]
     },
     "private" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.sec[0], 3, 2)]
+      idx                       = 2
       # associate_nsg             = true
       # network_security_group_id = module.basic.sg_id["wide-open"]
     },
     "jump" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.sec[0], 3, 3)]
+      idx                       = 3
     },
     "appgw1" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.sec[0], 3, 4)]
+      idx                       = 4
     },
     "appgw2" = {
-      address_prefixes = [cidrsubnet(local.vnet_address_space.sec[0], 3, 5)]
+      idx                       = 5
     },
   }
 }
