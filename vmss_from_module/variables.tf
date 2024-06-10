@@ -1,5 +1,6 @@
-variable "azure_subscription" {
-  type = string
+variable "region" {
+  type    = string
+  default = "North Europe"
 }
 
 variable "name" {

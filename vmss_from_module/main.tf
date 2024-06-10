@@ -2,13 +2,9 @@ provider "azurerm" {
   features {}
 }
 
-data "azurerm_subscriptions" "azsub" {
-  display_name_contains = var.azure_subscription
-}
-
 resource "azurerm_resource_group" "rg" {
   name     = var.name
-  location = "West Europe"
+  location = var.region
 }
 
 terraform {
