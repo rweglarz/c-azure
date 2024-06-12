@@ -1,6 +1,5 @@
 resource "azurerm_vpn_gateway" "hub2" {
-  #name                = "${local.dname}-hub2"
-  name                = local.dname
+  name                = "${local.dname}-hub2"
   location            = azurerm_resource_group.rg1.location
   resource_group_name = azurerm_resource_group.rg1.name
   virtual_hub_id      = azurerm_virtual_hub.hub2.id
