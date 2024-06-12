@@ -62,14 +62,13 @@ variable "psk" {
 variable "asn" {
   default = {
     aws_fw1         = 65001
+    aws_fw2         = 65002
     hub2            = 65515 # must be
     hub2_sdwan_fw   = 65021
-    hub4_sdwan_fw   = 65022
+    hub2_sdwan_fw2  = 65022
+    hub4_sdwan_fw   = 65026
     hub4            = 65515 # must be
-    ipsec_hub2_fw1  = 65041
-    ipsec_hub2_fw2  = 65042
     sdwan_spoke1_fw = 65101
-    ipsec_spoke1_fw = 65102
   }
 }
 
@@ -78,11 +77,9 @@ variable "router_ids" {
   default = {
     aws_fw1         = "192.168.253.11"
     hub2_sdwan_fw   = "192.168.253.31"
-    hub4_sdwan_fw   = "192.168.253.32"
-    ipsec_hub2_fw1  = "192.168.253.41"
-    ipsec_hub2_fw2  = "192.168.253.42"
+    hub2_sdwan_fw2  = "192.168.253.32"
+    hub4_sdwan_fw   = "192.168.253.36"
     sdwan_spoke1_fw = "192.168.253.101"
-    ipsec_spoke1_fw = "192.168.253.102"
   }
 }
 
@@ -108,18 +105,6 @@ variable "peering_address" {
       "169.254.21.7",
       "169.254.21.8",
     ],
-    ipsec_hub2_fw1-tun21 = [
-      "169.254.31.1"
-    ]
-    ipsec_hub2_fw2-tun22 = [
-      "169.254.31.3"
-    ]
-    ipsec_spoke1_fw-tun21 = [
-      "169.254.31.2"
-    ]
-    ipsec_spoke1_fw-tun22 = [
-      "169.254.31.4"
-    ]
   }
 }
 

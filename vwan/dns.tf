@@ -22,10 +22,6 @@ resource "azurerm_dns_a_record" "public" {
     vwan-hub4-sdwan-fw   = module.hub4_sdwan_fw.mgmt_ip_address
     vwan-sdwan-spoke1-fw = module.sdwan_spoke1_fw.mgmt_ip_address
     vwan-sdwan-spoke1    = module.sdwan_spoke1_h.public_ip,
-    vwan-ipsec-hub2-fw1  = module.ipsec_hub2_fw1.mgmt_ip_address
-    vwan-ipsec-hub2-fw2  = module.ipsec_hub2_fw2.mgmt_ip_address
-    vwan-ipsec-spoke1-fw = module.ipsec_spoke1_fw.mgmt_ip_address
-    vwan-ipsec-hubs      = local.public_ip["ipsec_hub2_fw1"][0]
     vwan-hub4-ext-lb     = azurerm_public_ip.hub4_ext_lb.ip_address
   }
   name = each.key
@@ -70,9 +66,6 @@ resource "azurerm_private_dns_a_record" "this" {
     sdwan-spoke1    = module.sdwan_spoke1_h.private_ip_address,
     sdwan-hub2      = module.hub2_sdwan_fw.private_ip_list.private[0],
     sdwan-hub4      = module.hub4_sdwan_fw.private_ip_list.private[0],
-    aws-internal    = module.vm-fw-1.private_ip_list.priv[0],
-    ipsec-hub2-fw1  = module.ipsec_hub2_fw1.private_ip_list.private[0],
-    ipsec-hub2-fw2  = module.ipsec_hub2_fw2.private_ip_list.private[0],
   }
   name                = each.key
   resource_group_name = azurerm_resource_group.rg1.name

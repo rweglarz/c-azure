@@ -9,7 +9,6 @@ locals {
     hub2            = cidrsubnet(var.region1_cidr, 4, 4)
     hub2_spoke1     = cidrsubnet(var.region1_cidr, 5, 5*2 + 0)
     hub2_spoke2     = cidrsubnet(var.region1_cidr, 5, 5*2 + 1)
-    ipsec_hub2      = cidrsubnet(var.region1_cidr, 4, 6)
     hub2_sdwan      = cidrsubnet(var.region1_cidr, 4, 7)
     hub2_dns        = cidrsubnet(var.region1_cidr, 4, 8)
 
@@ -20,7 +19,6 @@ locals {
     hub4_sdwan      = cidrsubnet(var.region2_cidr, 4, 7)
 
     sdwan_spoke1    = cidrsubnet(var.ext_spokes_cidr, 4, 1)
-    ipsec_spoke1    = cidrsubnet(var.ext_spokes_cidr, 4, 2)
   }
 
   public_ip = {
@@ -36,15 +34,6 @@ locals {
       [for ip in azurerm_vpn_gateway.hub4.bgp_settings[0].instance_0_bgp_peering_address[0].tunnel_ips: ip if cidrhost("${ip}/12",0)!=cidrhost("172.16.0.0/12",0)][0],
       [for ip in azurerm_vpn_gateway.hub4.bgp_settings[0].instance_1_bgp_peering_address[0].tunnel_ips: ip if cidrhost("${ip}/12",0)!=cidrhost("172.16.0.0/12",0)][0],
     ]
-    ipsec_hub2_fw1 = [
-      one([for k, v in module.ipsec_hub2_fw1.public_ips : v if length(regexall("internet", k)) > 0]),
-    ],
-    ipsec_hub2_fw2 = [
-      one([for k, v in module.ipsec_hub2_fw2.public_ips : v if length(regexall("internet", k)) > 0]),
-    ],
-    ipsec_spoke1_fw = [
-      one([for k, v in module.ipsec_spoke1_fw.public_ips : v if length(regexall("internet", k)) > 0]),
-    ],
   }
 
   tunnel-aws_fw1-hub2 = {

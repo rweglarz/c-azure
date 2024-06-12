@@ -27,19 +27,3 @@ resource "azurerm_virtual_hub_bgp_connection" "hub4-hub4_sdwan_fw2" {
 }
 
 
-resource "azurerm_virtual_hub_bgp_connection" "hub2-ipsec_hub2_fw1" {
-  name                          = "${local.dname}-hub2-ipsec-hub2-fw1"
-  virtual_hub_id                = azurerm_virtual_hub.hub2.id
-  virtual_network_connection_id = azurerm_virtual_hub_connection.hub2-hub2_ipsec.id
-  peer_asn                      = var.asn["ipsec_hub2_fw1"]
-  peer_ip                       = local.ipsec_hub2_fw1["eth1_2_ip"]
-}
-
-resource "azurerm_virtual_hub_bgp_connection" "hub2-ipsec_hub2_fw2" {
-  name                          = "${local.dname}-hub2-ipsec-hub2-fw2"
-  virtual_hub_id                = azurerm_virtual_hub.hub2.id
-  virtual_network_connection_id = azurerm_virtual_hub_connection.hub2-hub2_ipsec.id
-  peer_asn                      = var.asn["ipsec_hub2_fw2"]
-  peer_ip                       = local.ipsec_hub2_fw2["eth1_2_ip"]
-}
-
