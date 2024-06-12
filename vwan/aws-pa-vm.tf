@@ -23,7 +23,6 @@ module "vm-fw-1" {
 
   name             = "${var.name}-fw-1"
   fw_instance_type = "m5.xlarge"
-  fw_version       = "11.1.0"
 
   key_pair = "rweglarz"
   bootstrap_options = merge(
