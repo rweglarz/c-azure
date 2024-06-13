@@ -26,8 +26,8 @@ module "vm-fw-1" {
 
   key_pair = "rweglarz"
   bootstrap_options = merge(
-    var.bootstrap_options["common"],
-    var.bootstrap_options["aws1"],
+    local.bootstrap_options["common"],
+    local.bootstrap_options["aws_fw"],
   )
 
   interfaces = {

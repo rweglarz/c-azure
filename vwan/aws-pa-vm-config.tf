@@ -1,5 +1,90 @@
-resource "panos_panorama_template" "aws" {
-  name = "aws-azure-vwan-2isp"
+module "cfg_aws_fw" {
+  source = "../../ce-common/modules/pan_vm_template"
+
+  name = "azure-vwan-aws-2isp"
+
+  interfaces = {
+    "ethernet1/1" = {
+      static_ips = [local.ip_mask["isp1"][0]]
+      zone       = "public"
+    }
+    "ethernet1/2" = {
+      static_ips = [local.ip_mask["isp2"][0]]
+      zone       = "public"
+    }
+    "ethernet1/3" = {
+      static_ips = [local.ip_mask["priv"][0]]
+      zone       = "private"
+    }
+    "tunnel.10" = {
+      zone       = "vpn"
+    }
+    "tunnel.11" = {
+      zone       = "vpn"
+    }
+    "tunnel.20" = {
+      zone       = "vpn"
+    }
+    "tunnel.21" = {
+      zone       = "vpn"
+    }
+    "loopback.1" = {
+      static_ips = ["${var.peering_address.aws_fw1[0]}/32"]
+      zone       = "vpn"
+    }
+    "loopback.2" = {
+      static_ips = ["${var.peering_address.aws_fw1[1]}/32"]
+      zone       = "vpn"
+    }
+  }
+  routes = {
+    dg_isp1 = {
+      destination = "0.0.0.0/0"
+      interface   = "ethernet1/1"
+      type        = "ip-address"
+      next_hop    = cidrhost(module.vpc-fw-1.subnets["isp1"].cidr_block, 1)
+    }
+    dg_isp2 = {
+      destination = "0.0.0.0/0"
+      interface   = "ethernet1/2"
+      type        = "ip-address"
+      next_hop    = cidrhost(module.vpc-fw-1.subnets["isp2"].cidr_block, 1)
+    }
+    local = {
+      destination  = module.vpc-fw-1.vpc.cidr_block
+      interface   = "ethernet1/3"
+      type        = "ip-address"
+      next_hop    = cidrhost(module.vpc-fw-1.subnets["priv"].cidr_block, 1)
+    }
+    hub2-i0-0 = {
+      destination = "${var.peering_address.hub2_i0[0]}/32"
+      interface   = "tunnel.10"
+    }
+    hub2-i0-1 = {
+      destination = "${var.peering_address.hub2_i0[1]}/32"
+      interface   = "tunnel.11"
+    }
+    hub2-i1-0 = {
+      destination = "${var.peering_address.hub2_i1[0]}/32"
+      interface   = "tunnel.20"
+    }
+    hub2-i1-1 = {
+      destination = "${var.peering_address.hub2_i1[1]}/32"
+      interface   = "tunnel.21"
+    }
+  }
+  enable_ecmp             = true
+}
+
+
+resource "panos_panorama_template_stack" "azure_vwan_aws_fw" {
+  name         = "azure-vwan-aws-fw-ts"
+  default_vsys = "vsys1"
+  templates = [
+    module.cfg_aws_fw.template_name,
+    "vm common",
+  ]
+  description = "pat:acp"
 }
 
 locals {
@@ -8,160 +93,12 @@ locals {
     ki => formatlist("%s/%s", module.vm-fw-1.private_ip_list[ki], split("/", module.vpc-fw-1.subnets[ki].cidr_block)[1])
   }
 }
-resource "panos_panorama_management_profile" "aws_ping" {
-  template   = panos_panorama_template.aws.name
-
-  name = "ping"
-  ping = true
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "panos_panorama_management_profile" "aws_ssh" {
-  template   = panos_panorama_template.aws.name
-
-  name = "ssh"
-  ping = true
-  ssh  = true
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "panos_panorama_ethernet_interface" "aws_eth1_1" {
-  template   = panos_panorama_template.aws.name
-  name       = "ethernet1/1"
-  vsys       = "vsys1"
-  mode       = "layer3"
-  static_ips = [local.ip_mask["isp1"][0]]
-}
-resource "panos_panorama_ethernet_interface" "aws_eth1_2" {
-  template   = panos_panorama_template.aws.name
-  name       = "ethernet1/2"
-  vsys       = "vsys1"
-  mode       = "layer3"
-  static_ips = [local.ip_mask["isp2"][0]]
-}
-resource "panos_panorama_ethernet_interface" "aws_eth1_3" {
-  template   = panos_panorama_template.aws.name
-  name       = "ethernet1/3"
-  vsys       = "vsys1"
-  mode       = "layer3"
-  static_ips = [local.ip_mask["priv"][0]]
-  management_profile = panos_panorama_management_profile.aws_ssh.name
-}
-
-resource "panos_panorama_tunnel_interface" "aws_tun10" {
-  template = panos_panorama_template.aws.name
-  name     = "tunnel.10"
-  vsys     = "vsys1"
-}
-resource "panos_panorama_tunnel_interface" "aws_tun11" {
-  template = panos_panorama_template.aws.name
-  name     = "tunnel.11"
-  vsys     = "vsys1"
-}
-resource "panos_panorama_tunnel_interface" "aws_tun20" {
-  template = panos_panorama_template.aws.name
-  name     = "tunnel.20"
-  vsys     = "vsys1"
-}
-resource "panos_panorama_tunnel_interface" "aws_tun21" {
-  template = panos_panorama_template.aws.name
-  name     = "tunnel.21"
-  vsys     = "vsys1"
-}
-
-resource "panos_panorama_loopback_interface" "aws_isp1" {
-  name       = "loopback.1"
-  template   = panos_panorama_template.aws.name
-  static_ips = ["${var.peering_address.aws_fw1[0]}/32"]
-}
-resource "panos_panorama_loopback_interface" "aws_isp2" {
-  name       = "loopback.2"
-  template   = panos_panorama_template.aws.name
-  static_ips = ["${var.peering_address.aws_fw1[1]}/32"]
-}
-
-
-resource "panos_virtual_router" "aws-vr1" {
-  template = panos_panorama_template.aws.name
-  name     = "vr1"
-
-  enable_ecmp             = true
-  ecmp_max_path           = 4
-  ecmp_strict_source_path = true
-
-  interfaces = [
-    panos_panorama_ethernet_interface.aws_eth1_1.name,
-    panos_panorama_ethernet_interface.aws_eth1_2.name,
-    panos_panorama_ethernet_interface.aws_eth1_3.name,
-    panos_panorama_tunnel_interface.aws_tun10.name,
-    panos_panorama_tunnel_interface.aws_tun11.name,
-    panos_panorama_tunnel_interface.aws_tun20.name,
-    panos_panorama_tunnel_interface.aws_tun21.name,
-    panos_panorama_loopback_interface.aws_isp1.name,
-    panos_panorama_loopback_interface.aws_isp2.name,
-  ]
-}
-resource "panos_panorama_static_route_ipv4" "aws-vr1-tun10" {
-  template       = panos_panorama_template.aws.name
-  virtual_router = panos_virtual_router.aws-vr1.name
-  name           = "hub2-i0-0"
-  destination    = "${var.peering_address.hub2_i0[0]}/32"
-  interface      = panos_panorama_tunnel_interface.aws_tun10.name
-  type           = ""
-}
-resource "panos_panorama_static_route_ipv4" "aws-vr1-tun11" {
-  template       = panos_panorama_template.aws.name
-  virtual_router = panos_virtual_router.aws-vr1.name
-  name           = "hub2-i0-1"
-  destination    = "${var.peering_address.hub2_i0[1]}/32"
-  interface      = panos_panorama_tunnel_interface.aws_tun11.name
-  type           = ""
-}
-resource "panos_panorama_static_route_ipv4" "aws-vr1-tun20" {
-  template       = panos_panorama_template.aws.name
-  virtual_router = panos_virtual_router.aws-vr1.name
-  name           = "hub2-i1-0"
-  destination    = "${var.peering_address.hub2_i1[0]}/32"
-  interface      = panos_panorama_tunnel_interface.aws_tun20.name
-  type           = ""
-}
-resource "panos_panorama_static_route_ipv4" "aws-vr1-tun21" {
-  template       = panos_panorama_template.aws.name
-  virtual_router = panos_virtual_router.aws-vr1.name
-  name           = "hub2-i1-1"
-  destination    = "${var.peering_address.hub2_i1[1]}/32"
-  interface      = panos_panorama_tunnel_interface.aws_tun21.name
-  type           = ""
-}
-
-resource "panos_panorama_static_route_ipv4" "aws-vr1-eth1_1-dg" {
-  template       = panos_panorama_template.aws.name
-  virtual_router = panos_virtual_router.aws-vr1.name
-  name           = "dg isp1"
-  destination    = "0.0.0.0/0"
-  next_hop       = cidrhost(module.vpc-fw-1.subnets["isp1"].cidr_block, 1)
-  interface      = panos_panorama_ethernet_interface.aws_eth1_1.name
-}
-resource "panos_panorama_static_route_ipv4" "aws-vr1-eth1_2-dg" {
-  template       = panos_panorama_template.aws.name
-  virtual_router = panos_virtual_router.aws-vr1.name
-  name           = "dg isp2"
-  destination    = "0.0.0.0/0"
-  next_hop       = cidrhost(module.vpc-fw-1.subnets["isp2"].cidr_block, 1)
-  interface      = panos_panorama_ethernet_interface.aws_eth1_2.name
-}
 
 
 resource "panos_panorama_ike_gateway" "aws_fw1-hub2" {
   for_each = local.tunnel-aws_fw1-hub2
 
-  template      = panos_panorama_template.aws.name
+  template      = module.cfg_aws_fw.template_name
   name          = each.key
   peer_ip_type  = "ip"
   peer_ip_value = each.value.peer_ip
@@ -189,7 +126,7 @@ resource "panos_panorama_ipsec_tunnel" "aws_fw1-hub2" {
   for_each = local.tunnel-aws_fw1-hub2
 
   name             = each.key
-  template         = panos_panorama_template.aws.name
+  template         = module.cfg_aws_fw.template_name
   tunnel_interface = each.value.tunnel_interface
   anti_replay      = false
   ak_ike_gateway   = each.key
@@ -199,51 +136,17 @@ resource "panos_panorama_ipsec_tunnel" "aws_fw1-hub2" {
   ]
 }
 
-
-resource "panos_zone" "internet" {
-  template = panos_panorama_template.aws.name
-  name     = "internet"
-  mode     = "layer3"
-  interfaces = [
-    panos_panorama_ethernet_interface.aws_eth1_1.name,
-    panos_panorama_ethernet_interface.aws_eth1_2.name,
-  ]
-}
-resource "panos_zone" "vpn" {
-  template = panos_panorama_template.aws.name
-  name     = "vpn"
-  mode     = "layer3"
-  interfaces = [
-    panos_panorama_tunnel_interface.aws_tun10.name,
-    panos_panorama_tunnel_interface.aws_tun11.name,
-    panos_panorama_tunnel_interface.aws_tun20.name,
-    panos_panorama_tunnel_interface.aws_tun21.name,
-    panos_panorama_loopback_interface.aws_isp1.name,
-    panos_panorama_loopback_interface.aws_isp2.name,
-  ]
-}
-resource "panos_zone" "data" {
-  template = panos_panorama_template.aws.name
-  name     = "data"
-  mode     = "layer3"
-  interfaces = [
-    panos_panorama_ethernet_interface.aws_eth1_3.name,
-  ]
-}
-
-
-
 resource "panos_panorama_bgp" "aws-vr1_bgp" {
-  template       = panos_panorama_template.aws.name
-  virtual_router = panos_virtual_router.aws-vr1.name
+  template       = module.cfg_aws_fw.template_name
+  virtual_router = "vr1"
   install_route  = true
 
-  router_id = "169.254.21.2"
+  router_id = var.router_ids["aws_fw1"]
   as_number = var.asn["aws_fw1"]
 }
 resource "panos_panorama_bgp_redist_rule" "aws-vr1-all" {
-  template       = panos_panorama_template.aws.name
-  virtual_router = panos_virtual_router.aws-vr1.name
+  template       = module.cfg_aws_fw.template_name
+  virtual_router = "vr1"
   route_table    = "unicast"
   name           = module.vpc-fw-1.vpc.cidr_block
   set_med        = "20"
@@ -252,8 +155,8 @@ resource "panos_panorama_bgp_redist_rule" "aws-vr1-all" {
   ]
 }
 resource "panos_panorama_bgp_peer_group" "aws-vr1-g1" {
-  template       = panos_panorama_template.aws.name
-  virtual_router = panos_virtual_router.aws-vr1.name
+  template       = module.cfg_aws_fw.template_name
+  virtual_router = "vr1"
   name           = "azure"
   type           = "ebgp"
   depends_on = [
@@ -261,56 +164,56 @@ resource "panos_panorama_bgp_peer_group" "aws-vr1-g1" {
   ]
 }
 resource "panos_panorama_bgp_peer" "tun10" {
-  template                = panos_panorama_template.aws.name
+  template                = module.cfg_aws_fw.template_name
   name                    = "tun10"
-  virtual_router          = panos_virtual_router.aws-vr1.name
+  virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
   peer_as                 = var.asn.hub2
-  local_address_interface = panos_panorama_loopback_interface.aws_isp1.name
-  local_address_ip        = panos_panorama_loopback_interface.aws_isp1.static_ips[0]
+  local_address_interface = "loopback.1"
+  local_address_ip        = module.cfg_aws_fw.interfaces["loopback.1"].static_ips[0]
   peer_address_ip         = var.peering_address.hub2_i0[0]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
 resource "panos_panorama_bgp_peer" "tun11" {
-  template                = panos_panorama_template.aws.name
+  template                = module.cfg_aws_fw.template_name
   name                    = "tun11"
-  virtual_router          = panos_virtual_router.aws-vr1.name
+  virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
   peer_as                 = var.asn.hub2
-  local_address_interface = panos_panorama_loopback_interface.aws_isp1.name
-  local_address_ip        = panos_panorama_loopback_interface.aws_isp1.static_ips[0]
+  local_address_interface = "loopback.1"
+  local_address_ip        = module.cfg_aws_fw.interfaces["loopback.1"].static_ips[0]
   peer_address_ip         = var.peering_address.hub2_i0[1]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
 resource "panos_panorama_bgp_peer" "tun20" {
-  template                = panos_panorama_template.aws.name
+  template                = module.cfg_aws_fw.template_name
   name                    = "tun20"
-  virtual_router          = panos_virtual_router.aws-vr1.name
+  virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
   peer_as                 = var.asn.hub2
-  local_address_interface = panos_panorama_loopback_interface.aws_isp2.name
-  local_address_ip        = panos_panorama_loopback_interface.aws_isp2.static_ips[0]
+  local_address_interface = "loopback.2"
+  local_address_ip        = module.cfg_aws_fw.interfaces["loopback.2"].static_ips[0]
   peer_address_ip         = var.peering_address.hub2_i1[0]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
 resource "panos_panorama_bgp_peer" "tun21" {
-  template                = panos_panorama_template.aws.name
+  template                = module.cfg_aws_fw.template_name
   name                    = "tun21"
-  virtual_router          = panos_virtual_router.aws-vr1.name
+  virtual_router          = "vr1"
   bgp_peer_group          = panos_panorama_bgp_peer_group.aws-vr1-g1.name
   peer_as                 = var.asn.hub2
-  local_address_interface = panos_panorama_loopback_interface.aws_isp2.name
-  local_address_ip        = panos_panorama_loopback_interface.aws_isp2.static_ips[0]
+  local_address_interface = "loopback.2"
+  local_address_ip        = module.cfg_aws_fw.interfaces["loopback.2"].static_ips[0]
   peer_address_ip         = var.peering_address.hub2_i1[1]
   max_prefixes            = "unlimited"
   multi_hop               = 1
 }
 
 resource "panos_panorama_bgp_export_rule_group" "aws_vr1_bgp_ex" {
-  template                = panos_panorama_template.aws.name
+  template                = module.cfg_aws_fw.template_name
   virtual_router = "vr1"
   rule {
     name = "r1"

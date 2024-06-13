@@ -76,3 +76,8 @@ module "basic_rg2" {
   mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
 }
 
+resource "panos_vm_auth_key" "this" {
+  hours = 24*30*6
+
+  lifecycle { create_before_destroy = true }
+}

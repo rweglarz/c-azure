@@ -63,8 +63,15 @@ locals {
     },
   }
   bootstrap_options = {
-    hub2_sdwan_fw = {
-      tplname = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw.name
+    common = merge(
+      var.bootstrap_options.common,
+      {
+        vm-auth-key = panos_vm_auth_key.this.auth_key
+      }
+    )
+    aws_fw = {
+      tplname = panos_panorama_template_stack.azure_vwan_aws_fw.name
+    }
     }
     hub4_sdwan_fw = {
       tplname = panos_panorama_template_stack.azure_vwan_hub4_sdwan_fw.name
