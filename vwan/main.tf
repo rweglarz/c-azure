@@ -11,11 +11,14 @@ provider "aws" {
 
 terraform {
   required_providers {
-    panos = {
-      source = "PaloAltoNetworks/panos"
+    aws = {
+      version = "~>5.52"
     }
     azurerm = {
       version = "~>3.105"
+    }
+    panos = {
+      source = "PaloAltoNetworks/panos"
     }
   }
 }
