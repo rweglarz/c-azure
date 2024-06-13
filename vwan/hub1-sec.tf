@@ -136,13 +136,11 @@ module "hub1_sec_fw" {
   interfaces = {
     mgmt = {
       device_index = 0
-      name         = "${local.dname}-hub1-sec-fw-mgmt"
       subnet_id    = module.hub1_sec.subnets.mgmt.id
       public_ip    = true
     }
     data = {
       device_index         = 1
-      name                 = "${local.dname}-hub1-sec-fw-data"
       subnet_id            = module.hub1_sec.subnets.data.id
       private_ip_address   = cidrhost(module.hub1_sec.subnets.data.address_prefixes[0], 5)
       enable_ip_forwarding = true
