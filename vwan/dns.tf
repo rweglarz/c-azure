@@ -19,7 +19,8 @@ resource "azurerm_dns_a_record" "public" {
     vwan-hub4-spoke1-s1  = module.hub4_spoke1_s1_h.public_ip
     vwan-hub4-spoke1-s2  = module.hub4_spoke1_s2_h.public_ip
     vwan-hub4-spoke2-prv = module.hub4_spoke2_h_prv.public_ip
-    vwan-hub2-sdwan-fw   = module.hub2_sdwan_fw.mgmt_ip_address
+    vwan-hub2-sdwan-fw1  = module.hub2_sdwan_fw1.mgmt_ip_address
+    vwan-hub2-sdwan-fw2  = module.hub2_sdwan_fw2.mgmt_ip_address
     vwan-hub4-sdwan-fw   = module.hub4_sdwan_fw.mgmt_ip_address
     vwan-sdwan-spoke1-fw = module.sdwan_spoke1_fw.mgmt_ip_address
     vwan-sdwan-spoke1    = module.sdwan_spoke1_h.public_ip,

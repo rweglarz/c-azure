@@ -64,9 +64,9 @@ variable "asn" {
     aws_fw1         = 65001
     aws_fw2         = 65002
     hub2            = 65515 # must be
-    hub2_sdwan_fw   = 65021
+    hub2_sdwan_fw1  = 65021
     hub2_sdwan_fw2  = 65022
-    hub4_sdwan_fw   = 65026
+    hub4_sdwan_fw   = 65040
     hub4            = 65515 # must be
     sdwan_spoke1_fw = 65101
   }
@@ -76,9 +76,9 @@ variable "router_ids" {
   description = "also loopbacks"
   default = {
     aws_fw1         = "192.168.253.11"
-    hub2_sdwan_fw   = "192.168.253.31"
-    hub2_sdwan_fw2  = "192.168.253.32"
-    hub4_sdwan_fw   = "192.168.253.36"
+    hub2_sdwan_fw1  = "192.168.253.21"
+    hub2_sdwan_fw2  = "192.168.253.22"
+    hub4_sdwan_fw   = "192.168.253.40"
     sdwan_spoke1_fw = "192.168.253.101"
   }
 }
