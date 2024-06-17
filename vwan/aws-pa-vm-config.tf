@@ -42,19 +42,19 @@ module "cfg_aws_fw" {
       destination = "0.0.0.0/0"
       interface   = "ethernet1/1"
       type        = "ip-address"
-      next_hop    = cidrhost(module.vpc-fw-1.subnets["isp1"].cidr_block, 1)
+      next_hop    = cidrhost(module.aws_vpc.subnets["isp1"].cidr_block, 1)
     }
     dg_isp2 = {
       destination = "0.0.0.0/0"
       interface   = "ethernet1/2"
       type        = "ip-address"
-      next_hop    = cidrhost(module.vpc-fw-1.subnets["isp2"].cidr_block, 1)
+      next_hop    = cidrhost(module.aws_vpc.subnets["isp2"].cidr_block, 1)
     }
     local = {
-      destination  = module.vpc-fw-1.vpc.cidr_block
+      destination  = module.aws_vpc.vpc.cidr_block
       interface   = "ethernet1/3"
       type        = "ip-address"
-      next_hop    = cidrhost(module.vpc-fw-1.subnets["priv"].cidr_block, 1)
+      next_hop    = cidrhost(module.aws_vpc.subnets["priv"].cidr_block, 1)
     }
     hub2-i0-0 = {
       destination = "${var.peering_address.hub2_i0[0]}/32"
@@ -89,8 +89,8 @@ resource "panos_panorama_template_stack" "azure_vwan_aws_fw" {
 
 locals {
   ip_mask = {
-    for ki, vi in module.vm-fw-1.private_ip_list :
-    ki => formatlist("%s/%s", module.vm-fw-1.private_ip_list[ki], split("/", module.vpc-fw-1.subnets[ki].cidr_block)[1])
+    for ki, vi in module.aws_fw.private_ip_list :
+    ki => formatlist("%s/%s", module.aws_fw.private_ip_list[ki], split("/", module.aws_vpc.subnets[ki].cidr_block)[1])
   }
 }
 
@@ -148,7 +148,7 @@ resource "panos_panorama_bgp_redist_rule" "aws-vr1-all" {
   template       = module.cfg_aws_fw.template_name
   virtual_router = "vr1"
   route_table    = "unicast"
-  name           = module.vpc-fw-1.vpc.cidr_block
+  name           = module.aws_vpc.vpc.cidr_block
   set_med        = "20"
   depends_on = [
     panos_panorama_bgp.aws-vr1_bgp
@@ -218,7 +218,7 @@ resource "panos_panorama_bgp_export_rule_group" "aws_vr1_bgp_ex" {
   rule {
     name = "r1"
     match_address_prefix {
-      prefix = module.vpc-fw-1.vpc.cidr_block
+      prefix = module.aws_vpc.vpc.cidr_block
       exact  = false
     }
     match_route_table   = "unicast"

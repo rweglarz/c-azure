@@ -1,7 +1,7 @@
-module "vpc-fw-1" {
+module "aws_vpc" {
   source = "../../ce-aws/modules/vpc"
 
-  name = "${var.name}-fw-1"
+  name = "${var.name}-fw"
 
   cidr_block              = cidrsubnet(var.ext_spokes_cidr, 4, 0)
   public_mgmt_prefix_list = "pl-0139bb989ef6d1988"
@@ -18,10 +18,10 @@ module "vpc-fw-1" {
   }
 }
 
-module "vm-fw-1" {
+module "aws_fw" {
   source = "../../ce-aws/modules/vmseries"
 
-  name             = "${var.name}-fw-1"
+  name             = "${var.name}-fw"
   fw_instance_type = "m5.xlarge"
 
   key_pair = "rweglarz"
@@ -34,57 +34,57 @@ module "vm-fw-1" {
     mgmt = {
       device_index = 0
       public_ip    = true
-      subnet_id    = module.vpc-fw-1.subnets["mgmt"].id
+      subnet_id    = module.aws_vpc.subnets["mgmt"].id
       security_group_ids = [
-        module.vpc-fw-1.sg_public_id,
-        module.vpc-fw-1.sg_private_id,
+        module.aws_vpc.sg_public_id,
+        module.aws_vpc.sg_private_id,
       ]
-      private_ips = [cidrhost(module.vpc-fw-1.subnets["mgmt"].cidr_block, 5)]
+      private_ips = [cidrhost(module.aws_vpc.subnets["mgmt"].cidr_block, 5)]
     }
     isp1 = {
       device_index = 1
       public_ip    = true
-      subnet_id    = module.vpc-fw-1.subnets["isp1"].id
-      private_ips  = [cidrhost(module.vpc-fw-1.subnets["isp1"].cidr_block, 5)]
+      subnet_id    = module.aws_vpc.subnets["isp1"].id
+      private_ips  = [cidrhost(module.aws_vpc.subnets["isp1"].cidr_block, 5)]
       security_group_ids = [
-        module.vpc-fw-1.sg_open_id,
+        module.aws_vpc.sg_open_id,
       ]
     }
     isp2 = {
       device_index = 2
       public_ip    = true
-      subnet_id    = module.vpc-fw-1.subnets["isp2"].id
-      private_ips  = [cidrhost(module.vpc-fw-1.subnets["isp2"].cidr_block, 5)]
+      subnet_id    = module.aws_vpc.subnets["isp2"].id
+      private_ips  = [cidrhost(module.aws_vpc.subnets["isp2"].cidr_block, 5)]
       security_group_ids = [
-        module.vpc-fw-1.sg_open_id,
+        module.aws_vpc.sg_open_id,
       ]
     }
     priv = {
       device_index = 3
-      subnet_id    = module.vpc-fw-1.subnets["priv"].id
-      private_ips  = [cidrhost(module.vpc-fw-1.subnets["priv"].cidr_block, 5)]
+      subnet_id    = module.aws_vpc.subnets["priv"].id
+      private_ips  = [cidrhost(module.aws_vpc.subnets["priv"].cidr_block, 5)]
       security_group_ids = [
-        module.vpc-fw-1.sg_open_id,
+        module.aws_vpc.sg_open_id,
       ]
     }
   }
 }
 
 resource "aws_route_table_association" "aws1-mgmt-dg" {
-  subnet_id      = module.vpc-fw-1.subnets["mgmt"].id
-  route_table_id = module.vpc-fw-1.route_tables["via_igw"]
+  subnet_id      = module.aws_vpc.subnets["mgmt"].id
+  route_table_id = module.aws_vpc.route_tables["via_igw"]
 }
 resource "aws_route_table_association" "aws1-isp1-dg" {
-  subnet_id      = module.vpc-fw-1.subnets["isp1"].id
-  route_table_id = module.vpc-fw-1.route_tables["via_igw"]
+  subnet_id      = module.aws_vpc.subnets["isp1"].id
+  route_table_id = module.aws_vpc.route_tables["via_igw"]
 }
 resource "aws_route_table_association" "aws1-isp2-dg" {
-  subnet_id      = module.vpc-fw-1.subnets["isp2"].id
-  route_table_id = module.vpc-fw-1.route_tables["via_igw"]
+  subnet_id      = module.aws_vpc.subnets["isp2"].id
+  route_table_id = module.aws_vpc.route_tables["via_igw"]
 }
 
 resource "aws_ec2_managed_prefix_list_entry" "aws-pa-vm" {
-  for_each       = { for k, v in module.vm-fw-1.public_ips : k => v if length(regexall("mgmt", k)) > 0 }
+  for_each       = { for k, v in module.aws_fw.public_ips : k => v if length(regexall("mgmt", k)) > 0 }
   cidr           = "${each.value}/32"
   prefix_list_id = var.pl-mgmt-csp_nat_ips
   description    = "${var.name}-aws-azure-vwan"

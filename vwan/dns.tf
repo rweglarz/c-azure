@@ -1,15 +1,6 @@
-resource "azurerm_dns_a_record" "aws-fw-1" {
-  name                = "vwan-aws-fw-1"
-  resource_group_name = var.dns_zone_rg
-  zone_name           = var.dns_zone_name
-  ttl                 = local.dns_ttl
-  records = [
-    one([for k, v in module.vm-fw-1.public_ips : v if(length(regexall("mgmt", k)) > 0)])
-  ]
-}
-
 resource "azurerm_dns_a_record" "public" {
   for_each = {
+    vwan-aws-fw          = module.aws_fw.mgmt_public_ip
     vwan-aws-srv         = module.aws_srv.public_ip
     vwan-hub1-sec-fw     = module.hub1_sec_fw.mgmt_ip_address
     vwan-hub1-sec-spoke1 = module.hub1_sec_spoke1_h.public_ip
@@ -58,7 +49,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "this" {
 
 resource "azurerm_private_dns_a_record" "this" {
   for_each = {
-    aws-srv         = module.aws_srv.private_ip,
+    aws-fw          = module.aws_fw.private_ip_list.priv[0],
+    aws-s           = module.aws_srv.private_ip,
     hub2-spoke1-s1  = module.hub2_spoke1_s1_h.private_ip_address,
     hub2-spoke1-s2  = module.hub2_spoke1_s2_h.private_ip_address,
     hub2-spoke2     = module.hub2_spoke2_h.private_ip_address,

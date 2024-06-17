@@ -23,8 +23,8 @@ locals {
 
   public_ip = {
     aws_fw1 = [
-      one([for k, v in module.vm-fw-1.public_ips : v if length(regexall("isp1", k)) > 0]),
-      one([for k, v in module.vm-fw-1.public_ips : v if length(regexall("isp2", k)) > 0]),
+      one([for k, v in module.aws_fw.public_ips : v if length(regexall("isp1", k)) > 0]),
+      one([for k, v in module.aws_fw.public_ips : v if length(regexall("isp2", k)) > 0]),
     ],
     hub2 = [
       [for ip in azurerm_vpn_gateway.hub2.bgp_settings[0].instance_0_bgp_peering_address[0].tunnel_ips: ip if cidrhost("${ip}/12",0)!=cidrhost("172.16.0.0/12",0)][0],
