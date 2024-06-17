@@ -19,7 +19,7 @@ resource "panos_panorama_template_stack" "azure_vwan_hub2_sdwan_fw1" {
     "sdwan-1isp",
     "vm common",
   ]
-  description = "pat:acp"
+  description = "pat:acp pat:sdwan:hub:1"
 }
 
 resource "panos_panorama_template_stack" "azure_vwan_hub2_sdwan_fw2" {
@@ -30,7 +30,7 @@ resource "panos_panorama_template_stack" "azure_vwan_hub2_sdwan_fw2" {
     "sdwan-1isp",
     "vm common",
   ]
-  description = "pat:acp"
+  description = "pat:acp pat:sdwan:hub:2"
 }
 
 resource "panos_panorama_template_stack" "azure_vwan_hub4_sdwan_fw" {
@@ -41,7 +41,7 @@ resource "panos_panorama_template_stack" "azure_vwan_hub4_sdwan_fw" {
     "sdwan-1isp",
     "vm common",
   ]
-  description = "pat:acp"
+  description = "pat:acp pat:sdwan:hub:3"
 }
 
 
