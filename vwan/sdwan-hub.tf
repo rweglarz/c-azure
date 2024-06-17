@@ -105,8 +105,8 @@ module "hub2_sdwan_fw1" {
   }
 
   bootstrap_options = merge(
+    local.bootstrap_options["common"],
     local.bootstrap_options["hub2_sdwan_fw1"],
-    var.bootstrap_options["common"],
     var.bootstrap_options["hub2_sdwan_fw1"],
   )
 }
@@ -142,8 +142,8 @@ module "hub2_sdwan_fw2" {
   }
 
   bootstrap_options = merge(
+    local.bootstrap_options["common"],
     local.bootstrap_options["hub2_sdwan_fw2"],
-    var.bootstrap_options["common"],
     var.bootstrap_options["hub2_sdwan_fw2"],
   )
 }
@@ -180,8 +180,8 @@ module "hub4_sdwan_fw" {
   }
 
   bootstrap_options = merge(
+    local.bootstrap_options["common"],
     local.bootstrap_options["hub4_sdwan_fw"],
-    var.bootstrap_options["common"],
     var.bootstrap_options["hub4_sdwan_fw"],
   )
 }

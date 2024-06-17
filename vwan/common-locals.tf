@@ -72,6 +72,9 @@ locals {
     aws_fw = {
       tplname = panos_panorama_template_stack.azure_vwan_aws_fw.name
     }
+    hub1_sec_fw = {
+      tplname = panos_panorama_template_stack.hub1_sec_fw.name
+    }
     hub2_sdwan_fw1 = {
       tplname = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw1.name
     }

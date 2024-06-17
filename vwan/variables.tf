@@ -47,6 +47,28 @@ variable "password" {
 
 variable "bootstrap_options" {
   type = map(map(string))
+  default = {
+    common = {
+      panorama-server             = "192.0.2.10"
+      authcodes                   = "D0000000"
+      dgname                      = "azure-vwan"
+      cgname                      = "cg2"
+      plugin-op-commands          = "set-cores:2"
+      dhcp-accept-server-hostname = "yes"
+    }
+    hub2_sdwan_fw1 = {
+      dgname  = "azure-vwan-sdwan"
+    }
+    hub2_sdwan_fw2 = {
+      dgname  = "azure-vwan-sdwan"
+    }
+    hub4_sdwan_fw = {
+      dgname  = "azure-vwan-sdwan"
+    }
+    sdwan_spoke1_fw = {
+      dgname  = "azure-vwan-sdwan"
+    }
+  }
 }
 
 variable "aws_availability_zones" {

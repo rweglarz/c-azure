@@ -165,8 +165,8 @@ module "hub1_sec_fw" {
   }
 
   bootstrap_options = merge(
-    var.bootstrap_options["common"],
-    var.bootstrap_options["hub1"],
+    local.bootstrap_options["common"],
+    local.bootstrap_options["hub1_sec_fw"],
   )
 }
 
