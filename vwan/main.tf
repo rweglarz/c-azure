@@ -1,9 +1,6 @@
 provider "azurerm" {
   features {}
 }
-data "azurerm_subscriptions" "azsub" {
-  display_name_contains = var.subscription
-}
 
 provider "aws" {
   region = "eu-central-1"

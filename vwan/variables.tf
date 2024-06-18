@@ -11,10 +11,6 @@ variable "region2" {
   default = "North Europe"
 }
 
-variable "subscription" {
-  type = string
-}
-
 variable "region1_cidr" {
   type     = string
   default  = "172.16.0.0/20"
