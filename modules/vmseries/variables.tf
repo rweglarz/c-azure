@@ -15,7 +15,7 @@ variable "size" {
 
 variable "panos" {
   nullable = false
-  default  = "10.1.10"
+  default  = "11.1.3"
 }
 
 variable "username" {
