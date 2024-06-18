@@ -1,5 +1,5 @@
 output "mgmt_ip_address" {
-  value = azurerm_public_ip.this["mgmt"].ip_address
+  value = try(azurerm_public_ip.this["mgmt"].ip_address, null)
 }
 
 output "public_ips" {
