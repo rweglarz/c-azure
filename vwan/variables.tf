@@ -105,6 +105,14 @@ variable "router_ids" {
     sdwan_spoke1_fw = "192.168.253.101"
   }
 }
+variable "sdwan_communities" {
+  description = "to be updated with router_ids"
+  default = {
+      hub2_sdwan_fw1 = "49320:64789"
+      hub2_sdwan_fw2 = "49320:64790"
+      hub4_sdwan_fw  = "49320:64808"
+  }
+}
 
 variable "peering_address" {
   default = {

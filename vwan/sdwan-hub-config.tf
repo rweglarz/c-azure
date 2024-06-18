@@ -250,15 +250,15 @@ resource "panos_panorama_bgp_import_rule_group" "azure_vwan_hub2_sdwan_fw" {
   for_each = {
     hub2-fw1 = {
       template_stack = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw1.name
-      community_value = "49320:64799"
+      community_value = var.sdwan_communities.hub2_sdwan_fw1
     }
     hub2-fw2 = {
       template_stack = panos_panorama_template_stack.azure_vwan_hub2_sdwan_fw2.name
-      community_value = "49320:64800"
+      community_value = var.sdwan_communities.hub2_sdwan_fw2
     }
     hub4-fw = {
       template_stack = panos_panorama_template_stack.azure_vwan_hub4_sdwan_fw.name
-      community_value = "49320:64804"
+      community_value = var.sdwan_communities.hub4_sdwan_fw
     }
   }
   template_stack = each.value.template_stack
