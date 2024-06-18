@@ -9,22 +9,22 @@ module "sdwan_spoke1" {
   subnets = {
     "mgmt" = {
       address_prefixes          = [cidrsubnet(local.vnet_cidr.sdwan_spoke1, 4, 0)]
-      network_security_group_id = azurerm_network_security_group.rg2_mgmt.id
+      network_security_group_id = module.basic_rg2.sg_id.mgmt
       associate_nsg             = true
     },
     "isp1" = {
       address_prefixes          = [cidrsubnet(local.vnet_cidr.sdwan_spoke1, 4, 1)]
-      network_security_group_id = azurerm_network_security_group.rg2_all.id
+      network_security_group_id = module.basic_rg2.sg_id.wide-open
       associate_nsg             = true
     },
     "isp2" = {
       address_prefixes          = [cidrsubnet(local.vnet_cidr.sdwan_spoke1, 4, 2)]
-      network_security_group_id = azurerm_network_security_group.rg2_all.id
+      network_security_group_id = module.basic_rg2.sg_id.wide-open
       associate_nsg             = true
     },
     "private" = {
       address_prefixes          = [cidrsubnet(local.vnet_cidr.sdwan_spoke1, 4, 3)]
-      network_security_group_id = azurerm_network_security_group.rg2_all.id
+      network_security_group_id = module.basic_rg2.sg_id.wide-open
       associate_nsg             = true
     },
     "s1" = {

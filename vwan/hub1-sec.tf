@@ -10,12 +10,12 @@ module "hub1_sec" {
   subnets = {
     "mgmt" = {
       idx                       = 0
-      network_security_group_id = azurerm_network_security_group.rg1_mgmt.id
+      network_security_group_id = module.basic_rg1.sg_id.mgmt
       associate_nsg             = true
     },
     "data" = {
       idx                       = 1
-      network_security_group_id = azurerm_network_security_group.rg1_all.id
+      network_security_group_id = module.basic_rg1.sg_id.wide-open
       associate_nsg             = true
     },
   }
@@ -56,12 +56,12 @@ module "hub1_sec_spoke1" {
   subnets = {
     "s1" = {
       idx                       = 0
-      network_security_group_id = azurerm_network_security_group.rg1_mgmt.id
+      network_security_group_id = module.basic_rg1.sg_id.mgmt
       associate_nsg             = true
     },
     "s2" = {
       idx                       = 1
-      network_security_group_id = azurerm_network_security_group.rg1_mgmt.id
+      network_security_group_id = module.basic_rg1.sg_id.mgmt
       associate_nsg             = true
     },
   }
@@ -78,12 +78,12 @@ module "hub1_sec_spoke2" {
   subnets = {
     "s1" = {
       idx                       = 0
-      network_security_group_id = azurerm_network_security_group.rg1_mgmt.id
+      network_security_group_id = module.basic_rg1.sg_id.mgmt
       associate_nsg             = true
     },
     "s2" = {
       idx                       = 1
-      network_security_group_id = azurerm_network_security_group.rg1_mgmt.id
+      network_security_group_id = module.basic_rg1.sg_id.mgmt
       associate_nsg             = true
     },
   }

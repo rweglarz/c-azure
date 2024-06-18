@@ -31,11 +31,12 @@ variable "ext_spokes_cidr" {
 variable "mgmt_ips" {
   description = "List of IPs allowed external access"
   type        = list(map(string))
-}
-variable "tmp_ips" {
-  description = "List of tmp IPs allowed external access"
-  type        = list(map(string))
-  default     = []
+  default = [
+    {
+      cidr        = "192.0.2.0/24"
+      description = "public ip1"
+    },
+  ]
 }
 
 variable "username" {

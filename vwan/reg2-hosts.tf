@@ -8,7 +8,7 @@ module "hub4_spoke1_s1_h" {
   private_ip_address  = cidrhost(module.hub4_spoke1.subnets.s1.address_prefixes[0], 5)
   password            = var.password
   public_key          = azurerm_ssh_public_key.rg2.public_key
-  security_group      = azurerm_network_security_group.rg2_mgmt.id
+  security_group      = module.basic_rg2.sg_id.mgmt
   associate_nsg       = true
   tags = {
     rwe-region = "region2"
@@ -25,7 +25,7 @@ module "hub4_spoke1_s2_h" {
   private_ip_address  = cidrhost(module.hub4_spoke1.subnets.s2.address_prefixes[0], 5)
   password            = var.password
   public_key          = azurerm_ssh_public_key.rg2.public_key
-  security_group      = azurerm_network_security_group.rg2_mgmt.id
+  security_group      = module.basic_rg2.sg_id.mgmt
   associate_nsg       = true
   tags = {
     rwe-region = "region2"
@@ -42,7 +42,7 @@ module "hub4_spoke2_h_prv" {
   private_ip_address  = cidrhost(module.hub4_spoke2.subnets.s1.address_prefixes[0], 5)
   password            = var.password
   public_key          = azurerm_ssh_public_key.rg2.public_key
-  security_group      = azurerm_network_security_group.rg2_mgmt.id
+  security_group      = module.basic_rg2.sg_id.mgmt
   associate_nsg       = true
   tags = {
     rwe-region = "region2"
@@ -59,7 +59,7 @@ module "hub4_spoke2_h_pub" {
   private_ip_address  = cidrhost(module.hub4_spoke2.subnets.ext.address_prefixes[0], 6)
   password            = var.password
   public_key          = azurerm_ssh_public_key.rg2.public_key
-  security_group      = azurerm_network_security_group.rg2_mgmt.id
+  security_group      = module.basic_rg2.sg_id.mgmt
   associate_nsg       = true
   associate_public_ip = false
   tags = {
@@ -83,7 +83,7 @@ module "sdwan_spoke1_h" {
   private_ip_address  = cidrhost(module.sdwan_spoke1.subnets.s1.address_prefixes[0], 5)
   password            = var.password
   public_key          = azurerm_ssh_public_key.rg2.public_key
-  security_group      = azurerm_network_security_group.rg2_mgmt.id
+  security_group      = module.basic_rg2.sg_id.mgmt
   associate_nsg       = true
   tags = {
     rwe-region = "region2"

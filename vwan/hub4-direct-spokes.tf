@@ -10,12 +10,12 @@ module "hub4_spoke1" {
   subnets = {
     "s1" = {
       idx                       = 0
-      network_security_group_id = azurerm_network_security_group.rg2_mgmt.id
+      network_security_group_id = module.basic_rg2.sg_id.mgmt
       associate_nsg             = true
     },
     "s2" = {
       idx                       = 1
-      network_security_group_id = azurerm_network_security_group.rg2_mgmt.id
+      network_security_group_id = module.basic_rg2.sg_id.mgmt
       associate_nsg             = true
     },
   }
@@ -33,12 +33,12 @@ module "hub4_spoke2" {
   subnets = {
     "s1" = {
       idx                       = 0
-      network_security_group_id = azurerm_network_security_group.rg2_mgmt.id
+      network_security_group_id = module.basic_rg2.sg_id.mgmt
       associate_nsg             = true
     },
     "ext" = {
       idx                       = 1
-      network_security_group_id = azurerm_network_security_group.rg2_mgmt.id
+      network_security_group_id = module.basic_rg2.sg_id.mgmt
       associate_nsg             = true
     },
   }
