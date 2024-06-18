@@ -144,7 +144,9 @@ variable "fw_version" {
 }
 
 variable "pl-mgmt-csp_nat_ips" {
-  type = string
+  description = "aws prefix list id to open up sg on panorama for public fw access"
+  type    = string
+  default = null
 }
 
 variable "internet_security_enabled" {
