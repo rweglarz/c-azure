@@ -1,5 +1,6 @@
 resource "aws_ec2_managed_prefix_list_entry" "vm_fws" {
   for_each = var.pl-mgmt-csp_nat_ips==null ? {} : {
+    aws_fw          = "${module.aws_fw.mgmt_public_ip}/32"
     hub1_sec_fw     = "${module.hub1_sec_fw.mgmt_ip_address}/32"
     hub2_sdwan_fw1  = "${module.hub2_sdwan_fw1.mgmt_ip_address}/32"
     hub2_sdwan_fw2  = "${module.hub2_sdwan_fw2.mgmt_ip_address}/32"

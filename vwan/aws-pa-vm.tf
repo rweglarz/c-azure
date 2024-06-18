@@ -82,11 +82,3 @@ resource "aws_route_table_association" "aws1-isp2-dg" {
   subnet_id      = module.aws_vpc.subnets["isp2"].id
   route_table_id = module.aws_vpc.route_tables["via_igw"]
 }
-
-resource "aws_ec2_managed_prefix_list_entry" "aws-pa-vm" {
-  for_each       = { for k, v in module.aws_fw.public_ips : k => v if length(regexall("mgmt", k)) > 0 }
-  cidr           = "${each.value}/32"
-  prefix_list_id = var.pl-mgmt-csp_nat_ips
-  description    = "${var.name}-aws-azure-vwan"
-}
-
