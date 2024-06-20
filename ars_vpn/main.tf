@@ -5,6 +5,10 @@ provider "azurerm" {
 terraform {
   required_providers {
     aws = {
+      version = "~>5.53"
+    }
+    azurerm = {
+      version = "~>3.107"
     }
     panos = {
       source = "PaloAltoNetworks/panos"
@@ -14,11 +18,6 @@ terraform {
 
 provider "panos" {
   json_config_file = "panorama_creds.json"
-}
-
-
-data "azurerm_subscriptions" "azsub" {
-  display_name_contains = var.subscription
 }
 
 resource "azurerm_resource_group" "rg1" {
