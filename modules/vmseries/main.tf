@@ -14,9 +14,10 @@ resource "azurerm_network_interface" "this" {
   resource_group_name = var.resource_group_name
   location            = var.location
 
-  name                          = "${var.name}-${each.key}"
-  enable_ip_forwarding          = true
-  enable_accelerated_networking = true
+  name                   = "${var.name}-${each.key}"
+
+  ip_forwarding_enabled          = true
+  accelerated_networking_enabled = true
 
   ip_configuration {
     name                          = "primary"
