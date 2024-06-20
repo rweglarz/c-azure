@@ -1,20 +1,19 @@
-resource "azurerm_virtual_network_peering" "vnet_left_u_hub-vnet_left_b_hub" {
-  name                      = "left-u-hub--left-b-hub"
-  resource_group_name       = azurerm_resource_group.rg1.name
-  virtual_network_name      = module.vnet_left_u_hub.vnet.name
-  remote_virtual_network_id = module.vnet_left_b_hub.vnet.id
-  allow_forwarded_traffic   = true
-}
+module "vnet_peering-left_u-left_b" {
+  source = "../modules/vnet_peering"
 
-resource "azurerm_virtual_network_peering" "vnet_left_b_hub-vnet_left_u_hub" {
-  name                      = "left-b-hub--left-u-hub"
-  resource_group_name       = azurerm_resource_group.rg2.name
-  virtual_network_name      = module.vnet_left_b_hub.vnet.name
-  remote_virtual_network_id = module.vnet_left_u_hub.vnet.id
-  allow_forwarded_traffic   = true
-  depends_on = [
-    azurerm_virtual_network_peering.vnet_left_u_hub-vnet_left_b_hub
-  ]
+  on_local = {
+    resource_group_name     = azurerm_resource_group.rg1.name
+    virtual_network_name    = module.vnet_left_u_hub.vnet.name
+    virtual_network_id      = module.vnet_left_u_hub.vnet.id
+    allow_forwarded_traffic = true
+  }
+
+  on_remote = {
+    resource_group_name     = azurerm_resource_group.rg2.name
+    virtual_network_name    = module.vnet_left_b_hub.vnet.name
+    virtual_network_id      = module.vnet_left_b_hub.vnet.id
+    allow_forwarded_traffic = true
+  }
 }
 
 

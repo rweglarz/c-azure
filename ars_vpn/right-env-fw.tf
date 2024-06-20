@@ -99,22 +99,20 @@ module "right_env_fw1" {
   )
 }
 
+module "vnet_peering-right_hub-right_env_fw" {
+  source = "../modules/vnet_peering"
 
-resource "azurerm_virtual_network_peering" "vnet_right_hub-vnet_right_env_fw" {
-  name                      = "right-hub--right-env_fw"
-  resource_group_name       = azurerm_resource_group.rg1.name
-  virtual_network_name      = module.vnet_right_hub.vnet.name
-  remote_virtual_network_id = module.vnet_right_env_fw.vnet.id
-}
+  on_local = {
+    resource_group_name  = azurerm_resource_group.rg1.name
+    virtual_network_name = module.vnet_right_hub.vnet.name
+    virtual_network_id   = module.vnet_right_hub.vnet.id
+  }
 
-resource "azurerm_virtual_network_peering" "vnet_right_env_fw-vnet_right_hub" {
-  name                      = "right-env-fw--right-hub"
-  resource_group_name       = azurerm_resource_group.rg1.name
-  virtual_network_name      = module.vnet_right_env_fw.vnet.name
-  remote_virtual_network_id = module.vnet_right_hub.vnet.id
-  depends_on = [
-    azurerm_virtual_network_peering.vnet_right_hub-vnet_right_env_fw
-  ]
+  on_remote = {
+    resource_group_name  = azurerm_resource_group.rg1.name
+    virtual_network_name = module.vnet_right_env_fw.vnet.name
+    virtual_network_id   = module.vnet_right_env_fw.vnet.id
+  }
 }
 
 

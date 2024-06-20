@@ -88,65 +88,67 @@ module "vnet_right_srv_1" {
   }
 }
 
-resource "azurerm_virtual_network_peering" "vnet_left_u_hub-vnet_left_u_srv_1" {
-  name                      = "left-u-hub--left-u-srv-1"
-  resource_group_name       = azurerm_resource_group.rg1.name
-  virtual_network_name      = module.vnet_left_u_hub.vnet.name
-  remote_virtual_network_id = module.vnet_left_u_srv_1.vnet.id
-  allow_gateway_transit     = true
-}
 
-resource "azurerm_virtual_network_peering" "vnet_left_u_srv_1-vnet_left_u_hub" {
-  name                      = "left-u-srv-1--left-u-hub"
-  resource_group_name       = azurerm_resource_group.rg1.name
-  virtual_network_name      = module.vnet_left_u_srv_1.vnet.name
-  remote_virtual_network_id = module.vnet_left_u_hub.vnet.id
-  use_remote_gateways       = true
-  allow_forwarded_traffic   = true
-  depends_on = [
-    azurerm_virtual_network_peering.vnet_left_u_hub-vnet_left_u_srv_1
-  ]
-}
+module "vnet_peering-left_u_srv_1-left_u_hub" {
+  source = "../modules/vnet_peering"
 
+  on_local = {
+    resource_group_name     = azurerm_resource_group.rg1.name
+    virtual_network_name    = module.vnet_left_u_srv_1.vnet.name
+    virtual_network_id      = module.vnet_left_u_srv_1.vnet.id
+    use_remote_gateways     = true
+    allow_forwarded_traffic = true
+  }
 
-resource "azurerm_virtual_network_peering" "vnet_left_b_hub-vnet_left_b_srv_1" {
-  name                      = "left-b-hub--left-b-srv-1"
-  resource_group_name       = azurerm_resource_group.rg2.name
-  virtual_network_name      = module.vnet_left_b_hub.vnet.name
-  remote_virtual_network_id = module.vnet_left_b_srv_1.vnet.id
-  allow_gateway_transit     = true
-}
-
-resource "azurerm_virtual_network_peering" "vnet_left_b_srv_1-vnet_left_b_hub" {
-  name                      = "left-b-srv-1--left-b-hub"
-  resource_group_name       = azurerm_resource_group.rg2.name
-  virtual_network_name      = module.vnet_left_b_srv_1.vnet.name
-  remote_virtual_network_id = module.vnet_left_b_hub.vnet.id
-  use_remote_gateways       = true
-  allow_forwarded_traffic   = true
-  depends_on = [
-    azurerm_virtual_network_peering.vnet_left_b_hub-vnet_left_b_srv_1
-  ]
+  on_remote = {
+    resource_group_name    = azurerm_resource_group.rg1.name
+    virtual_network_name   = module.vnet_left_u_hub.vnet.name
+    virtual_network_id     = module.vnet_left_u_hub.vnet.id
+    allow_gateway_transit  = true
+  }
 }
 
 
-resource "azurerm_virtual_network_peering" "vnet_right_hub-vnet_right_srv_1" {
-  name                      = "right-hub--right-srv-1"
-  resource_group_name       = azurerm_resource_group.rg1.name
-  virtual_network_name      = module.vnet_right_hub.vnet.name
-  remote_virtual_network_id = module.vnet_right_srv_1.vnet.id
-  allow_gateway_transit     = true
+module "vnet_peering-left_b_srv_1-left_b_hub" {
+  source = "../modules/vnet_peering"
+
+  on_local = {
+    resource_group_name     = azurerm_resource_group.rg2.name
+    virtual_network_name    = module.vnet_left_b_srv_1.vnet.name
+    virtual_network_id      = module.vnet_left_b_srv_1.vnet.id
+    use_remote_gateways     = true
+    allow_forwarded_traffic = true
+  }
+
+  on_remote = {
+    resource_group_name    = azurerm_resource_group.rg2.name
+    virtual_network_name   = module.vnet_left_b_hub.vnet.name
+    virtual_network_id     = module.vnet_left_b_hub.vnet.id
+    allow_gateway_transit  = true
+  }
 }
 
-resource "azurerm_virtual_network_peering" "vnet_right_srv_1-vnet_right_hub" {
-  name                      = "right-srv-1--right-hub"
-  resource_group_name       = azurerm_resource_group.rg1.name
-  virtual_network_name      = module.vnet_right_srv_1.vnet.name
-  remote_virtual_network_id = module.vnet_right_hub.vnet.id
-  use_remote_gateways       = true
-  depends_on = [
-    azurerm_virtual_network_peering.vnet_right_hub-vnet_right_srv_1
-  ]
+
+module "vnet_peering-right_srv_1-right_hub" {
+  source = "../modules/vnet_peering"
+
+  on_local = {
+    resource_group_name     = azurerm_resource_group.rg1.name
+    virtual_network_name    = module.vnet_right_srv_1.vnet.name
+    virtual_network_id      = module.vnet_right_srv_1.vnet.id
+    use_remote_gateways     = true
+  }
+
+  on_remote = {
+    resource_group_name    = azurerm_resource_group.rg1.name
+    virtual_network_name   = module.vnet_right_hub.vnet.name
+    virtual_network_id     = module.vnet_right_hub.vnet.id
+    allow_gateway_transit  = true
+  }
+
+  depends_on = [ 
+    azurerm_virtual_network_gateway.right
+   ]
 }
 
 
