@@ -73,19 +73,3 @@ resource "azurerm_network_interface_backend_address_pool_association" "hub4_spok
   backend_address_pool_id = azurerm_lb_backend_address_pool.hub4_ext.id
 }
 
-module "sdwan_spoke1_h" {
-  source = "../modules/linux"
-
-  name                = "${local.dname}-sdwan-spoke1"
-  location            = azurerm_resource_group.rg2.location
-  resource_group_name = azurerm_resource_group.rg2.name
-  subnet_id           = module.sdwan_spoke1.subnets.s1.id
-  private_ip_address  = cidrhost(module.sdwan_spoke1.subnets.s1.address_prefixes[0], 5)
-  password            = var.password
-  public_key          = azurerm_ssh_public_key.rg2.public_key
-  security_group      = module.basic_rg2.sg_id.mgmt
-  associate_nsg       = true
-  tags = {
-    rwe-region = "region2"
-  }
-}

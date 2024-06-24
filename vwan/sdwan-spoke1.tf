@@ -1,7 +1,7 @@
 module "sdwan_spoke1" {
   source              = "../modules/vnet"
-  resource_group_name = azurerm_resource_group.rg2.name
-  location            = azurerm_resource_group.rg2.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 
   name          = "${local.dname}-sdwan-spoke1"
   address_space = [local.vnet_cidr.sdwan_spoke1]
@@ -9,22 +9,22 @@ module "sdwan_spoke1" {
   subnets = {
     "mgmt" = {
       address_prefixes          = [cidrsubnet(local.vnet_cidr.sdwan_spoke1, 4, 0)]
-      network_security_group_id = module.basic_rg2.sg_id.mgmt
+      network_security_group_id = module.basic_rg1.sg_id.mgmt
       associate_nsg             = true
     },
     "isp1" = {
       address_prefixes          = [cidrsubnet(local.vnet_cidr.sdwan_spoke1, 4, 1)]
-      network_security_group_id = module.basic_rg2.sg_id.wide-open
+      network_security_group_id = module.basic_rg1.sg_id.wide-open
       associate_nsg             = true
     },
     "isp2" = {
       address_prefixes          = [cidrsubnet(local.vnet_cidr.sdwan_spoke1, 4, 2)]
-      network_security_group_id = module.basic_rg2.sg_id.wide-open
+      network_security_group_id = module.basic_rg1.sg_id.wide-open
       associate_nsg             = true
     },
     "private" = {
       address_prefixes          = [cidrsubnet(local.vnet_cidr.sdwan_spoke1, 4, 3)]
-      network_security_group_id = module.basic_rg2.sg_id.wide-open
+      network_security_group_id = module.basic_rg1.sg_id.wide-open
       associate_nsg             = true
     },
     "s1" = {
@@ -49,8 +49,8 @@ locals {
 module "sdwan_spoke1_fw" {
   source = "../modules/vmseries"
 
-  location            = azurerm_resource_group.rg2.location
-  resource_group_name = azurerm_resource_group.rg2.name
+  location            = azurerm_resource_group.rg1.location
+  resource_group_name = azurerm_resource_group.rg1.name
   name                = "${local.dname}-sdwan-spoke1-fw"
   username            = var.username
   password            = var.password
@@ -97,13 +97,13 @@ module "sdwan_spoke1_fw" {
 
 resource "azurerm_route_table" "sdwan_spoke1" {
   name                = "${var.name}-sdwan-spoke1"
-  resource_group_name = azurerm_resource_group.rg2.name
-  location            = azurerm_resource_group.rg2.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  location            = azurerm_resource_group.rg1.location
 }
 
 resource "azurerm_route" "sdwan_spoke1-prv" {
   name                   = "prv"
-  resource_group_name    = azurerm_resource_group.rg2.name
+  resource_group_name    = azurerm_resource_group.rg1.name
   route_table_name       = azurerm_route_table.sdwan_spoke1.name
   address_prefix         = "172.16.0.0/12"
   next_hop_type          = "VirtualAppliance"

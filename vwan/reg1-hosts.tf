@@ -67,3 +67,19 @@ module "hub2_spoke2_h" {
   }
 }
 
+module "sdwan_spoke1_h" {
+  source = "../modules/linux"
+
+  name                = "${local.dname}-sdwan-spoke1"
+  location            = azurerm_resource_group.rg1.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  subnet_id           = module.sdwan_spoke1.subnets.s1.id
+  private_ip_address  = cidrhost(module.sdwan_spoke1.subnets.s1.address_prefixes[0], 5)
+  password            = var.password
+  public_key          = azurerm_ssh_public_key.rg1.public_key
+  security_group      = module.basic_rg1.sg_id.mgmt
+  associate_nsg       = true
+  tags = {
+    rwe-region = "region1"
+  }
+}
