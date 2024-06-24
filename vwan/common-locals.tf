@@ -13,6 +13,7 @@ locals {
     hub2_dns        = cidrsubnet(var.region1_cidr, 4, 8)
 
     hub3            = cidrsubnet(var.region2_cidr, 4, 0)
+    hub3_spoke1     = cidrsubnet(var.region2_cidr, 5, 1*2 + 0)
     hub4            = cidrsubnet(var.region2_cidr, 4, 4)
     hub4_spoke1     = cidrsubnet(var.region2_cidr, 5, 5*2 + 0)
     hub4_spoke2     = cidrsubnet(var.region2_cidr, 5, 5*2 + 1)

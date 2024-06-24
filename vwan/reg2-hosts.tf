@@ -1,3 +1,20 @@
+module "hub3_spoke1_s1_h" {
+  source = "../modules/linux"
+
+  name                = "${local.dname}-hub3-spoke1-s1"
+  location            = azurerm_resource_group.rg2.location
+  resource_group_name = azurerm_resource_group.rg2.name
+  subnet_id           = module.hub3_spoke1.subnets.s1.id
+  private_ip_address  = cidrhost(module.hub3_spoke1.subnets.s1.address_prefixes[0], 5)
+  password            = var.password
+  public_key          = azurerm_ssh_public_key.rg2.public_key
+  security_group      = module.basic_rg2.sg_id.mgmt
+  associate_nsg       = true
+  tags = {
+    rwe-region = "region2"
+  }
+}
+
 module "hub4_spoke1_s1_h" {
   source = "../modules/linux"
 
