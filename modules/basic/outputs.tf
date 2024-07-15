@@ -8,24 +8,27 @@ output "sg_id" {
 output "route_table_id" {
   value = {
     # explicit dg via internet
-    all-via-igw = {
+    dg-via-igw = {
       "igw" = azurerm_route_table.all.id
     }
     # only mgmt via internet
     only-mgmt-via-igw = {
       "igw" = azurerm_route_table.mgmt.id
     }
-    # mgmt to internet, dg to nh
+    # mgmt via internet, dg via nh
     mgmt-via-igw = {
       for rt,v in azurerm_route_table.split_mgmt:  rt => v.id
     }
-    # private to nh
-    private-via-fw = {
+    mgmt-via-igw-dg-via-nh = {
+      for rt,v in azurerm_route_table.split_mgmt:  rt => v.id
+    }
+    # private via nh, no dg
+    private-via-nh = {
       for rt,v in azurerm_route_table.split_private:  rt => v.id
     }
-    # dg to nh
-    all-via-fw = {
-      for rt,v in azurerm_route_table.all_fw:  rt => v.id
+    # dg via nh
+    dg-via-nh = {
+      for rt,v in azurerm_route_table.all_nh:  rt => v.id
     }
   }
 }

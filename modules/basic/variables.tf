@@ -14,7 +14,7 @@ variable "mgmt_cidrs" {
   type = list(any)
 }
 
-variable "split_route_tables" {
-  description = "mgmt ips route to internet"
+variable "route_tables_params" {
+  description = "parameters / next hops to generate route tables"
   default = {}
 }
