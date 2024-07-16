@@ -1,0 +1,88 @@
+router id ${router_id};
+
+log "/var/log/bird/bird.log" all;
+
+debug protocols {events,states};
+
+protocol device {
+  scan time 10;
+  import all;
+}
+protocol direct {
+  interface "db0";
+  interface "eth0";
+}
+
+protocol kernel {
+  export all;
+  import all;
+  scan time 15;
+  learn yes;
+}
+
+protocol bgp ars1 {
+  import filter {
+    if (net ~ [10.0.0.0/8+] ) then accept;
+    reject;
+  };
+  export filter {
+    if (net ~ [10.0.0.0/8+] ) then accept;
+    reject;
+  };
+  multihop;
+  local as ${local_asn};
+  source address ${local_ip};
+  graceful restart on;
+  neighbor ${ars1_ip} as ${ars_asn};
+  hold time 15;
+}
+
+protocol bgp ars2 {
+  import filter {
+    if (net ~ [10.0.0.0/8+] ) then accept;
+    reject;
+  };
+  export filter {
+    if (net ~ [10.0.0.0/8+] ) then accept;
+    reject;
+  };
+  multihop;
+  local as ${local_asn};
+  source address ${local_ip};
+  graceful restart on;
+  neighbor ${ars2_ip} as ${ars_asn};
+  hold time 15;
+}
+
+protocol bgp peer1 {
+  import filter {
+    accept;
+  };
+  export filter {
+    if (net ~ [10.0.0.0/8+] ) then accept;
+    reject;
+  };
+  multihop;
+  local as ${local_asn};
+  source address ${local_ip};
+  graceful restart on;
+  neighbor ${peer1_ip} as ${peer1_asn};
+  hold time 15;
+}
+
+protocol bgp peer2 {
+  import filter {
+    accept;
+  };
+  export filter {
+    if (net ~ [10.0.0.0/8+] ) then accept;
+    reject;
+  };
+  multihop;
+  local as ${local_asn};
+  source address ${local_ip};
+  graceful restart on;
+  multihop;
+  neighbor ${peer2_ip} as ${peer2_asn};
+  hold time 15;
+}
