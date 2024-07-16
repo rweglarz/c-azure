@@ -52,10 +52,10 @@ module "basic_rg1" {
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
   mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
-  split_route_tables = {
+  route_tables_params = {
     left_u = {
       nh                            = local.private_ips.left_u_hub_ilb["obew"]
-      disable_bgp_route_propagation = true
+      bgp_route_propagation_enabled = false
     }
     right = {
       nh = local.private_ips.right_hub_fw["eth1_1_ip"]
@@ -70,10 +70,10 @@ module "basic_rg2" {
   resource_group_name = azurerm_resource_group.rg2.name
   location            = azurerm_resource_group.rg2.location
   mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
-  split_route_tables = {
+  route_tables_params = {
     left_b = {
       nh                            = local.private_ips.left_b_hub_ilb["obew"]
-      disable_bgp_route_propagation = true
+      bgp_route_propagation_enabled = false
     }
     right = {
       nh = local.private_ips.right_hub_fw["eth1_1_ip"]

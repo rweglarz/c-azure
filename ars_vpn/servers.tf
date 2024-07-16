@@ -154,12 +154,12 @@ module "vnet_peering-right_srv_1-right_hub" {
 
 resource "azurerm_subnet_route_table_association" "left_u_srv1" {
   subnet_id      = module.vnet_left_u_srv_1.subnets["s1"].id
-  route_table_id = module.basic_rg1.route_table_id["private-via-fw"]["left_u"]
+  route_table_id = module.basic_rg1.route_table_id.mgmt-via-igw-dg-via-nh.left_u
 }
 
 resource "azurerm_subnet_route_table_association" "left_b_srv1" {
   subnet_id      = module.vnet_left_b_srv_1.subnets["s1"].id
-  route_table_id = module.basic_rg2.route_table_id["private-via-fw"]["left_b"]
+  route_table_id = module.basic_rg2.route_table_id.mgmt-via-igw-dg-via-nh.left_b
 }
 
 
