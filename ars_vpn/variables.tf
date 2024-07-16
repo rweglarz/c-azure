@@ -24,10 +24,6 @@ variable "mgmt_ips" {
   type        = list(map(string))
 }
 
-variable "subscription" {
-  type = string
-}
-
 variable "fw_version" {
   default = null
 }
