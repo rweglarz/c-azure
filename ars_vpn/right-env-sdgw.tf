@@ -14,7 +14,7 @@ module "vnet_right_env_sdgw" {
     },
     "env2" = {
       address_prefixes          = [cidrsubnet(local.vnet_address_space.right_env_sdgw[0], 3, 3)]
-      attach_nsg                = true
+      associate_nsg             = true
       network_security_group_id = module.basic_rg1.sg_id["mgmt"]
     },
     "RouteServerSubnet" = {
