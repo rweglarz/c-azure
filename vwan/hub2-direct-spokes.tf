@@ -7,8 +7,8 @@ module "hub2_spoke1" {
   address_space = [local.vnet_cidr.hub2_spoke1]
   bgp_community = "12076:20021"
 
-  dns_servers = [
-    azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama.hub2.network_profile[0].ip_of_trust_for_user_defined_routes
+  dns_servers = var.cloud_ngfw_panorama_config.hub2==null ? [] : [
+    azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama.hub2[0].network_profile[0].ip_of_trust_for_user_defined_routes
   ]
 
   subnets = {
