@@ -29,7 +29,13 @@ variable "instance_type" {
   default = "Standard_D3_v2"
 }
 
-variable "bootstrap_options" {
+variable "bootstrap_options_common" {
+  type = map(string)
+}
+variable "bootstrap_options_byol" {
+  type = map(string)
+}
+variable "bootstrap_options_payg" {
   type = map(string)
 }
 
@@ -53,3 +59,10 @@ variable "dns_zone_name" {
   type = string
 }
 
+variable "panos_version" {
+  default = "11.1.4"
+}
+
+variable "byol_count" {
+  default = 0
+}

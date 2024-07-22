@@ -1,33 +1,49 @@
-resource "azurerm_application_insights" "vmss" {
-  name                = "${var.name}-app-insights-vmss"
+resource "azurerm_application_insights" "fw" {
+  name                = "${var.name}-app-insights-fw"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   application_type    = "other"
 }
 
 
-module "vmss" {
-  name = var.name
-  source = "github.com/PaloAltoNetworks/terraform-azurerm-vmseries-modules//modules/vmss?ref=v1.0.2"
+locals {
+  bootstrap_options_byol = merge(
+    var.bootstrap_options_common,
+    var.bootstrap_options_byol,
+    {
+      tplname     = panos_panorama_template_stack.this.name,
+      vm-auth-key = panos_vm_auth_key.this.auth_key,
+    }
+  )
+}
 
-  location                = azurerm_resource_group.rg.location
-  resource_group_name     = azurerm_resource_group.rg.name
-  disable_password_authentication = false
-  password                = var.password #default username panadmin
+
+
+module "vmss_byol" {
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/vmss?ref=v3.0.2"
+  #source = "PaloAltoNetworks/swfw-modules/azurerm//modules/vmss"
+  #version = "3.0.2"
+
+  name                = "${var.name}-fw-byol"
+  region              = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  authentication = {
+    username                        = "panadmin"
+    password                        = var.password
+    disable_password_authentication = false
+  }
+
   interfaces = [
     {
       name       = "mgmt"
       subnet_id  =  module.vnet_sec.subnets["mgmt"].id
-      create_pip = false
-      lb_backend_pool_ids = []
-      appgw_backend_pool_ids = []
     },
     {
       name                = "public"
       subnet_id           =  module.vnet_sec.subnets["public"].id
-      create_pip = false
       lb_backend_pool_ids = [
-        azurerm_lb_backend_address_pool.fw_ext.id
+        module.slb_fw_ext.backend_pool_id
       ]
       appgw_backend_pool_ids = [
         one([for i in module.appgw1.backend_address_pools: i.id if strcontains(i.name, "dummy")]),
@@ -35,33 +51,39 @@ module "vmss" {
       ]
     },
     {
-      name      = "private"
-      subnet_id =  module.vnet_sec.subnets["private"].id
-      create_pip = false
+      name       = "private"
+      subnet_id  =  module.vnet_sec.subnets["private"].id
       lb_backend_pool_ids = [
-        azurerm_lb_backend_address_pool.fw_int.id
+        module.slb_fw_int.backend_pool_id
       ]
       appgw_backend_pool_ids = []
     },
   ]
-  bootstrap_options = join(",", compact(concat(
-    [for k, v in var.bootstrap_options : "${k}=${v}"],
-  )))
 
-  img_sku     = "byol"
-  img_version = "10.1.9" #otherwise it is 10.1.0
+  virtual_machine_scale_set = {
+    size  = "Standard_D3_v2"
+    zones = [1,2,3]
 
-  application_insights_id = azurerm_application_insights.vmss.id
-  autoscale_metrics = {
-    panSessionActive = {
-      scaleout_threshold = 500
-      scalein_threshold  = 100
-    }
+    bootstrap_options = join(";", compact(concat(
+      [for k, v in local.bootstrap_options_byol : "${k}=${v}"],
+    )))
   }
+
+  image = {
+    sku     = "byol"
+    version = var.panos_version
+  }
+
+  autoscaling_configuration = {
+    application_insights_id = azurerm_application_insights.fw.id
+    default_count           = var.byol_count
+  }
+  autoscaling_profiles      = [
+    {
+      name          = "default"
+      default_count = var.byol_count
+      minimum_count = var.byol_count
+      maximum_count = var.byol_count
+    }
+  ]
 }
-
-
-# output "metric_key" {
-#   value     = module.vmss.metrics_instrumentation_key
-#   sensitive = true
-# }

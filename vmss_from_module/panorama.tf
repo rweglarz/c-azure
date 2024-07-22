@@ -1,3 +1,9 @@
+resource "panos_vm_auth_key" "this" {
+  hours = 7200
+
+  lifecycle { create_before_destroy = true }
+}
+
 data "panos_device_group" "this" {
   name = "azure-vmss-m"
 }
@@ -35,7 +41,7 @@ resource "panos_address_object" "pub_ext_1" {
   device_group = data.panos_device_group.this.name
 
   name  = "pub-ext-1"
-  value = azurerm_public_ip.fw_lb_ext_1.ip_address
+  value = module.slb_fw_ext.frontend_ip_configs.ext-1
 
   lifecycle { create_before_destroy = true }
 }
@@ -44,7 +50,7 @@ resource "panos_address_object" "pub_ext_2" {
   device_group = data.panos_device_group.this.name
 
   name  = "pub-ext-2"
-  value = azurerm_public_ip.fw_lb_ext_2.ip_address
+  value = module.slb_fw_ext.frontend_ip_configs.ext-2
 
   lifecycle { create_before_destroy = true }
 }

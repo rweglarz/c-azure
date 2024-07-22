@@ -1,5 +1,9 @@
 provider "azurerm" {
-  features {}
+  features {
+    virtual_machine_scale_set {
+      roll_instances_when_required = false
+    }
+  }
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -35,9 +39,9 @@ module "basic" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
-  split_route_tables = {
+  route_tables_params = {
     ilb = {
-      nh = azurerm_lb.fw_int.frontend_ip_configuration[0].private_ip_address
+      nh = module.slb_fw_int.frontend_ip_configs.ha
     }
   }
 }

@@ -113,7 +113,7 @@ resource "azurerm_route" "app1-dg" {
   route_table_name       = azurerm_route_table.app1.name
   address_prefix         = "0.0.0.0/0"
   next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = azurerm_lb.fw_int.frontend_ip_configuration[0].private_ip_address
+  next_hop_in_ip_address = module.slb_fw_int.frontend_ip_configs.ha
 }
 
 locals {
@@ -121,7 +121,7 @@ locals {
     for e in var.mgmt_ips : {
       name = replace(e.cidr, "/\\//", "_")
       prefix = e.cidr
-      nh   = azurerm_lb.fw_int.frontend_ip_configuration[0].private_ip_address
+      nh   = module.slb_fw_int.frontend_ip_configs.ha
     }
   ])
 }
@@ -141,7 +141,7 @@ resource "azurerm_route" "app1-apps" {
   route_table_name       = azurerm_route_table.app1.name
   address_prefix         = module.vnet_app1.subnets.app.address_prefixes[0]
   next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = azurerm_lb.fw_int.frontend_ip_configuration[0].private_ip_address
+  next_hop_in_ip_address = module.slb_fw_int.frontend_ip_configs.ha
 }
 
 
