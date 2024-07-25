@@ -1,10 +1,6 @@
 provider "azurerm" {
   features {}
 }
-data "azurerm_subscriptions" "azsub" {
-  display_name_contains = var.azure_subscription
-}
-
 
 terraform {
   required_version = ">= 1.6"
@@ -44,7 +40,7 @@ module "basic" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
-  split_route_tables = {
+  route_tables_params = {
     servers = {
       nh = replace(panos_panorama_ethernet_interface.azure_ha2_eth1_3.static_ips[0], "/\\/../", "")
     }
