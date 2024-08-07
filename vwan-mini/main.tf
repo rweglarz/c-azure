@@ -53,7 +53,7 @@ module "basic" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
-  split_route_tables = {
+  route_tables_params  = {
     hub1 = {
       nh = local.private_ip.hub1_sec_lb
     }
