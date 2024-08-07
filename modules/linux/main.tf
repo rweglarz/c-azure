@@ -45,8 +45,8 @@ resource "azurerm_linux_virtual_machine" "this" {
 
   source_image_reference {
     publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
+    offer     = "ubuntu-24_04-lts"
+    sku       = "server"
     version   = "latest"
   }
 
@@ -59,6 +59,9 @@ resource "azurerm_linux_virtual_machine" "this" {
   admin_ssh_key {
     username   = "ubuntu"
     public_key = var.public_key
+  }
+  boot_diagnostics {
+    storage_account_uri = null
   }
 
   tags = var.tags
