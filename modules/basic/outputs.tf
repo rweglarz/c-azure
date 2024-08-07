@@ -2,6 +2,7 @@ output "sg_id" {
   value = {
     mgmt      = azurerm_network_security_group.mgmt.id
     wide-open = azurerm_network_security_group.wide_open.id
+    vpn       = azurerm_network_security_group.vpn.id
   }
 }
 
