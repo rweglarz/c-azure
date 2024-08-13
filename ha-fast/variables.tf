@@ -58,18 +58,6 @@ variable dns_zone_name {
   type = string
 }
 
-variable inbound_tcp_ports {
-  default = [
-    22,
-  ]
-}
-variable inbound_udp_ports {
-  default = [
-    500,
-    4500,
-  ]
-}
-
 variable "vmseries" {
   default = {
     fw0 = {
