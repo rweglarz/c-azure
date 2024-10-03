@@ -28,7 +28,7 @@ module "cfg_fw" {
       management_profile = "ping"
     }
     "loopback.1" = {
-      static_ips         = [module.slb_fw_ext.frontend_ip_configs.ext-fw]
+      static_ips         = ["192.0.2.2"]
       zone               = "public"
     }
     "loopback.999" = {
