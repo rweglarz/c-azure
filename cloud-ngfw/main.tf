@@ -23,6 +23,9 @@ terraform {
     panos = {
       source = "PaloAltoNetworks/panos"
     }
+    azurerm = {
+      version = "~>3.113"
+    }
   }
 }
 provider "panos" {
