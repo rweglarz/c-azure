@@ -31,7 +31,7 @@ locals {
         port = 80
       }
       backend_config = {
-        public_ip_address = module.app01_srv[0].private_ip_address
+        public_ip_address = module.app01_prod_srv[0].private_ip_address
         port = 80
       }
     }

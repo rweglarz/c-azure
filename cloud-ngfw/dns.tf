@@ -5,7 +5,7 @@ resource "azurerm_dns_a_record" "app01-srv" {
   zone_name           = var.dns_zone_name
   ttl                 = 300
   records = [
-    module.app01_srv[count.index].public_ip
+    module.app01_prod_srv[count.index].public_ip
   ]
 }
 
