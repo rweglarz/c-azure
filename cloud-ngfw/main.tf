@@ -1,5 +1,6 @@
 provider "azurerm" {
   features {}
+  subscription_id = var.subscription_id
 }
 
 resource "random_id" "did" {
@@ -24,7 +25,7 @@ terraform {
       source = "PaloAltoNetworks/panos"
     }
     azurerm = {
-      version = "~>3.113"
+      version = "~>4.5"
     }
   }
 }

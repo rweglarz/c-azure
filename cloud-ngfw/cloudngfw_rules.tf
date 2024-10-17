@@ -56,6 +56,7 @@ resource "azurerm_palo_alto_local_rulestack_rule" "ew" {
     cidrs = ["172.16.0.0/12"]
   }
   applications    = ["any"]
+  protocol        = "application-default"
   logging_enabled = true
 }
 
@@ -77,6 +78,7 @@ resource "azurerm_palo_alto_local_rulestack_rule" "outbound-web" {
     "ssl",
     "web-browsing",
   ]
+  protocol        = "application-default"
   logging_enabled = true
 }
 
@@ -95,12 +97,13 @@ resource "azurerm_palo_alto_local_rulestack_rule" "outbound" {
   }
   negate_destination = true
   applications    = ["any"]
+  protocol        = "application-default"
   logging_enabled = true
 }
 
 
 resource "azurerm_palo_alto_local_rulestack_rule" "deny" {
-  name         = "deny-any-any"
+  name         = "deny-almost-any-any"
   rulestack_id = azurerm_palo_alto_local_rulestack.this.id
   priority     = 9999
   action       = "DenySilent"
@@ -113,5 +116,7 @@ resource "azurerm_palo_alto_local_rulestack_rule" "deny" {
     cidrs = ["any"]
   }
   applications    = ["any"]
+  //protocol        = "any"
+  protocol        = "application-default"
   logging_enabled = true
 }

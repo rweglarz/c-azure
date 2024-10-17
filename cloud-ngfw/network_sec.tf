@@ -9,7 +9,7 @@ resource "azurerm_subnet" "public" {
   name                 = "${var.name}-public"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.sec.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.sec.address_space[0], 2, 0)]
+  address_prefixes     = [cidrsubnet(one(azurerm_virtual_network.sec.address_space), 2, 0)]
 
   delegation {
     name = "public"
@@ -26,7 +26,7 @@ resource "azurerm_subnet" "private" {
   name                 = "${var.name}-private"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.sec.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.sec.address_space[0], 2, 1)]
+  address_prefixes     = [cidrsubnet(one(azurerm_virtual_network.sec.address_space), 2, 1)]
 
   delegation {
     name = "private"

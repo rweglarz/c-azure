@@ -9,7 +9,7 @@ resource "azurerm_subnet" "app01_s01" {
   name                 = "${var.name}-app01-s01"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.app01.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.app01.address_space[0], 4, 0)]
+  address_prefixes     = [cidrsubnet(one(azurerm_virtual_network.app01.address_space), 4, 0)]
 }
 
 resource "azurerm_virtual_network_peering" "app01-sec" {
@@ -51,7 +51,7 @@ resource "azurerm_subnet" "app02_s01" {
   name                 = "${var.name}-app02-s01"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.app02.name
-  address_prefixes     = [cidrsubnet(azurerm_virtual_network.app02.address_space[0], 4, 0)]
+  address_prefixes     = [cidrsubnet(one(azurerm_virtual_network.app02.address_space), 4, 0)]
 }
 
 resource "azurerm_virtual_network_peering" "app02-sec" {
