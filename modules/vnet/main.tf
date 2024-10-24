@@ -15,7 +15,7 @@ resource "azurerm_virtual_network_dns_servers" "this" {
 
 locals {
   extra_mask_bits = {
-    for k, v in var.subnets: k => lookup(v, "subnet_mask_length", var.subnet_mask_length) - tonumber(split("/", azurerm_virtual_network.this.address_space[0])[1])
+    for k, v in var.subnets: k => lookup(v, "subnet_mask_length", var.subnet_mask_length) - tonumber(split("/", tolist(azurerm_virtual_network.this.address_space)[0])[1])
   }
 }
 
@@ -26,8 +26,10 @@ resource "azurerm_subnet" "this" {
   name                 = each.key
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.this.name
-  address_prefixes     = try(each.value.address_prefixes, [cidrsubnet(azurerm_virtual_network.this.address_space[0], local.extra_mask_bits[each.key], each.value.idx)])
+  address_prefixes     = try(each.value.address_prefixes, [cidrsubnet(tolist(azurerm_virtual_network.this.address_space)[0], local.extra_mask_bits[each.key], each.value.idx)])
   service_endpoints    = try(each.value.service_endpoints, [])
+
+  default_outbound_access_enabled = try(each.value.default_outbound_access_enabled, true)
   
   dynamic "delegation" {
     for_each = try(contains(each.value.delegations, "dnsResolvers"), false) == true ? [1] : []
