@@ -180,6 +180,13 @@ variable "cloud_ngfw_panorama_config" {
   type = map
 }
 
+variable "configure_hub_routing_intent" {
+  default = {
+    hub2 = false
+    hub4 = false
+  }
+}
+
 variable "ssl_certificate_path" {
   default = null
 }

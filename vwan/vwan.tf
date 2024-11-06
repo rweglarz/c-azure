@@ -119,6 +119,43 @@ resource "azurerm_virtual_hub_connection" "hub2-hub2_dns" {
 }
 
 
+
+resource "azurerm_virtual_hub_routing_intent" "hub2" {
+  count = (var.cloud_ngfw_panorama_config.hub2!=null && try(var.configure_hub_routing_intent.hub2, false)==true) ? 1 : 0
+  name           = "${local.dname}-hub2"
+  virtual_hub_id = azurerm_virtual_hub.hub2.id
+
+  routing_policy {
+    name         = "InternetTrafficPolicy"
+    destinations = ["Internet"]
+    next_hop     = azurerm_palo_alto_virtual_network_appliance.hub2[0].id
+  }
+  routing_policy {
+    name         = "PrivateTrafficPolicy"
+    destinations = ["PrivateTraffic"]
+    next_hop     = azurerm_palo_alto_virtual_network_appliance.hub2[0].id
+  }
+}
+
+resource "azurerm_virtual_hub_routing_intent" "hub4" {
+  count = (var.cloud_ngfw_panorama_config.hub4!=null && try(var.configure_hub_routing_intent.hub4, false)==true) ? 1 : 0
+  name           = "${local.dname}-hub4"
+  virtual_hub_id = azurerm_virtual_hub.hub4.id
+
+  routing_policy {
+    name         = "InternetTrafficPolicy"
+    destinations = ["Internet"]
+    next_hop     = azurerm_palo_alto_virtual_network_appliance.hub4[0].id
+  }
+  routing_policy {
+    name         = "PrivateTrafficPolicy"
+    destinations = ["PrivateTraffic"]
+    next_hop     = azurerm_palo_alto_virtual_network_appliance.hub4[0].id
+  }
+}
+
+
+
 resource "azurerm_virtual_hub_route_table_route" "hub1-hub1_sec_spokes" {
   route_table_id = azurerm_virtual_hub.hub1.default_route_table_id
 
