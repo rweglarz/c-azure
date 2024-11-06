@@ -53,7 +53,7 @@ resource "azurerm_route" "hub2_spoke1-local" {
   name = "local"
   resource_group_name    = azurerm_resource_group.rg1.name
   route_table_name       = azurerm_route_table.hub2_spoke1.name
-  address_prefix         = module.hub2_spoke1.vnet.address_space[0]
+  address_prefix         = tolist(module.hub2_spoke1.vnet.address_space)[0]
   next_hop_type          = "VirtualAppliance"
   next_hop_in_ip_address = var.cloud_ngfw_private_ips.hub2
 }

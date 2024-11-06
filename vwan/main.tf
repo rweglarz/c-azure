@@ -1,5 +1,6 @@
 provider "azurerm" {
   features {}
+  subscription_id = var.subscription_id
 }
 
 provider "aws" {
@@ -12,7 +13,7 @@ terraform {
       version = "~>5.52"
     }
     azurerm = {
-      version = "~>3.105"
+      version = "~>4.0"
     }
     google = {
       version = "~>6.10"

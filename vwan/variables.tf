@@ -1,7 +1,11 @@
+variable "subscription_id" {
+  type = string
+}
 variable "name" {
   description = "Name/Prefix of the deployment"
   type        = string
 }
+
 variable "region1" {
   type    = string
   default = "East US 2"
