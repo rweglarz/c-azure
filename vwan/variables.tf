@@ -231,3 +231,10 @@ variable "prisma_access" {
 #   }
 # }
 }
+
+variable "gcp_project" {
+  default = null
+}
+variable "gcp_panorama_vpc_id" {
+  default = null
+}

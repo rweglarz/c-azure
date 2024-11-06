@@ -14,6 +14,9 @@ terraform {
     azurerm = {
       version = "~>3.105"
     }
+    google = {
+      version = "~>6.10"
+    }
     panos = {
       source = "PaloAltoNetworks/panos"
     }
