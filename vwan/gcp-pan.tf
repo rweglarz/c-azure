@@ -6,7 +6,7 @@ resource "google_compute_firewall" "pan" {
   source_ranges = [
     "172.16.0.0/12",
     module.aws_fw.mgmt_public_ip,
-    module.hub1_sec_fw.mgmt_ip_address,
+    azurerm_public_ip.hub1_sec_ngw.ip_address,
     module.hub2_sdwan_fw1.mgmt_ip_address,
     module.hub2_sdwan_fw2.mgmt_ip_address,
     module.hub4_sdwan_fw.mgmt_ip_address,

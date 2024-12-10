@@ -49,7 +49,7 @@ resource "azurerm_virtual_hub_connection" "hub1-hub1_sec" {
       address_prefixes = [
         cidrsubnet(var.region1_cidr, 2, 0)
       ]
-      next_hop_ip_address = cidrhost(module.hub1_sec.subnets.data.address_prefixes[0], 5)
+      next_hop_ip_address = local.private_ip.hub1_sec_ilb
     }
   }
   depends_on = [

@@ -1,5 +1,9 @@
 provider "azurerm" {
-  features {}
+  features {
+    virtual_machine_scale_set {
+      roll_instances_when_required = false
+    }
+  }
   subscription_id = var.subscription_id
 }
 

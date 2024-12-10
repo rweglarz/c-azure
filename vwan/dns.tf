@@ -2,8 +2,8 @@ resource "azurerm_dns_a_record" "public" {
   for_each = {
     vwan-aws-fw          = module.aws_fw.mgmt_public_ip
     vwan-aws-srv         = module.aws_srv.public_ip
-    vwan-hub1-sec-fw     = module.hub1_sec_fw.mgmt_ip_address
     vwan-hub1-sec-spoke1 = module.hub1_sec_spoke1_h.public_ip
+    vwan-hub1-sec-spoke2 = module.hub1_sec_spoke2_h.public_ip
     vwan-hub2-spoke1-s1  = module.hub2_spoke1_s1_h.public_ip
     vwan-hub2-spoke1-s2  = module.hub2_spoke1_s2_h.public_ip
     vwan-hub2-spoke2     = module.hub2_spoke2_h.public_ip

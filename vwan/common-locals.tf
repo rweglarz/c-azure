@@ -1,4 +1,11 @@
 locals {
+  hub1_sec_fw_count = 0
+  hub1_sec_fw_ver = "11.2.303"
+  # hub1_sec_fw_ver = "11.1.407"
+}
+
+
+locals {
   dns_ttl              = 90
   subnet_prefix_length = 28
   vnet_cidr = {
@@ -6,6 +13,8 @@ locals {
     hub1_sec        = cidrsubnet(var.region1_cidr, 4, 1)
     hub1_sec_spoke1 = cidrsubnet(var.region1_cidr, 5, 2*2 + 0)
     hub1_sec_spoke2 = cidrsubnet(var.region1_cidr, 5, 2*2 + 1)
+    hub1_spoke3     = cidrsubnet(var.region1_cidr, 5, 3*2 + 0)
+    hub1_spoke4     = cidrsubnet(var.region1_cidr, 5, 3*2 + 1)
     hub2            = cidrsubnet(var.region1_cidr, 4, 4)
     hub2_spoke1     = cidrsubnet(var.region1_cidr, 5, 5*2 + 0)
     hub2_spoke2     = cidrsubnet(var.region1_cidr, 5, 5*2 + 1)
@@ -20,6 +29,10 @@ locals {
     hub4_sdwan      = cidrsubnet(var.region2_cidr, 4, 7)
 
     sdwan_spoke1    = cidrsubnet(var.ext_spokes_cidr, 4, 1)
+  }
+
+  private_ip = {
+    hub1_sec_ilb = cidrhost(module.hub1_sec.subnets.private.address_prefixes[0], 4)
   }
 
   public_ip = {
@@ -74,6 +87,7 @@ locals {
       tplname = panos_panorama_template_stack.azure_vwan_aws_fw.name
     }
     hub1_sec_fw = {
+      dgname  = panos_device_group.hub1.name
       tplname = panos_panorama_template_stack.hub1_sec_fw.name
     }
     hub2_sdwan_fw1 = {

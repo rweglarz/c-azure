@@ -13,8 +13,13 @@ module "hub1_sec" {
       network_security_group_id = module.basic_rg1.sg_id.mgmt
       associate_nsg             = true
     },
-    "data" = {
+    "public" = {
       idx                       = 1
+      network_security_group_id = module.basic_rg1.sg_id.wide-open
+      associate_nsg             = true
+    },
+    "private" = {
+      idx                       = 2
       network_security_group_id = module.basic_rg1.sg_id.wide-open
       associate_nsg             = true
     },
@@ -22,151 +27,215 @@ module "hub1_sec" {
 }
 
 
-resource "azurerm_route_table" "hub1_sec_data" {
-  name                = "${local.dname}-hub1-sec-data"
-  resource_group_name = azurerm_resource_group.rg1.name
+resource "azurerm_public_ip" "hub1_sec_ngw" {
+  name                = "${var.name}-hub1-sec-nat-gateway"
   location            = azurerm_resource_group.rg1.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+resource "azurerm_nat_gateway" "hub1_sec_ngw" {
+  name                    = "${var.name}-hub1-sec-nat-gateway"
+  location                = azurerm_resource_group.rg1.location
+  resource_group_name     = azurerm_resource_group.rg1.name
+  sku_name                = "Standard"
+  idle_timeout_in_minutes = 10
+}
+
+resource "azurerm_nat_gateway_public_ip_association" "hub1_sec_ngfw" {
+  nat_gateway_id       = azurerm_nat_gateway.hub1_sec_ngw.id
+  public_ip_address_id = azurerm_public_ip.hub1_sec_ngw.id
+}
+
+resource "azurerm_subnet_nat_gateway_association" "hub1_sec_mgmt" {
+  subnet_id      = module.hub1_sec.subnets.mgmt.id
+  nat_gateway_id = azurerm_nat_gateway.hub1_sec_ngw.id
 }
 
 
-resource "azurerm_route_table" "hub1_sec_spokes" {
-  name                = "${local.dname}-hub1-sec-spokes"
+
+resource "azurerm_public_ip" "hub1_sec_snat" {
+  name                = "${var.name}-hub1-sec-snat"
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  zones               = [1, 2, 3]
 }
 
-resource "azurerm_route" "hub1_sec_spokes_172" {
-  name                   = "172"
-  resource_group_name    = azurerm_resource_group.rg1.name
-  route_table_name       = azurerm_route_table.hub1_sec_spokes.name
-  address_prefix         = "172.16.0.0/12"
-  next_hop_type          = "VirtualAppliance"
-  next_hop_in_ip_address = cidrhost(module.hub1_sec.subnets.data.address_prefixes[0], 5)
-}
 
-module "hub1_sec_spoke1" {
-  source              = "../modules/vnet"
+
+
+module "elb_hub1_sec" {
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/loadbalancer?ref=v3.2.1"
+
+  name                = "${var.name}-elb-hub1-sec"
   resource_group_name = azurerm_resource_group.rg1.name
-  location            = azurerm_resource_group.rg1.location
+  region              = azurerm_resource_group.rg1.location
 
-  name          = "${local.dname}-hub1-sec-spoke1"
-  address_space = [local.vnet_cidr.hub1_sec_spoke1]
-  bgp_community = "12076:20011"
+  backend_name = "fws"
 
-  subnets = {
-    "s1" = {
-      idx                       = 0
-      network_security_group_id = module.basic_rg1.sg_id.mgmt
-      associate_nsg             = true
-    },
-    "s2" = {
-      idx                       = 1
-      network_security_group_id = module.basic_rg1.sg_id.mgmt
-      associate_nsg             = true
-    },
+  frontend_ips = {
+    ext-1 = {
+      name             = "ext-1-n"
+      public_ip_name   = "${var.name}-ext-1"
+      create_public_ip = true
+      in_rules = {
+        http = {
+          name     = "ext-1-r"
+          port     = 80
+          protocol = "Tcp"
+          health_probe_key = "mdefault"
+        }
+      }
+    }
+    out = {
+      name             = "outbound"
+      public_ip_name   = azurerm_public_ip.hub1_sec_snat.name
+      create_public_ip = false
+      out_rules = {
+        out = {
+          name                     = "out"
+          protocol                 = "All"
+          allocated_outbound_ports = 8192
+          idle_timeout_in_minutes  = 10
+        }
+      }
+    }
   }
-}
 
-module "hub1_sec_spoke2" {
-  source              = "../modules/vnet"
-  resource_group_name = azurerm_resource_group.rg1.name
-  location            = azurerm_resource_group.rg1.location
+  health_probes = {
+    mdefault = {
+      name     = "r-default"
+      protocol = "Http"
+      port     = 54321
 
-  name          = "${local.dname}-hub1-sec-spoke2"
-  address_space = [local.vnet_cidr.hub1_sec_spoke2]
-
-  subnets = {
-    "s1" = {
-      idx                       = 0
-      network_security_group_id = module.basic_rg1.sg_id.mgmt
-      associate_nsg             = true
-    },
-    "s2" = {
-      idx                       = 1
-      network_security_group_id = module.basic_rg1.sg_id.mgmt
-      associate_nsg             = true
-    },
+      request_path        = "/unauth/php/health.php"
+      probe_threshold     = 3
+      interval_in_seconds = 5
+    }
   }
-}
 
-resource "azurerm_subnet_route_table_association" "hub1_sec_spoke1_s1" {
-  subnet_id      = module.hub1_sec_spoke1.subnets.s1.id
-  route_table_id = azurerm_route_table.hub1_sec_spokes.id
-}
-
-
-
-resource "azurerm_virtual_network" "hub1_sec_spoke2" {
-  name                = "${local.dname}-hub1-sec-spoke2"
-  resource_group_name = azurerm_resource_group.rg1.name
-  location            = azurerm_resource_group.rg1.location
-  address_space       = [local.vnet_cidr.hub1_sec_spoke2]
-}
-
-
-resource "azurerm_subnet_route_table_association" "hub1_sec_data" {
-  subnet_id      = module.hub1_sec.subnets.data.id
-  route_table_id = azurerm_route_table.hub1_sec_data.id
-}
-
-resource "azurerm_virtual_network_peering" "hub1_sec_spoke1-hub1_sec" {
-  name                      = "${local.dname}-hub1-vnet2-hub1-sec"
-  resource_group_name       = azurerm_resource_group.rg1.name
-  virtual_network_name      = module.hub1_sec_spoke1.vnet.name
-  remote_virtual_network_id = module.hub1_sec.vnet.id
-  allow_forwarded_traffic   = true
-}
-resource "azurerm_virtual_network_peering" "hub1_sec-hub1_sec_spoke1" {
-  name                      = "${local.dname}-hub1-sec-hub1-spoke1"
-  resource_group_name       = azurerm_resource_group.rg1.name
-  virtual_network_name      = module.hub1_sec.vnet.name
-  remote_virtual_network_id = module.hub1_sec_spoke1.vnet.id
-}
-
-
-resource "panos_panorama_template_stack" "hub1_sec_fw" {
-  name         = "azure-vwan-hub1-sec-fw-ts"
-  default_vsys = "vsys1"
-  templates = [
-    "azure-1-if",
-    "vm common",
+  depends_on = [
+    azurerm_public_ip.hub1_sec_snat,
   ]
-  description = "pat:acp"
-}
-
-resource "panos_panorama_template_variable" "hub1_sec_fw_eth1_1_gw" {
-  template_stack = panos_panorama_template_stack.hub1_sec_fw.name
-  name           = "$eth1-1-gw"
-  type           = "ip-netmask"
-  value          = cidrhost(module.hub1_sec.subnets.data.address_prefixes[0], 1)
 }
 
 
-module "hub1_sec_fw" {
-  source = "../modules/vmseries"
 
-  location            = azurerm_resource_group.rg1.location
+
+module "ilb_hub1_sec" {
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/loadbalancer?ref=v3.2.1"
+
+  name                = "${var.name}-ilb-hub1-sec"
   resource_group_name = azurerm_resource_group.rg1.name
-  name                = "${local.dname}-hub1-sec-fw"
-  username            = var.username
-  password            = var.password
-  interfaces = {
-    mgmt = {
-      device_index = 0
-      subnet_id    = module.hub1_sec.subnets.mgmt.id
-      public_ip    = true
-    }
-    data = {
-      device_index         = 1
-      subnet_id            = module.hub1_sec.subnets.data.id
-      private_ip_address   = cidrhost(module.hub1_sec.subnets.data.address_prefixes[0], 5)
-      enable_ip_forwarding = true
+  region              = azurerm_resource_group.rg1.location
+
+  backend_name = "fws"
+
+  frontend_ips = {
+    ha = {
+      name               = "ha-n"
+      subnet_id          = module.hub1_sec.subnets.private.id
+      private_ip_address = local.private_ip.hub1_sec_ilb
+      in_rules = {
+        har = {
+          name             = "ha-r"
+          port             = 0
+          protocol         = "All"
+          health_probe_key = "mdefault"
+        }
+      }
     }
   }
 
-  bootstrap_options = merge(
-    local.bootstrap_options["common"],
-    local.bootstrap_options["hub1_sec_fw"],
-  )
+  health_probes = {
+    mdefault = {
+      name     = "r-default"
+      protocol = "Http"
+      port     = 54321
+
+      request_path        = "/unauth/php/health.php"
+      probe_threshold     = 3
+      interval_in_seconds = 5
+    }
+  }
 }
 
+resource "azurerm_application_insights" "hub1_sec_fw" {
+  name                = "${var.name}-hub1-fw-insights"
+  location            = azurerm_resource_group.rg1.location
+  resource_group_name = azurerm_resource_group.rg1.name
+  application_type    = "other"
+}
+
+module "vmss_hub1_sec_fw" {
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/vmss?ref=v3.2.1"
+
+  name                = "${var.name}-hub1-fw"
+  region              = azurerm_resource_group.rg1.location
+  resource_group_name = azurerm_resource_group.rg1.name
+
+  authentication = {
+    username                        = var.username
+    password                        = var.password
+    disable_password_authentication = false
+  }
+
+  interfaces = [
+    {
+      name       = "mgmt"
+      subnet_id  =  module.hub1_sec.subnets.mgmt.id
+    },
+    {
+      name                = "public"
+      subnet_id           =  module.hub1_sec.subnets.public.id
+      lb_backend_pool_ids = [
+        module.elb_hub1_sec.backend_pool_id
+      ]
+      appgw_backend_pool_ids = []
+    },
+    {
+      name       = "private"
+      subnet_id  =  module.hub1_sec.subnets.private.id
+      lb_backend_pool_ids = [
+        module.ilb_hub1_sec.backend_pool_id
+      ]
+      appgw_backend_pool_ids = []
+    },
+  ]
+
+  virtual_machine_scale_set = {
+    size  = "Standard_D3_v2"
+    zones = [1,2,3]
+
+    bootstrap_options = join(";", [for k, v in merge(
+        local.bootstrap_options.common,
+        local.bootstrap_options.hub1_sec_fw,
+      ) : "${k}=${v}" if k !="authcodes"])
+  }
+
+  image = {
+    sku     = "bundle1"
+    version = local.hub1_sec_fw_ver
+  }
+
+  autoscaling_configuration = {
+    application_insights_id = azurerm_application_insights.hub1_sec_fw.id
+    default_count           = local.hub1_sec_fw_count
+  }
+  autoscaling_profiles      = [
+    {
+      name          = "default"
+      default_count = local.hub1_sec_fw_count
+      minimum_count = local.hub1_sec_fw_count
+      maximum_count = local.hub1_sec_fw_count
+    }
+  ]
+
+  depends_on = [ 
+    azurerm_subnet_nat_gateway_association.hub1_sec_mgmt,
+    panos_panorama_template_stack.hub1_sec_fw,
+  ]
+}
