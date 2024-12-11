@@ -177,9 +177,16 @@ resource "azurerm_linux_virtual_machine" "vmseries" {
     storage_account_type = "Standard_LRS"
   }
 
-  custom_data = base64encode(join("\n", compact(concat(
+  boot_diagnostics {
+    storage_account_uri = null
+  }
+
+  custom_data = base64encode(join(";", compact(concat(
     [for k, v in var.bootstrap_options : "${k}=${v}"],
-    ["tplname=${panos_panorama_template_stack.azure_ha2[count.index].name}"],
+    [
+      "vm-auth-key=${panos_vm_auth_key.this.auth_key}",
+      "tplname=${panos_panorama_template_stack.azure_ha2[count.index].name}",
+    ],
   ))))
 }
 

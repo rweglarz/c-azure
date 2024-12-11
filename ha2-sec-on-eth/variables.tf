@@ -1,6 +1,5 @@
-variable "azure_subscription" {
+variable "subscription_id" {
    type    = string
-   default = "change_me"
 }
 
 variable "region" {
@@ -53,11 +52,6 @@ variable "password" {
   type = string
 }
 
-variable "pl-mgmt-csp_nat_ips" {
-  type = string
-  default = "pl-029b5d80e69d9bc9e"
-}
-
 variable dns_zone_rg {
   type = string
 }
@@ -65,3 +59,9 @@ variable dns_zone_name {
   type = string
 }
 
+variable "gcp_project" {
+  default = null
+}
+variable "gcp_panorama_vpc_id" {
+  default = null
+}

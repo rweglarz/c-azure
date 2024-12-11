@@ -1,10 +1,17 @@
 provider "azurerm" {
   features {}
+  subscription_id = var.subscription_id
 }
 
 terraform {
   required_version = ">= 1.6"
   required_providers {
+    azurerm = {
+      version = "~>4.0"
+    }
+    google = {
+      version = "~>6.10"
+    }
     panos = {
       source = "PaloAltoNetworks/panos"
     }
@@ -45,4 +52,8 @@ module "basic" {
       nh = replace(panos_panorama_ethernet_interface.azure_ha2_eth1_3.static_ips[0], "/\\/../", "")
     }
   }
+}
+
+resource "panos_vm_auth_key" "this" {
+  hours = 24*30*6
 }

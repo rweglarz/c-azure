@@ -50,8 +50,8 @@ resource "azurerm_route" "servers-routes" {
   for_each = {
     srv5  = module.vnet_sec.subnets.srv5.address_prefixes[0]
     srv6  = module.vnet_sec.subnets.srv6.address_prefixes[0]
-    psrv0 = module.vnet_srv0.vnet.address_space[0]
-    psrv1 = module.vnet_srv1.vnet.address_space[0]
+    psrv0 = tolist(module.vnet_srv0.vnet.address_space)[0]
+    psrv1 = tolist(module.vnet_srv1.vnet.address_space)[0]
   }
   name                   = each.key
   resource_group_name    = azurerm_resource_group.rg.name
