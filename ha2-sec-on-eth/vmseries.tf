@@ -29,7 +29,7 @@ resource "azurerm_public_ip" "mgmt" {
   location            = azurerm_resource_group.rg.location
   allocation_method   = "Static"
   sku                 = "Standard"
-  zones               = toset(var.availabilty_zones)
+  zones               = [1, 2, 3]
 }
 
 resource "azurerm_network_interface" "mgmt" {
@@ -37,7 +37,7 @@ resource "azurerm_network_interface" "mgmt" {
   name                 = "${var.name}-fw${count.index}-mgmt"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
-  enable_ip_forwarding = false
+  ip_forwarding_enabled = false
 
   ip_configuration {
     name                          = "primary"
@@ -54,8 +54,8 @@ resource "azurerm_network_interface" "ha2" {
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
 
-  enable_ip_forwarding          = true
-  enable_accelerated_networking = true
+  ip_forwarding_enabled          = true
+  accelerated_networking_enabled = true
 
   ip_configuration {
     name                          = "primary"
@@ -71,8 +71,8 @@ resource "azurerm_network_interface" "public" {
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
 
-  enable_ip_forwarding          = true
-  enable_accelerated_networking = true
+  ip_forwarding_enabled          = true
+  accelerated_networking_enabled = true
 
   ip_configuration {
     name                          = "primary"
@@ -82,13 +82,23 @@ resource "azurerm_network_interface" "public" {
     private_ip_address            = local.fw_ip.public["fw${count.index}"]
   }
   dynamic "ip_configuration" {
-    for_each = (count.index==0) ? [1]: []
+    for_each = (count.index==0) ? [1] : []
     content {
-      name                          = "secondary"
+      name                          = "secondary-main"
       subnet_id                     = module.vnet_sec.subnets.public.id
       private_ip_address_allocation = "Static"
       private_ip_address            = local.fw_ip.public["fws"]
-      public_ip_address_id          = (count.index == 0) ? azurerm_public_ip.untrust[0].id : null
+      public_ip_address_id          = azurerm_public_ip.untrust["main"].id
+    }
+  }
+  dynamic "ip_configuration" {
+    for_each = (count.index==0) ? var.additional_untrust_ips: {}
+    content {
+      name                          = "secondary-${ip_configuration.key}"
+      subnet_id                     = module.vnet_sec.subnets.public.id
+      private_ip_address_allocation = "Static"
+      private_ip_address            = cidrhost(module.vnet_sec.subnets.public.address_prefixes[0], ip_configuration.value.idx)
+      public_ip_address_id          = azurerm_public_ip.untrust[ip_configuration.key].id
     }
   }
 }
@@ -105,8 +115,8 @@ resource "azurerm_network_interface" "private" {
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
 
-  enable_ip_forwarding          = true
-  enable_accelerated_networking = true
+  ip_forwarding_enabled          = true
+  accelerated_networking_enabled = true
 
   ip_configuration {
     name                          = "primary"
@@ -127,13 +137,18 @@ resource "azurerm_network_interface" "private" {
 }
 
 resource "azurerm_public_ip" "untrust" {
-  count               = 1
-  name                = "${var.name}-fw-untrust-${count.index}"
+  for_each = merge(
+    { main = { idx = 6 } },
+    var.additional_untrust_ips
+  )
+  name                = "${var.name}-fw-untrust-${each.key}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   allocation_method   = "Static"
   sku                 = "Standard"
-  zones               = toset(var.availabilty_zones)
+  zones               = [1, 2, 3]
+
+  idle_timeout_in_minutes = 8
 }
 
 
@@ -199,6 +214,5 @@ output "vmseries1_management_ip" {
 }
 
 output "public_ip_untrust" {
-  value = azurerm_public_ip.untrust[*].ip_address
+  value = { for k,v in azurerm_public_ip.untrust: k => v.ip_address }
 }
-

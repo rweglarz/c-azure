@@ -59,6 +59,13 @@ variable dns_zone_name {
   type = string
 }
 
+variable additional_untrust_ips {
+  default = {
+    svc1 = { idx = 7 }
+    svc2 = { idx = 8 }
+  }
+}
+
 variable "gcp_project" {
   default = null
 }
