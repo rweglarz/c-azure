@@ -27,12 +27,12 @@ module "vnet_sec" {
       network_security_group_id = module.basic.sg_id.wide-open
       associate_nsg             = true
     },
-    "srv5" = {
+    "srv0" = {
       idx                       = 4
       network_security_group_id = module.basic.sg_id.mgmt
       associate_nsg             = true
     },
-    "srv6" = {
+    "srv1" = {
       idx                       = 5
       network_security_group_id = module.basic.sg_id.mgmt
       associate_nsg             = true
@@ -48,10 +48,10 @@ resource "azurerm_route_table" "servers" {
 }
 resource "azurerm_route" "servers-routes" {
   for_each = {
-    srv5  = module.vnet_sec.subnets.srv5.address_prefixes[0]
-    srv6  = module.vnet_sec.subnets.srv6.address_prefixes[0]
-    psrv0 = tolist(module.vnet_srv0.vnet.address_space)[0]
-    psrv1 = tolist(module.vnet_srv1.vnet.address_space)[0]
+    srv5  = module.vnet_sec.subnets.srv0.address_prefixes[0]
+    srv6  = module.vnet_sec.subnets.srv1.address_prefixes[0]
+    psrv0 = tolist(module.vnet_srv5.vnet.address_space)[0]
+    psrv1 = tolist(module.vnet_srv6.vnet.address_space)[0]
   }
   name                   = each.key
   resource_group_name    = azurerm_resource_group.rg.name
@@ -79,16 +79,16 @@ resource "azurerm_route" "servers-dg" {
 
 
 
-module "vnet_srv0" {
+module "vnet_srv5" {
   source              = "../modules/vnet"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
-  name          = "${var.name}-srv0"
+  name          = "${var.name}-srv5"
   address_space = [cidrsubnet(var.cidr, 2, 1)]
 
   subnets = {
-    "s1" = {
+    "s0" = {
       idx                       = 0
       network_security_group_id = module.basic.sg_id.mgmt
       associate_nsg             = true
@@ -105,16 +105,16 @@ module "vnet_srv0" {
 }
 
 
-module "vnet_srv1" {
+module "vnet_srv6" {
   source              = "../modules/vnet"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
-  name          = "${var.name}-srv1"
+  name          = "${var.name}-srv6"
   address_space = [cidrsubnet(var.cidr, 2, 2)]
 
   subnets = {
-    "s1" = {
+    "s0" = {
       idx                       = 0
       network_security_group_id = module.basic.sg_id.mgmt
       associate_nsg             = true
@@ -133,10 +133,10 @@ module "vnet_srv1" {
 
 resource "azurerm_subnet_route_table_association" "servers" {
   for_each = {
-    srv0      = module.vnet_srv0.subnets.s1.id
-    srv1      = module.vnet_srv1.subnets.s1.id
-    srv5      = module.vnet_sec.subnets.srv5.id
-    srv6      = module.vnet_sec.subnets.srv6.id
+    srv0      = module.vnet_sec.subnets.srv0.id
+    srv1      = module.vnet_sec.subnets.srv1.id
+    srv5      = module.vnet_srv5.subnets.s0.id
+    srv6      = module.vnet_srv6.subnets.s0.id
   }
   subnet_id      = each.value
   route_table_id = azurerm_route_table.servers.id

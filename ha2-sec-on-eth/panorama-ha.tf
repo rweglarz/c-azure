@@ -268,6 +268,27 @@ resource panos_panorama_nat_rule_group "this" {
   position_keyword = "bottom"
 
   rule {
+    name = "outbound nat"
+    original_packet {
+      source_zones          = ["private"]
+      destination_zone      = "public"
+      source_addresses      = ["any"]
+      destination_addresses = ["any"]
+    }
+    translated_packet {
+      source {
+        dynamic_ip_and_port {
+          translated_address {
+            translated_addresses = [local.fw_ip.public.fws]
+          }
+        }
+      }
+      destination {
+
+      }
+    }
+  }
+  rule {
     name = "inbound ssh nat"
     original_packet {
       source_zones          = ["public"]
@@ -285,7 +306,7 @@ resource panos_panorama_nat_rule_group "this" {
       }
       destination {
         dynamic_translation {
-          address = module.sec-srv5.private_ip_address
+          address = module.vm_sec_srv0.private_ip_address
           port    = 22
         }
       }
