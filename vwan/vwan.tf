@@ -156,32 +156,32 @@ resource "azurerm_virtual_hub_routing_intent" "hub4" {
 
 
 
-resource "azurerm_virtual_hub_route_table_route" "hub1-hub1_sec_spokes" {
-  route_table_id = azurerm_virtual_hub.hub1.default_route_table_id
+# resource "azurerm_virtual_hub_route_table_route" "hub1-hub1_sec_spokes" {
+#   route_table_id = azurerm_virtual_hub.hub1.default_route_table_id
 
-  name              = "hub1 sec spokes via nva"
-  destinations_type = "CIDR"
-  destinations = [
-    cidrsubnet(var.region1_cidr, 1, 1)
-  ]
-  next_hop_type = "ResourceId"
-  next_hop      = azurerm_virtual_hub_connection.hub1-hub1_sec.id
-  depends_on = [
-    azurerm_virtual_hub_connection.hub2-hub2_dns
-  ]
-}
+#   name              = "hub1 sec spokes via nva"
+#   destinations_type = "CIDR"
+#   destinations = [
+#     cidrsubnet(var.region1_cidr, 1, 1)
+#   ]
+#   next_hop_type = "ResourceId"
+#   next_hop      = azurerm_virtual_hub_connection.hub1-hub1_sec.id
+#   depends_on = [
+#     azurerm_virtual_hub_connection.hub2-hub2_dns
+#   ]
+# }
 
-resource "azurerm_virtual_hub_route_table_route" "hub3-hub1_sec_spokes" {
-  route_table_id = azurerm_virtual_hub.hub3.default_route_table_id
+# resource "azurerm_virtual_hub_route_table_route" "hub3-hub1_sec_spokes" {
+#   route_table_id = azurerm_virtual_hub.hub3.default_route_table_id
 
-  name              = "hub1 sec spokes via nva"
-  destinations_type = "CIDR"
-  destinations = [
-    cidrsubnet(var.region1_cidr, 1, 1)
-  ]
-  next_hop_type = "ResourceId"
-  next_hop      = azurerm_virtual_hub_connection.hub1-hub1_sec.id
-  depends_on = [
-    azurerm_virtual_hub_connection.hub2-hub2_spoke2
-  ]
-}
+#   name              = "hub1 sec spokes via nva"
+#   destinations_type = "CIDR"
+#   destinations = [
+#     cidrsubnet(var.region1_cidr, 1, 1)
+#   ]
+#   next_hop_type = "ResourceId"
+#   next_hop      = azurerm_virtual_hub_connection.hub1-hub1_sec.id
+#   depends_on = [
+#     azurerm_virtual_hub_connection.hub2-hub2_spoke2
+#   ]
+# }
