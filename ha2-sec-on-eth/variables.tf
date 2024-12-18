@@ -32,6 +32,11 @@ variable "tmp_ips" {
   default = []
 }
 
+variable "fw_plan" {
+  type = string
+  default = "byol"
+}
+
 variable "fw_ver" {
   type = string
 }

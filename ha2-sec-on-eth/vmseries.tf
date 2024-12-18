@@ -24,7 +24,7 @@ locals {
 
 resource "azurerm_public_ip" "mgmt" {
   count               = 2
-  name                = "${var.name}-mgmt-${count.index}"
+  name                = "${local.name}-mgmt-${count.index}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   allocation_method   = "Static"
@@ -34,7 +34,7 @@ resource "azurerm_public_ip" "mgmt" {
 
 resource "azurerm_network_interface" "mgmt" {
   count                = 2
-  name                 = "${var.name}-fw${count.index}-mgmt"
+  name                 = "${local.name}-fw${count.index}-mgmt"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
   ip_forwarding_enabled = false
@@ -50,7 +50,7 @@ resource "azurerm_network_interface" "mgmt" {
 
 resource "azurerm_network_interface" "ha2" {
   count                = 2
-  name                 = "${var.name}-fw${count.index}-ha2"
+  name                 = "${local.name}-fw${count.index}-ha2"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
 
@@ -67,7 +67,7 @@ resource "azurerm_network_interface" "ha2" {
 
 resource "azurerm_network_interface" "public" {
   count                = 2
-  name                 = "${var.name}-fw${count.index}-public"
+  name                 = "${local.name}-fw${count.index}-public"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
 
@@ -111,7 +111,7 @@ resource "azurerm_network_interface_security_group_association" "public" {
 
 resource "azurerm_network_interface" "private" {
   count                = 2
-  name                 = "${var.name}-fw${count.index}-private"
+  name                 = "${local.name}-fw${count.index}-private"
   resource_group_name  = azurerm_resource_group.rg.name
   location             = azurerm_resource_group.rg.location
 
@@ -141,7 +141,7 @@ resource "azurerm_public_ip" "untrust" {
     { main = { idx = 6 } },
     var.additional_untrust_ips
   )
-  name                = "${var.name}-fw-untrust-${each.key}"
+  name                = "${local.name}-fw-untrust-${each.key}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   allocation_method   = "Static"
@@ -155,7 +155,7 @@ resource "azurerm_public_ip" "untrust" {
 resource "azurerm_linux_virtual_machine" "vmseries" {
   count = 2
 
-  name                = "${var.name}-fw-${count.index}"
+  name                = "${local.name}-fw-${count.index}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   zone                = var.availabilty_zones[count.index]
@@ -173,7 +173,7 @@ resource "azurerm_linux_virtual_machine" "vmseries" {
   ]
 
   plan {
-    name      = "byol"
+    name      = var.fw_plan
     publisher = "paloaltonetworks"
     product   = "vmseries-flex"
   }
@@ -181,12 +181,12 @@ resource "azurerm_linux_virtual_machine" "vmseries" {
   source_image_reference {
     publisher = "paloaltonetworks"
     offer     = "vmseries-flex"
-    sku       = "byol"
+    sku       = var.fw_plan
     version   = var.fw_ver
   }
 
   os_disk {
-    name    = "${var.name}-osdisk-${count.index}"
+    name    = "${local.name}-osdisk-${count.index}"
     caching = "ReadWrite"
     //  storage_account_type = "Premium_LRS"
     storage_account_type = "Standard_LRS"
@@ -200,9 +200,15 @@ resource "azurerm_linux_virtual_machine" "vmseries" {
     [for k, v in var.bootstrap_options : "${k}=${v}"],
     [
       "vm-auth-key=${panos_vm_auth_key.this.auth_key}",
+      "dgname=${panos_panorama_device_group.azure_ha2.name}",
       "tplname=${panos_panorama_template_stack.azure_ha2[count.index].name}",
     ],
   ))))
+
+  depends_on = [
+    panos_panorama_device_group.azure_ha2,
+    panos_panorama_template_stack.azure_ha2,
+   ]
 }
 
 output "vmseries0_management_ip" {

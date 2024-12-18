@@ -1,7 +1,7 @@
 module "vm_peered_srv5" {
   source = "../modules/linux"
 
-  name                = "${var.name}-peered-srv5"
+  name                = "${local.name}-peered-srv5"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   subnet_id           = module.vnet_srv5.subnets.s0.id
@@ -13,7 +13,7 @@ module "vm_peered_srv5" {
 module "vm_peered_srv6" {
   source = "../modules/linux"
 
-  name                = "${var.name}-peered-srv6"
+  name                = "${local.name}-peered-srv6"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   subnet_id           = module.vnet_srv6.subnets.s0.id
@@ -25,7 +25,7 @@ module "vm_peered_srv6" {
 module "vm_sec_srv0" {
   source = "../modules/linux"
 
-  name                = "${var.name}-sec-srv0"
+  name                = "${local.name}-sec-srv0"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   subnet_id           = module.vnet_sec.subnets.srv0.id
@@ -37,7 +37,7 @@ module "vm_sec_srv0" {
 module "vm_sec_srv1" {
   source = "../modules/linux"
 
-  name                = "${var.name}-sec-srv1"
+  name                = "${local.name}-sec-srv1"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   subnet_id           = module.vnet_sec.subnets.srv1.id

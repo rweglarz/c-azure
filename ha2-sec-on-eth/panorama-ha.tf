@@ -1,7 +1,11 @@
+resource "panos_panorama_device_group" "azure_ha2" {
+  name = "azure-ha2-${random_id.did.hex}"
+}
+
 resource "panos_panorama_template" "azure_ha2" {
   name = "azure-ha2-${random_id.did.hex}"
 
-  description = "azrg:${var.name}-${random_id.did.hex}"
+  description = "azrg:${local.name}-${random_id.did.hex}"
 }
 
 resource "panos_panorama_template_stack" "azure_ha2" {
@@ -224,7 +228,7 @@ resource "panos_panorama_management_profile" "ha1z_ping" {
 */
 
 locals {
-  device_group = "azure-ha"
+  device_group = panos_panorama_device_group.azure_ha2.name
 }
 
 
@@ -241,6 +245,19 @@ resource "panos_security_rule_group" "this" {
   device_group = local.device_group
   position_keyword = "bottom"
 
+  rule {
+    name                  = "outbound any"
+    audit_comment         = ""
+    source_zones          = ["private"]
+    source_addresses      = ["any"]
+    source_users          = ["any"]
+    destination_zones     = ["public"]
+    destination_addresses      = ["any"]
+    applications = [ "any", ]
+    services   = ["application-default"]
+    categories = ["any"]
+    action     = "allow"
+  }
   rule {
     name                  = "inbound ssh"
     audit_comment         = ""

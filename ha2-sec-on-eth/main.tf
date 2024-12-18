@@ -22,13 +22,17 @@ provider "panos" {
   json_config_file = "panorama_creds.json"
 }
 
+locals {
+  name = terraform.workspace == "default" ? var.name : format("%s-%s", var.name, terraform.workspace)
+  dns_prefix = terraform.workspace == "default" ? "ha" : format("ha-%s", terraform.workspace)
+}
 
 resource "random_id" "did" {
   byte_length = 3 #to workaround delete recreate cross regions
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.name}-${random_id.did.hex}"
+  name     = "${local.name}-${random_id.did.hex}"
   location = var.region
 }
 
@@ -42,7 +46,7 @@ resource "azurerm_ssh_public_key" "rwe" {
 
 module "basic" {
   source = "../modules/basic"
-  name = var.name
+  name = local.name
 
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
