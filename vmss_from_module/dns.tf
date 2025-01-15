@@ -5,8 +5,10 @@ resource "azurerm_dns_a_record" "public" {
     app12    = module.srv_app12.public_ip
     app2     = module.srv_app2.public_ip
     db1      = module.srv_db1.public_ip
-    appgw1   = module.appgw1.public_ip_address
-    appgw2   = module.appgw2.public_ip_address
+    ext-1    = module.slb_fw_ext.frontend_ip_configs.ext-1
+    ext-2    = module.slb_fw_ext.frontend_ip_configs.ext-2
+    # appgw1   = module.appgw1.public_ip_address
+    # appgw2   = module.appgw2.public_ip_address
   }
   name                = "vmss-m-${each.key}"
   resource_group_name = var.dns_zone_rg

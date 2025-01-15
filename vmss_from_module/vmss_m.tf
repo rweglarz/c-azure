@@ -20,7 +20,7 @@ locals {
 
 
 module "vmss_byol" {
-  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/vmss?ref=v3.0.2"
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/vmss?ref=v3.2.1"
   #source = "PaloAltoNetworks/swfw-modules/azurerm//modules/vmss"
   #version = "3.0.2"
 

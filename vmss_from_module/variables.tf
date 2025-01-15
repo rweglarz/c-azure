@@ -1,3 +1,7 @@
+variable "subscription_id" {
+   type    = string
+}
+
 variable "region" {
   type    = string
   default = "North Europe"
@@ -47,10 +51,13 @@ variable "password" {
 }
 
 
-
-variable "pl-mgmt-csp_nat_ips" {
-  type = string
+variable "gcp_project" {
+  default = null
 }
+variable "gcp_panorama_vpc_id" {
+  default = null
+}
+
 
 variable "dns_zone_rg" {
   type = string
@@ -66,3 +73,8 @@ variable "panos_version" {
 variable "byol_count" {
   default = 0
 }
+
+variable "payg_count" {
+  default = 2
+}
+

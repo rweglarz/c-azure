@@ -4,6 +4,7 @@ provider "azurerm" {
       roll_instances_when_required = false
     }
   }
+  subscription_id = var.subscription_id
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -13,6 +14,9 @@ resource "azurerm_resource_group" "rg" {
 
 terraform {
   required_providers {
+    azurerm = {
+      version = "~>4.0"
+    }
     panos = {
       source = "PaloAltoNetworks/panos"
     }

@@ -10,7 +10,7 @@ resource "azurerm_public_ip" "fw_ext_snat_1" {
 
 
 module "slb_fw_ext" {
-  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/loadbalancer?ref=v3.0.2"
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/loadbalancer?ref=v3.2.1"
   #source = "PaloAltoNetworks/swfw-modules/azurerm//modules/loadbalancer"
   #version = "3.0.2"
 
@@ -82,7 +82,7 @@ module "slb_fw_ext" {
 
 
 module "slb_fw_int" {
-  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/loadbalancer?ref=v3.0.2"
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/loadbalancer?ref=v3.2.1"
   #source = "PaloAltoNetworks/swfw-modules/azurerm//modules/loadbalancer"
   #version = "3.0.2"
 

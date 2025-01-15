@@ -61,7 +61,7 @@ resource "panos_security_rule_group" "this" {
   rule {
     name                  = "Azure-HC"
     source_zones          = ["any"]
-    source_addresses      = ["azure health probe"]
+    source_addresses      = ["azure health check"]
     source_users          = ["any"]
     destination_zones     = ["any"]
     destination_addresses = ["any"]
@@ -165,7 +165,7 @@ resource "panos_panorama_nat_rule_group" "this" {
     original_packet {
       source_zones          = ["public"]
       destination_zone      = "public"
-      source_addresses      = ["azure health probe"]
+      source_addresses      = ["azure health check"]
       destination_addresses = ["any"]
       service               = panos_panorama_service_object.hc.name
     }
@@ -185,7 +185,7 @@ resource "panos_panorama_nat_rule_group" "this" {
     original_packet {
       source_zones          = ["private"]
       destination_zone      = "private"
-      source_addresses      = ["azure health probe"]
+      source_addresses      = ["azure health check"]
       destination_addresses = ["any"]
       service               = panos_panorama_service_object.hc.name
     }
