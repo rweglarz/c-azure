@@ -31,3 +31,7 @@ variable "interfaces" {
 variable "bootstrap_options" {
 
 }
+
+variable "airs" {
+  default = false
+}

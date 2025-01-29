@@ -58,15 +58,15 @@ resource "azurerm_linux_virtual_machine" "this" {
   network_interface_ids = local.interfaces
 
   plan {
-    name      = "byol"
+    name      = var.airs ? "airs-byol" : "byol"
     publisher = "paloaltonetworks"
-    product   = "vmseries-flex"
+    product   = var.airs ? "airs-flex" : "vmseries-flex"
   }
 
   source_image_reference {
     publisher = "paloaltonetworks"
-    offer     = "vmseries-flex"
-    sku       = "byol"
+    offer     = var.airs ? "airs-flex" : "vmseries-flex"
+    sku       = var.airs ? "airs-byol" : "byol"
     version   = var.panos
   }
 
