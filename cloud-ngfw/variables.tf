@@ -54,6 +54,18 @@ variable "cloud_ngfw_panorama_config" {
   default     = null
 }
 
+variable "cloud_ngfw_internal_ip" {
+  description = "used for UDR when deployment via azure portal == scm"
+  type        = string
+  default     = null
+}
+
+variable "scm_tenant" {
+  description = "used only to not deploy panorama for now"
+  type        = string
+  default     = null
+}
+
 variable "cloud_ngfw_public_ingress_ip_number" {
   type    = number
   default = 2

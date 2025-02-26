@@ -89,7 +89,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
 }
 
 resource "azurerm_palo_alto_next_generation_firewall_virtual_network_local_rulestack" "this" {
-  count = var.cloud_ngfw_panorama_config==null ? 1 : 0
+  count = (var.cloud_ngfw_panorama_config==null && var.scm_tenant==null)? 1 : 0
   name                   = "${var.name}-rulestack"
   resource_group_name    = azurerm_resource_group.rg.name
   #location               = azurerm_resource_group.rg.location
@@ -128,7 +128,7 @@ locals {
     rs_private_ip = one(azurerm_palo_alto_next_generation_firewall_virtual_network_local_rulestack.this[*].network_profile[0].vnet_configuration[0].ip_of_trust_for_user_defined_routes)
   }
   cngfw = {
-    private_ip = coalesce(local.tcngfw.pan_private_ip, local.tcngfw.rs_private_ip)
+    private_ip = coalesce(local.tcngfw.pan_private_ip, local.tcngfw.rs_private_ip, var.cloud_ngfw_internal_ip)
     device_group = one(azurerm_palo_alto_next_generation_firewall_virtual_network_panorama.this[*].panorama[0].device_group_name)
   }
 }
