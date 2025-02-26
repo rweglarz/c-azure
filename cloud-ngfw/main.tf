@@ -15,10 +15,6 @@ resource "azurerm_resource_group" "rg" {
   location = var.region
 }
 
-provider "aws" {
-  region = "eu-central-1"
-}
-
 terraform {
   required_providers {
     panos = {
@@ -29,6 +25,7 @@ terraform {
     }
   }
 }
+
 provider "panos" {
   json_config_file = "panorama_creds.json"
 }

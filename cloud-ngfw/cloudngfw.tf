@@ -84,8 +84,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
   }
 
   depends_on = [
-    aws_ec2_managed_prefix_list_entry.cloud_ngfw_ips,
-    aws_ec2_managed_prefix_list_entry.cloud_ngfw_snat,
+    google_compute_firewall.pan,
   ]
 }
 

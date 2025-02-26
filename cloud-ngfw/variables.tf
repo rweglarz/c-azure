@@ -48,10 +48,6 @@ variable "dns_zone_name" {
   type = string
 }
 
-variable "pl-mgmt-csp_nat_ips" {
-  type = string
-}
-
 variable "cloud_ngfw_panorama_config" {
   description = "if null, will deploy cloud-ngfw managed by local rulestack"
   type        = string
@@ -80,5 +76,12 @@ variable "server_count" {
 
 variable "server_size" {
   type    = string
+  default = null
+}
+
+variable "gcp_project" {
+  default = null
+}
+variable "gcp_panorama_vpc_id" {
   default = null
 }
