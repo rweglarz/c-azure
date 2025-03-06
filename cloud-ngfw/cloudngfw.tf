@@ -82,6 +82,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
       }
     }
   }
+  plan_id  = "panw-cngfw-payg"
 
   depends_on = [
     google_compute_firewall.pan,
@@ -120,6 +121,8 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_local_rules
       }
     }
   }
+
+  plan_id  = "panw-cngfw-payg"
 }
 
 locals {
