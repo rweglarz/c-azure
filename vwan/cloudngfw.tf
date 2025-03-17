@@ -57,6 +57,15 @@ resource "azurerm_public_ip" "hub4_fw" {
   zones               = [1,2,3]
 }
 
+resource "azurerm_public_ip" "hub4_fw_e" {
+  name                = "${local.dname}-hub4-fw-e"
+  resource_group_name = azurerm_resource_group.rg2.name
+  location            = azurerm_resource_group.rg2.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
+  zones               = [1,2,3]
+}
+
 resource "azurerm_palo_alto_virtual_network_appliance" "hub4" {
   count = var.cloud_ngfw_panorama_config.hub4==null ? 0 : 1
 
