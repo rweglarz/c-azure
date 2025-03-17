@@ -32,13 +32,15 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama" "hub2
     ]
   }
 
-  panorama_base64_config = var.cloud_ngfw_panorama_config.hub2
 
   dns_settings {
     dns_servers = [
       azurerm_private_dns_resolver_inbound_endpoint.hub2.ip_configurations[0].private_ip_address,
     ]
   }
+
+  panorama_base64_config = var.cloud_ngfw_panorama_config.hub2
+  plan_id  = "panw-cngfw-payg"
 
   depends_on = [
     google_compute_firewall.pan
@@ -94,6 +96,7 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama" "hub4
   }
 
   panorama_base64_config = var.cloud_ngfw_panorama_config.hub4
+  plan_id  = "panw-cngfw-payg"
 
   depends_on = [
     google_compute_firewall.pan
