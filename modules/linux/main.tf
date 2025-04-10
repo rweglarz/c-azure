@@ -57,7 +57,7 @@ resource "azurerm_linux_virtual_machine" "this" {
   custom_data = var.custom_data
 
   admin_ssh_key {
-    username   = "ubuntu"
+    username   = var.username
     public_key = var.public_key
   }
   boot_diagnostics {
