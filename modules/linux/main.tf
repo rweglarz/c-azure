@@ -7,6 +7,8 @@ resource "azurerm_public_ip" "this" {
   allocation_method   = "Static"
   sku                 = "Standard"
   tags                = var.tags
+
+  lifecycle { create_before_destroy = true }
 }
 
 
