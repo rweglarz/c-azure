@@ -13,7 +13,8 @@ resource "azurerm_network_interface" "this" {
   location            = var.location
   resource_group_name = var.resource_group_name
 
-  ip_forwarding_enabled = var.enable_ip_forwarding
+  ip_forwarding_enabled          = true
+  accelerated_networking_enabled = false
 
   ip_configuration {
     name                          = "internal"
@@ -23,6 +24,11 @@ resource "azurerm_network_interface" "this" {
     public_ip_address_id          = azurerm_public_ip.this.id
   }
   tags = var.tags
+}
+
+resource "random_password" "this" {
+  length           = 12
+  special          = false
 }
 
 resource "azurerm_linux_virtual_machine" "this" {
@@ -51,8 +57,8 @@ resource "azurerm_linux_virtual_machine" "this" {
     version   = var.sw_version
   }
 
-  admin_username                  = var.username
-  admin_password                  = var.password
+  admin_username                  = "adminuser"
+  admin_password                  = random_password.this.result
   disable_password_authentication = false
 
   custom_data = base64encode(<<-EOT
@@ -70,10 +76,6 @@ resource "azurerm_linux_virtual_machine" "this" {
     EOT
   )
 
-  admin_ssh_key {
-    username   = var.username
-    public_key = var.public_key
-  }
   boot_diagnostics {
     storage_account_uri = null
   }

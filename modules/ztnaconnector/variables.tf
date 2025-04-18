@@ -9,12 +9,6 @@ variable "private_ip_address" {
   type = string
 }
 
-variable "username" {
-  type    = string
-}
-variable "password" {
-  type = string
-}
 variable "location" {
   type = string
 }
@@ -43,23 +37,18 @@ variable "associate_nsg" {
   default = false
 }
 
-variable "custom_data" {
-  type    = string
-  default = null
-}
-
-variable "enable_ip_forwarding" {
-  type    = bool
-  default = false
-}
-
 variable "tags" {
   default = null
 }
 
 variable "sw_version" {
-  default = "6.2.51"
+  # default = "6.2.51"
+  default = "latest"
 }
 
 variable "token" {
+  type = object({
+    key    = string
+    secret = string
+  })
 }
