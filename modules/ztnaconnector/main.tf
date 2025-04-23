@@ -28,7 +28,7 @@ resource "azurerm_network_interface" "this" {
 
 resource "random_password" "this" {
   length           = 12
-  special          = false
+  special          = true
 }
 
 resource "azurerm_linux_virtual_machine" "this" {
@@ -81,6 +81,11 @@ resource "azurerm_linux_virtual_machine" "this" {
   }
 
   tags = var.tags
+  lifecycle {
+    ignore_changes = [ 
+      admin_password
+    ]
+  }
 }
 
 resource "azurerm_network_interface_security_group_association" "this" {
