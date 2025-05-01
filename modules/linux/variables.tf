@@ -12,6 +12,7 @@ variable "private_ip_address" {
 variable "username" {
   type    = string
   default = "ubuntu"
+  nullable = false
 }
 variable "password" {
   type    = string
