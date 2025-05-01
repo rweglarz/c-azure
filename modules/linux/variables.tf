@@ -14,7 +14,8 @@ variable "username" {
   default = "ubuntu"
 }
 variable "password" {
-  type = string
+  type    = string
+  default = null
 }
 variable "location" {
   type = string

@@ -54,7 +54,7 @@ resource "azurerm_linux_virtual_machine" "this" {
 
   admin_username                  = var.username
   admin_password                  = var.password
-  disable_password_authentication = false
+  disable_password_authentication = var.password!=null ? false : true
 
   custom_data = var.custom_data
 
