@@ -21,7 +21,7 @@ resource "panos_panorama_template_stack" "this" {
 
 resource "panos_panorama_template_variable" "eth1_1_gw" {
   template_stack = panos_panorama_template_stack.this.name
-  name           = "$eth1_1_gw"
+  name           = "$eth1-1-gw"
   type           = "ip-netmask"
   value          = cidrhost(module.vnet_sec.subnets["public"].address_prefixes[0], 1)
 
@@ -30,7 +30,7 @@ resource "panos_panorama_template_variable" "eth1_1_gw" {
 
 resource "panos_panorama_template_variable" "eth1_2_gw" {
   template_stack = panos_panorama_template_stack.this.name
-  name           = "$eth1_2_gw"
+  name           = "$eth1-2-gw"
   type           = "ip-netmask"
   value          = cidrhost(module.vnet_sec.subnets["private"].address_prefixes[0], 1)
 
