@@ -1,30 +1,53 @@
-resource "azurerm_application_insights" "fw" {
-  name                = "${var.name}-app-insights-fw"
+resource "azurerm_log_analytics_workspace" "this" {
+  name                = "${var.name}-workspace"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
+resource "azurerm_application_insights" "this" {
+  name                = "${var.name}-app-insights"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  workspace_id        = azurerm_log_analytics_workspace.this.id
+
   application_type    = "other"
 }
 
+output "la_instrumentation_key" {
+  value     = azurerm_application_insights.this.instrumentation_key
+  sensitive = true
+}
 
 locals {
-  bootstrap_options_byol = merge(
-    var.bootstrap_options_common,
-    var.bootstrap_options_byol,
-    {
-      tplname     = panos_panorama_template_stack.this.name,
-      vm-auth-key = panos_vm_auth_key.this.auth_key,
-    }
-  )
+  bootstrap_options = {
+    byol = merge(
+      var.bootstrap_options_common,
+      var.bootstrap_options_byol,
+      {
+        tplname     = panos_panorama_template_stack.this.name,
+        vm-auth-key = panos_vm_auth_key.this.auth_key,
+      }
+    )
+    payg = merge(
+      var.bootstrap_options_common,
+      var.bootstrap_options_payg,
+      {
+        tplname     = panos_panorama_template_stack.this.name,
+        vm-auth-key = panos_vm_auth_key.this.auth_key,
+      }
+    )
+  }
 }
 
 
 
-module "vmss_byol" {
-  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/vmss?ref=v3.2.1"
-  #source = "PaloAltoNetworks/swfw-modules/azurerm//modules/vmss"
-  #version = "3.0.2"
+module "vmss_fws" {
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/vmss?ref=v3.3.7"
+  for_each = var.fw_sets
 
-  name                = "${var.name}-fw-byol"
+  name                = "${var.name}-${each.key}"
   region              = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -65,25 +88,18 @@ module "vmss_byol" {
     zones = [1,2,3]
 
     bootstrap_options = join(";", compact(concat(
-      [for k, v in local.bootstrap_options_byol : "${k}=${v}"],
+      [for k, v in local.bootstrap_options[each.value.bootstrap_set] : "${k}=${v}"],
     )))
   }
 
   image = {
-    sku     = "byol"
-    version = var.panos_version
+    sku     = each.value.sku
+    version = each.value.panos_version
   }
 
   autoscaling_configuration = {
-    application_insights_id = azurerm_application_insights.fw.id
-    default_count           = var.byol_count
+    application_insights_id = azurerm_application_insights.this.id
+    default_count           = 0
   }
-  autoscaling_profiles      = [
-    {
-      name          = "default"
-      default_count = var.byol_count
-      minimum_count = var.byol_count
-      maximum_count = var.byol_count
-    }
-  ]
+  autoscaling_profiles      = each.value.autoscaling_profiles
 }

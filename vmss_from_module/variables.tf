@@ -66,15 +66,38 @@ variable "dns_zone_name" {
   type = string
 }
 
-variable "panos_version" {
-  default = "11.1.4"
+variable "fw_sets" {
+  default  = {
+    byol = {
+      sku                  = "byol"
+      panos_version        = "11.1.407"
+      bootstrap_set        = "byol"
+      autoscaling_profiles = [
+        {
+          name          = "default"
+          default_count = 0
+        },
+      ]
+    }
+    paygo = {
+      sku                  = "bundle2"
+      panos_version        = "11.1.407"
+      bootstrap_set        = "payg"
+      autoscaling_profiles = [
+        {
+          name          = "default"
+          default_count = 0
+        },
+        {
+          name          = "work_hours"
+          default_count = 1
+          recurrence    = {
+            days       = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+            start_time = "07:00"
+            end_time   = "18:00"
+          }
+        }
+      ]
+    }
+  }
 }
-
-variable "byol_count" {
-  default = 0
-}
-
-variable "payg_count" {
-  default = 2
-}
-
