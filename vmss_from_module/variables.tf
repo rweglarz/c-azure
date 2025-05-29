@@ -15,7 +15,7 @@ variable "name" {
 variable "cidr" {
   description = "vnet cidr"
   type        = string
-  default     = "172.29.32.0/23"
+  default     = "172.29.32.0/22"
 }
 
 variable "mgmt_ips" {
