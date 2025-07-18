@@ -10,6 +10,8 @@ resource "azurerm_kubernetes_cluster" "this" {
   identity {
     type = "SystemAssigned"
   }
+  oidc_issuer_enabled       = var.workload_identity_enabled
+  workload_identity_enabled = var.workload_identity_enabled
 
   network_profile {
     network_plugin      = var.network_plugin

@@ -57,3 +57,6 @@ variable "tags" {
   default = {}
 }
 
+variable "workload_identity_enabled" {
+  default = false
+}
