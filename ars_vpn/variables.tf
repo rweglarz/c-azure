@@ -33,7 +33,14 @@ variable "psk" {
 
 variable "username" {}
 variable "password" {}
-variable "pl-mgmt-csp_nat_ips" {}
+
+variable "gcp_project" {
+  default = null
+}
+variable "gcp_panorama_vpc_id" {
+  default = null
+}
+
 
 variable "dns_zone_rg" {
   type = string
