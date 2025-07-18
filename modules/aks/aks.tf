@@ -22,14 +22,24 @@ resource "azurerm_kubernetes_cluster" "this" {
     vm_size         = "Standard_A2_v2"
     os_disk_size_gb = 30
     vnet_subnet_id  = var.subnet_id
+    upgrade_settings {
+      drain_timeout_in_minutes      = 0
+      max_surge                     = "10%"
+      node_soak_duration_in_minutes = 0
+    }
+    tags = merge(
+      var.tags,
+      {
+        mnodepool = "default"
+      }
+    )
   }
   api_server_access_profile {
     authorized_ip_ranges = var.mgmt_cidrs
   }
 
-  ingress_application_gateway {
-    gateway_id = var.application_gateway_id
-  }
+
+  tags = var.tags
 }
 
 resource "azurerm_kubernetes_cluster_node_pool" "this" {
@@ -39,4 +49,10 @@ resource "azurerm_kubernetes_cluster_node_pool" "this" {
   vm_size               = "Standard_D3_v2"
   os_disk_size_gb       = 30
   vnet_subnet_id        = var.subnet_id
+  tags = merge(
+    var.tags,
+    {
+      mnodepool = "pool1"
+    }
+  )
 }

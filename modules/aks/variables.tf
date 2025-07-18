@@ -41,3 +41,8 @@ variable "network_plugin" {
 variable "node_count" {
   default = 2
 }
+
+variable "tags" {
+  default = {}
+}
+
