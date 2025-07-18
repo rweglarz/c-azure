@@ -41,6 +41,12 @@ variable "outbound_type" {
 
 variable "network_plugin" {
   default = "azure"
+  nullable = false
+}
+
+variable "network_plugin_mode" {
+  default = null
+  description = "or set to overlay"
 }
 
 variable "node_count" {
