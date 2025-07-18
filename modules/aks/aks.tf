@@ -38,6 +38,12 @@ resource "azurerm_kubernetes_cluster" "this" {
     authorized_ip_ranges = var.mgmt_cidrs
   }
 
+  dynamic "ingress_application_gateway" {
+    for_each = var.application_gateway ? { id = var.application_gateway_id } : {}
+    content {
+      gateway_id = ingress_application_gateway.value
+    }
+  }
 
   tags = var.tags
 }

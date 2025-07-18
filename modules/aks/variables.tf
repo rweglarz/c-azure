@@ -23,8 +23,13 @@ variable "mgmt_cidrs" {
   type = list(string)
 }
 
+variable "application_gateway" {
+  default = false
+}
+
 variable "application_gateway_id" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "outbound_type" {
