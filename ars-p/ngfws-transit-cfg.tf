@@ -2,25 +2,27 @@ locals {
 
   bgp_peers-transit_fw-transit_ars-f = flatten([
     for k,v in local.transit_fws: [
-      for ip in azurerm_route_server.transit.virtual_router_ips: {
+      for i in [0, 1]: {
+        i      = i
         fw     = k
-        ars_ip = ip
+        ars_ip = tolist(azurerm_route_server.transit.virtual_router_ips)[i]
       }
     ]
   ])
   bgp_peers-transit_fw-transit_ars = { 
-    for v in local.bgp_peers-transit_fw-transit_ars-f: "${v.fw}-${v.ars_ip}" => v
+    for v in local.bgp_peers-transit_fw-transit_ars-f: "${v.fw}-${v.i}" => v
   }
   bgp_peers-transit_fw-p_ars-f = flatten([
     for k,v in local.transit_fws: [
-      for ip in azurerm_route_server.p.virtual_router_ips: {
+      for i in [0, 1]: {
+        i      = i
         fw     = k
-        ars_ip = ip
+        ars_ip = tolist(azurerm_route_server.p.virtual_router_ips)[i]
       }
     ]
   ])
   bgp_peers-transit_fw-p_ars = { 
-    for v in local.bgp_peers-transit_fw-p_ars-f: "${v.fw}-${v.ars_ip}" => v
+    for v in local.bgp_peers-transit_fw-p_ars-f: "${v.fw}-${v.i}" => v
   }
 }
 
