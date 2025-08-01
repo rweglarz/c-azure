@@ -51,12 +51,17 @@ variable "dns_zone_name" {
 
 variable "asn" {
   default = {
-    ars      = "65515"
-    fws      = "65011"
-    partner1 = "65031"
-    partner2 = "65032"
+    ars        = "65515"
+    transit_fw = "65011"
+    onprem_fw  = "65021"
+    partner1   = "65031"
+    partner2   = "65032"
   }
 }
 
 variable "bootstrap_options" {
+}
+
+variable "fw_version" {
+  default = "11.2.5"
 }

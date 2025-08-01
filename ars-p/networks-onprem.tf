@@ -35,3 +35,7 @@ module "vnet_onprem" {
   }
 }
 
+resource "azurerm_subnet_route_table_association" "onprem" {
+  subnet_id      = module.vnet_onprem.subnets["workloads"].id
+  route_table_id = module.basic.route_table_id["mgmt-via-igw-dg-via-nh"]["onprem"]
+}

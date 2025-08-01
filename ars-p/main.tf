@@ -42,5 +42,13 @@ module "basic" {
   resource_group_name = azurerm_resource_group.rg1.name
   location            = azurerm_resource_group.rg1.location
   mgmt_cidrs          = [for r in var.mgmt_ips : "${r.cidr}"]
-  # route_tables_params = {}
+  route_tables_params = {
+    onprem = {
+      nh = local.onprem_fw["eth1_3_ip"]
+    }
+  }
+}
+
+resource "random_bytes" "psk" {
+  length = 8
 }
