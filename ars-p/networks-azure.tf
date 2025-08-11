@@ -286,6 +286,9 @@ module "vnet_peering-app-ars_p" {
     virtual_network_id      = module.vnet_ars_p.vnet.id
     allow_gateway_transit   = true
   }
+  depends_on = [
+    azurerm_route_server.p
+  ]
 }
 
 module "vnet_peering-app-transit" {
