@@ -1,7 +1,7 @@
 locals {
   subnet_prefix_length = 27
 
-  template_prefix = "azure-ars-s"
+  template_prefix = "azure-ars-p"
 
   app_vnets = {
     app1 = {
