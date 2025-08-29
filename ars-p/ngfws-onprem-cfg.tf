@@ -114,7 +114,7 @@ locals {
       vng_peering_ip   = local.peering_addresses["vng"]["c1"][1]
       loopback_interface = "loopback.2"
     },
-    tun-isp2-12 = {
+    tun-isp2-c2 = {
       interface        = "ethernet1/2"
       tunnel_interface = "tunnel.22"
       local_ip         = module.onprem_fw.public_ips["isp2"]
@@ -211,7 +211,7 @@ resource "panos_panorama_bgp" "onprem_fw" {
 resource "panos_panorama_bgp_peer_group" "onprem_fw-vng" {
   template        = module.cfg_onprem_fw.template_name
   virtual_router  = "vr1"
-  name            = "onprem_ars"
+  name            = "transit_vng"
   type            = "ebgp"
 
   depends_on = [
