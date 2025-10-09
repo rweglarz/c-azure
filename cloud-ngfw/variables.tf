@@ -15,7 +15,7 @@ variable "region" {
 variable "sec_vpc_cidr" {
   description = "vpc cidr"
   type        = string
-  default     = "172.30.0.0/16"
+  default     = "172.30.0.0/20"
 }
 
 variable "app_vpc_cidr" {
