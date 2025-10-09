@@ -39,6 +39,22 @@ resource "azurerm_subnet" "private" {
   }
 }
 
+resource "azurerm_subnet" "dns" {
+  name                 = "${var.name}-dns"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.sec.name
+  address_prefixes     = [cidrsubnet(one(azurerm_virtual_network.sec.address_space), 4, 2)]
+  delegation {
+    name = "Microsoft.Network.dnsResolvers"
+    service_delegation {
+      name    = "Microsoft.Network/dnsResolvers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
+}
+
 
 
 resource "azurerm_subnet_network_security_group_association" "sec-private" {

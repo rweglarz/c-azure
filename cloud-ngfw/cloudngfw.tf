@@ -82,6 +82,13 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_network_panorama" "
       }
     }
   }
+
+  dns_settings {
+    dns_servers = [
+      azurerm_private_dns_resolver_inbound_endpoint.sec.ip_configurations[0].private_ip_address
+    ]
+  }
+
   plan_id  = "panw-cngfw-payg"
 
   depends_on = [

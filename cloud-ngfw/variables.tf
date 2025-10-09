@@ -47,6 +47,9 @@ variable "dns_zone_rg" {
 variable "dns_zone_name" {
   type = string
 }
+variable "private_dns_zone_name" {
+  type = string
+}
 
 variable "cloud_ngfw_panorama_config" {
   description = "if null, will deploy cloud-ngfw managed by local rulestack"
