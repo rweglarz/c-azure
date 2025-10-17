@@ -36,8 +36,9 @@ module "aws_fw" {
       public_ip    = true
       subnet_id    = module.aws_vpc.subnets["mgmt"].id
       security_group_ids = [
-        module.aws_vpc.sg_public_id,
-        module.aws_vpc.sg_private_id,
+        module.aws_vpc.security_group_ids.public_mgmt,
+        module.aws_vpc.security_group_ids.private,
+        module.aws_vpc.security_group_ids.outbound,
       ]
       private_ips = [cidrhost(module.aws_vpc.subnets["mgmt"].cidr_block, 5)]
     }
@@ -47,7 +48,8 @@ module "aws_fw" {
       subnet_id    = module.aws_vpc.subnets["isp1"].id
       private_ips  = [cidrhost(module.aws_vpc.subnets["isp1"].cidr_block, 5)]
       security_group_ids = [
-        module.aws_vpc.sg_open_id,
+        module.aws_vpc.security_group_ids.wide_open,
+        module.aws_vpc.security_group_ids.outbound,
       ]
     }
     isp2 = {
@@ -56,7 +58,8 @@ module "aws_fw" {
       subnet_id    = module.aws_vpc.subnets["isp2"].id
       private_ips  = [cidrhost(module.aws_vpc.subnets["isp2"].cidr_block, 5)]
       security_group_ids = [
-        module.aws_vpc.sg_open_id,
+        module.aws_vpc.security_group_ids.wide_open,
+        module.aws_vpc.security_group_ids.outbound,
       ]
     }
     priv = {
@@ -64,7 +67,8 @@ module "aws_fw" {
       subnet_id    = module.aws_vpc.subnets["priv"].id
       private_ips  = [cidrhost(module.aws_vpc.subnets["priv"].cidr_block, 5)]
       security_group_ids = [
-        module.aws_vpc.sg_open_id,
+        module.aws_vpc.security_group_ids.private,
+        module.aws_vpc.security_group_ids.outbound,
       ]
     }
   }
