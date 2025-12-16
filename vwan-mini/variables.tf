@@ -1,3 +1,7 @@
+variable "subscription_id" {
+   type    = string
+}
+
 variable "name" {
   description = "Name/Prefix of the deployment"
   type        = string
@@ -73,10 +77,14 @@ variable "vmss_size" {
   default = 1
 }
 
-variable "pl-mgmt-csp_nat_ips" {
-  type = string
-}
-
 variable "tags" {
   default = {}
+}
+
+
+variable "gcp_project" {
+  default = null
+}
+variable "gcp_panorama_vpc_id" {
+  default = null
 }

@@ -1,22 +1,19 @@
 provider "azurerm" {
   features {}
-}
-
-provider "aws" {
-  region = "eu-central-1"
+  subscription_id = var.subscription_id
 }
 
 terraform {
   required_providers {
+    google = {
+      version = "~>6.10"
+    }
     panos = {
       source = "PaloAltoNetworks/panos"
       version = "~>1.11"
     }
-    aws = {
-      version = "~>5.40"
-    }
     azurerm = {
-      version = "~>3.95"
+      version = "~>4.20"
     }
   }
 }
