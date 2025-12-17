@@ -4,7 +4,8 @@ resource "google_compute_firewall" "pan" {
   network   = var.gcp_panorama_vpc_id
   direction = "INGRESS"
   source_ranges = [
-    azurerm_public_ip.hub1_natgw.ip_address
+    azurerm_public_ip.hub1_natgw.ip_address,
+    azurerm_public_ip.hub2_fw.ip_address,
   ]
   allow {
     protocol = "tcp"

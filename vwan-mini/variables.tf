@@ -9,7 +9,7 @@ variable "name" {
 
 variable "region" {
   type    = string
-  default = "polandcentral"
+  default = "north europe"
 }
 
 variable "region_cidr" {
@@ -82,4 +82,8 @@ variable "gcp_project" {
 }
 variable "gcp_panorama_vpc_id" {
   default = null
+}
+
+variable "cloud_ngfw_panorama_config" {
+  type = string
 }
