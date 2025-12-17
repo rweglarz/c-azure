@@ -12,19 +12,10 @@ variable "region" {
   default = "polandcentral"
 }
 
-variable "subscription" {
-  type = string
-}
-
 variable "region_cidr" {
   type     = string
   default  = "172.16.0.0/20"
 }
-
-# variable "ext_spokes_cidr" {
-#   type    = string
-#   default = "172.16.64.0/20"
-# }
 
 variable "mgmt_ips" {
   description = "List of IPs allowed external access"
