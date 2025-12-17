@@ -68,9 +68,13 @@ variable "dns_zone_name" {
   type = string
 }
 
-variable "panos_version" {
+variable "fw_sku" {
   type    = string
-  default = "11.1.2"
+  default = "bundle1"
+}
+variable "fw_panos_version" {
+  type    = string
+  default = "11.2.8"
 }
 variable "vmss_size" {
   type    = number
