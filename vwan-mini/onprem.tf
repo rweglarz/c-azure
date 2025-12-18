@@ -21,7 +21,8 @@ module "vnet_onprem" {
 }
 
 
-data "template_cloudinit_config" "onprem" {
+
+data "cloudinit_config" "onprem" {
   gzip          = true
   base64_encode = true
 
@@ -32,11 +33,15 @@ data "template_cloudinit_config" "onprem" {
       write_files = [
         {
           path    = "/etc/bird/bird.conf"
-          content = templatefile("${path.module}/init/bird.conf.tfpl", local.linux_init_p.onprem)
+          content = templatefile("${path.module}/init/bird.conf.n.tfpl", local.linux_init_p.onprem)
         },
+        # {
+        #   path    = "/etc/ipsec.conf"
+        #   content = templatefile("${path.module}/init/ipsec.conf.tfpl", local.linux_init_p.onprem)
+        # },
         {
-          path    = "/etc/ipsec.conf"
-          content = templatefile("${path.module}/init/ipsec.conf.tfpl", local.linux_init_p.onprem)
+          path    = "/etc/swanctl/swanctl.conf"
+          content = templatefile("${path.module}/init/swanctl.conf.tfpl", local.linux_init_p.onprem)
         },
         {
           path        = "/var/lib/cloud/scripts/per-once/bird.sh"
@@ -71,13 +76,15 @@ data "template_cloudinit_config" "onprem" {
         },
       ]
       runcmd = [
-        "netplan apply"
+        "netplan apply",
+        "swanctl --load-all",
       ]
       packages = [
         "bird",
         "fping",
         "net-tools",
-        "strongswan",
+        "strongswan-charon",
+        "strongswan-swanctl",
       ]
     })
   }
@@ -95,5 +102,5 @@ module "linux_onprem" {
   public_key          = azurerm_ssh_public_key.this.public_key
 
   enable_ip_forwarding = true
-  custom_data          = data.template_cloudinit_config.onprem.rendered
+  custom_data          = data.cloudinit_config.onprem.rendered
 }
