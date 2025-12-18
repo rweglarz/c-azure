@@ -97,10 +97,6 @@ module "vnet_hub1_sdwan" {
 }
 
 
-resource "azurerm_subnet_route_table_association" "hub1_spoke1" {
-  subnet_id      = module.vnet_hub1_spoke1.subnets.s0.id
-  route_table_id = module.basic.route_table_id.private-via-fw.hub1
-}
 
 
 
@@ -145,3 +141,58 @@ resource "azurerm_subnet_nat_gateway_association" "hub1_natgw_mgmt" {
   nat_gateway_id = azurerm_nat_gateway.hub1_natgw.id
 }
 
+
+
+#region spoke1
+resource "azurerm_route_table" "hub1_spoke1" {
+  name                = "${var.name}-hub1-spoke1"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+}
+
+resource "azurerm_route" "hub1_spoke1" {
+  for_each = toset([
+    "0.0.0.0/0",
+  ])
+  name                   = format("r-%s", replace(each.key, "/", "_"))
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.hub1_spoke1.name
+  address_prefix         = each.key
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = azurerm_lb.hub1_fw_int.frontend_ip_configuration[0].private_ip_address
+}
+
+
+resource "azurerm_subnet_route_table_association" "hub1_spoke1" {
+  subnet_id      = module.vnet_hub1_spoke1.subnets["s0"].id
+  route_table_id = azurerm_route_table.hub1_spoke1.id
+}
+#endregion
+
+
+
+#region spoke2
+resource "azurerm_route_table" "hub1_spoke2" {
+  name                = "${var.name}-hub1-spoke2"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+}
+
+resource "azurerm_route" "hub1_spoke2" {
+  for_each = toset([
+    "0.0.0.0/0",
+  ])
+  name                   = format("r-%s", replace(each.key, "/", "_"))
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.hub1_spoke2.name
+  address_prefix         = each.key
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = azurerm_lb.hub1_fw_int.frontend_ip_configuration[0].private_ip_address
+}
+
+
+resource "azurerm_subnet_route_table_association" "hub1_spoke2" {
+  subnet_id      = module.vnet_hub1_spoke2.subnets["s0"].id
+  route_table_id = azurerm_route_table.hub1_spoke2.id
+}
+#endregion
