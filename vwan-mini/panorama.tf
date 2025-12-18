@@ -28,3 +28,54 @@ resource "panos_panorama_template_variable" "hub1" {
 
   lifecycle { create_before_destroy = true }
 }
+
+
+data "panos_device_group" "this" {
+  name = "azure-vwan"
+}
+
+resource "panos_panorama_nat_rule_group" "this" {
+  device_group = data.panos_device_group.this.name
+  rule {
+    name = "inbound pub hc dnat"
+    original_packet {
+      source_zones          = ["public"]
+      destination_zone      = "public"
+      source_addresses      = ["azure health check"]
+      destination_addresses = ["any"]
+      service               = "tcp-health-check-54321"
+    }
+    translated_packet {
+      source {
+      }
+      destination {
+        dynamic_translation {
+          address = "192.0.2.1"
+          port    = 80
+        }
+      }
+    }
+  }
+  rule {
+    name = "inbound prv hc dnat"
+    original_packet {
+      source_zones          = ["private"]
+      destination_zone      = "private"
+      source_addresses      = ["azure health check"]
+      destination_addresses = ["any"]
+      service               = "tcp-health-check-54321"
+    }
+    translated_packet {
+      source {
+      }
+      destination {
+        dynamic_translation {
+          address = "192.0.2.1"
+          port    = 80
+        }
+      }
+    }
+  }
+
+  lifecycle { create_before_destroy = true }
+}
