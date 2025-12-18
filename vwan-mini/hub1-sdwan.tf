@@ -1,4 +1,4 @@
-data "template_cloudinit_config" "hub1_sdwan" {
+data "cloudinit_config" "hub1_sdwan" {
   count = 2
   gzip          = true
   base64_encode = true
@@ -69,5 +69,5 @@ module "linux_hub1_sdwan" {
   public_key          = azurerm_ssh_public_key.this.public_key
 
   enable_ip_forwarding = true
-  custom_data          = data.template_cloudinit_config.hub1_sdwan[count.index].rendered
+  custom_data          = data.cloudinit_config.hub1_sdwan[count.index].rendered
 }
