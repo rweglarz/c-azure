@@ -35,10 +35,6 @@ data "cloudinit_config" "onprem" {
           path    = "/etc/bird/bird.conf"
           content = templatefile("${path.module}/init/bird.conf.n.tfpl", local.linux_init_p.onprem)
         },
-        # {
-        #   path    = "/etc/ipsec.conf"
-        #   content = templatefile("${path.module}/init/ipsec.conf.tfpl", local.linux_init_p.onprem)
-        # },
         {
           path    = "/etc/swanctl/swanctl.conf"
           content = templatefile("${path.module}/init/swanctl.conf.tfpl", local.linux_init_p.onprem)
