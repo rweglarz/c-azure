@@ -12,6 +12,10 @@ module "vnet_hub2_spoke1" {
       network_security_group_id = module.basic.sg_id.mgmt
       associate_nsg             = true
     },
+    "pe" = {
+      idx                               = 1
+      private_endpoint_network_policies = "RouteTableEnabled"
+    }
   }
 }
 
