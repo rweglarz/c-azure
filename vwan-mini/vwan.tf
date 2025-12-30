@@ -63,6 +63,12 @@ resource "azurerm_vpn_gateway_connection" "hub1_onprem" {
     bgp_enabled      = true
     shared_key       = var.psk
   }
+  # workaround for azurerm provider doing updated in-place each time
+  lifecycle {
+    ignore_changes = [
+      vpn_link[0].shared_key,
+    ]
+  }
 }
 
 
