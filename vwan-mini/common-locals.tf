@@ -9,6 +9,7 @@ locals {
     hub1_sdwan      = cidrsubnet(var.region_cidr, 4, 3)
     hub2            = cidrsubnet(var.region_cidr, 4, 4)
     hub2_spoke1     = cidrsubnet(var.region_cidr, 5, 5*2 + 0)
+    hub2_spoke2     = cidrsubnet(var.region_cidr, 5, 5*2 + 1)
   }
 
 
