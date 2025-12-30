@@ -29,7 +29,9 @@ resource "azurerm_subnet" "this" {
   address_prefixes     = try(each.value.address_prefixes, [cidrsubnet(tolist(azurerm_virtual_network.this.address_space)[0], local.extra_mask_bits[each.key], each.value.idx)])
   service_endpoints    = try(each.value.service_endpoints, [])
 
-  default_outbound_access_enabled = try(each.value.default_outbound_access_enabled, true)
+  default_outbound_access_enabled   = try(each.value.default_outbound_access_enabled, true)
+  private_endpoint_network_policies = try(each.value.private_endpoint_network_policies, "Disabled")
+  private_link_service_network_policies_enabled = try(each.value.private_link_service_network_policies_enabled, false)
   
   dynamic "delegation" {
     for_each = try(contains(each.value.delegations, "dnsResolvers"), false) == true ? [1] : []
