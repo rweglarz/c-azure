@@ -34,6 +34,17 @@ resource "azurerm_vpn_gateway" "hub1" {
   }
 }
 
+resource "azurerm_vpn_gateway" "hub2" {
+  name                = "${local.dname}-hub2"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  virtual_hub_id      = azurerm_virtual_hub.hub2.id
+  bgp_settings {
+    asn         = var.asn.hub2
+    peer_weight = 0
+  }
+}
+
 
 resource "azurerm_vpn_site" "onprem" {
   name                = "onprem"
@@ -70,6 +81,26 @@ resource "azurerm_vpn_gateway_connection" "hub1_onprem" {
     ]
   }
 }
+
+resource "azurerm_vpn_gateway_connection" "hub2_onprem" {
+  name               = "hub2_onprem"
+  vpn_gateway_id     = azurerm_vpn_gateway.hub2.id
+  remote_vpn_site_id = azurerm_vpn_site.onprem.id
+
+  vpn_link {
+    name             = "l1"
+    vpn_site_link_id = azurerm_vpn_site.onprem.link[0].id
+    bgp_enabled      = true
+    shared_key       = var.psk
+  }
+  # workaround for azurerm provider doing updated in-place each time
+  lifecycle {
+    ignore_changes = [
+      vpn_link[0].shared_key,
+    ]
+  }
+}
+
 
 
 resource "azurerm_virtual_hub_connection" "hub1-hub1_sec" {

@@ -18,6 +18,10 @@ locals {
       azurerm_vpn_gateway.hub1.ip_configuration[0].public_ip_address,
       azurerm_vpn_gateway.hub1.ip_configuration[1].public_ip_address,
     ]
+    hub2 = [
+      azurerm_vpn_gateway.hub2.ip_configuration[0].public_ip_address,
+      azurerm_vpn_gateway.hub2.ip_configuration[1].public_ip_address,
+    ]
   }
   private_ip = {
     onprem      = cidrhost(module.vnet_onprem.subnets.public.address_prefixes[0], 5)
@@ -34,6 +38,14 @@ locals {
       azurerm_virtual_hub.hub1.virtual_router_ips[0],
       azurerm_virtual_hub.hub1.virtual_router_ips[1],
     ]
+    hub2_vng = [
+      tolist(azurerm_vpn_gateway.hub2.bgp_settings[0].instance_0_bgp_peering_address[0].default_ips)[0],
+      tolist(azurerm_vpn_gateway.hub2.bgp_settings[0].instance_1_bgp_peering_address[0].default_ips)[0],
+    ]
+    hub2 = [
+      azurerm_virtual_hub.hub2.virtual_router_ips[0],
+      azurerm_virtual_hub.hub2.virtual_router_ips[1],
+    ]
   }
 
   linux_init_p = {
@@ -44,23 +56,39 @@ locals {
       local_id  = module.linux_onprem.public_ip
       vpn_psk   = var.psk
       peers = {
-        vngi0 = {
+        hub1_vngi0 = {
           peer_ip  = local.peering_address.hub1_vng[0]
           peer_asn = 65515
         }
-        vngi1 = {
+        hub1_vngi1 = {
           peer_ip  = local.peering_address.hub1_vng[1]
+          peer_asn = 65515
+        }
+        hub2_vngi0 = {
+          peer_ip  = local.peering_address.hub2_vng[0]
+          peer_asn = 65515
+        }
+        hub2_vngi1 = {
+          peer_ip  = local.peering_address.hub2_vng[1]
           peer_asn = 65515
         }
       }
       tunnels = {
-        vngi0 = {
+        hub1_vngi0 = {
           peer_ip = local.public_ip.hub1[0]
-          if_id   = 101
+          if_id   = 110
         }
-        vngi1 = {
+        hub1_vngi1 = {
           peer_ip = local.public_ip.hub1[1]
-          if_id   = 102
+          if_id   = 111
+        }
+        hub2_vngi0 = {
+          peer_ip = local.public_ip.hub2[0]
+          if_id   = 120
+        }
+        hub2_vngi1 = {
+          peer_ip = local.public_ip.hub2[1]
+          if_id   = 121
         }
       }
       lo_ips = [
