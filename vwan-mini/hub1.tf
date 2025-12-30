@@ -101,6 +101,19 @@ module "vnet_hub1_sdwan" {
 }
 
 
+module "linux_hub1_jumphost" {
+  source = "../modules/linux"
+
+  name                = "${var.name}-jumphost"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  subnet_id           = module.vnet_hub1_sec.subnets.mgmt.id
+  private_ip_address  = cidrhost(module.vnet_hub1_sec.subnets.mgmt.address_prefixes[0], 10)
+  password            = var.password
+  public_key          = azurerm_ssh_public_key.this.public_key
+  size                = var.workload_size
+}
+
 
 module "linux_hub1_spoke1" {
   source = "../modules/linux"
@@ -110,6 +123,21 @@ module "linux_hub1_spoke1" {
   resource_group_name = azurerm_resource_group.rg.name
   subnet_id           = module.vnet_hub1_spoke1.subnets.s0.id
   private_ip_address  = cidrhost(module.vnet_hub1_spoke1.subnets.s0.address_prefixes[0], 5)
+  password            = var.password
+  public_key          = azurerm_ssh_public_key.this.public_key
+  size                = var.workload_size
+}
+
+
+
+module "linux_hub1_spoke2" {
+  source = "../modules/linux"
+
+  name                = "${var.name}-hub1-spoke2"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  subnet_id           = module.vnet_hub1_spoke2.subnets.s0.id
+  private_ip_address  = cidrhost(module.vnet_hub1_spoke2.subnets.s0.address_prefixes[0], 5)
   password            = var.password
   public_key          = azurerm_ssh_public_key.this.public_key
   size                = var.workload_size
