@@ -92,3 +92,7 @@ variable "configure_hub_routing_intent" {
   default = true
 }
 
+variable "workload_size" {
+  # default = "Standard_DS1_v2"
+  default = null
+}

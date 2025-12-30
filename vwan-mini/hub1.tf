@@ -112,6 +112,7 @@ module "linux_hub1_spoke1" {
   private_ip_address  = cidrhost(module.vnet_hub1_spoke1.subnets.s0.address_prefixes[0], 5)
   password            = var.password
   public_key          = azurerm_ssh_public_key.this.public_key
+  size                = var.workload_size
 }
 
 
