@@ -98,9 +98,6 @@ module "vnet_hub1_sdwan" {
 
 
 
-
-
-
 module "linux_hub1_spoke1" {
   source = "../modules/linux"
 

@@ -46,3 +46,23 @@ resource "azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama" "hub2
   ]
 }
 
+
+resource "azurerm_virtual_hub_routing_intent" "hub2" {
+  count = (var.cloud_ngfw_panorama_config!=null && var.configure_hub_routing_intent) ? 1 : 0
+  name           = "${local.dname}-hub2"
+  virtual_hub_id = azurerm_virtual_hub.hub2.id
+
+  routing_policy {
+    name         = "InternetTrafficPolicy"
+    destinations = ["Internet"]
+    next_hop     = azurerm_palo_alto_virtual_network_appliance.hub2[0].id
+  }
+  routing_policy {
+    name         = "PrivateTrafficPolicy"
+    destinations = ["PrivateTraffic"]
+    next_hop     = azurerm_palo_alto_virtual_network_appliance.hub2[0].id
+  }
+  depends_on = [
+    azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama.hub2
+  ]
+}

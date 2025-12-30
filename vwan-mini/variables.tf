@@ -87,3 +87,8 @@ variable "gcp_panorama_vpc_id" {
 variable "cloud_ngfw_panorama_config" {
   type = string
 }
+variable "configure_hub_routing_intent" {
+  type    = bool
+  default = true
+}
+
