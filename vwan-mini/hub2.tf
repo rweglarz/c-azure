@@ -62,3 +62,29 @@ module "linux_hub2_spoke2" {
   size                = var.workload_size
 }
 
+#region spoke1 routing
+resource "azurerm_route_table" "hub2_spoke1" {
+  name                = "${var.name}-hub2-spoke1"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+}
+
+resource "azurerm_route" "hub2_spoke1" {
+  for_each = var.cloud_ngfw_panorama_config!=null ? toset([
+    module.vnet_hub2_spoke1.subnets["pe"].address_prefixes[0],
+  ]) : toset([])
+  name                   = format("r-%s", replace(each.key, "/", "_"))
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.hub2_spoke1.name
+  address_prefix         = each.key
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama.hub2[0].network_profile[0].ip_of_trust_for_user_defined_routes
+}
+
+
+resource "azurerm_subnet_route_table_association" "hub2_spoke1" {
+  subnet_id      = module.vnet_hub2_spoke1.subnets["s0"].id
+  route_table_id = azurerm_route_table.hub2_spoke1.id
+}
+#endregion
+

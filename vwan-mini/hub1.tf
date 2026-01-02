@@ -173,7 +173,47 @@ resource "azurerm_subnet_nat_gateway_association" "hub1_natgw_mgmt" {
 
 
 
-#region spoke1
+#region mgmt / jumphost routing
+resource "azurerm_route_table" "hub1_jumphost" {
+  name                = "${var.name}-hub1-jumphost"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+}
+
+resource "azurerm_route" "hub1_jumphost" {
+  for_each = toset([
+    module.vnet_hub1_spoke1.subnets["pe"].address_prefixes[0],
+  ])
+  name                   = format("r-%s", replace(each.key, "/", "_"))
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.hub1_jumphost.name
+  address_prefix         = each.key
+  next_hop_type          = "VirtualAppliance"
+  next_hop_in_ip_address = azurerm_lb.hub1_fw_int.frontend_ip_configuration[0].private_ip_address
+}
+resource "azurerm_route" "hub1_jumphost_dg" {
+  for_each = toset([
+    "0.0.0.0/0",
+    "0.0.0.0/1",
+    "128.0.0.0/1",
+  ])
+  name                   = format("r-%s", replace(each.key, "/", "_"))
+  resource_group_name    = azurerm_resource_group.rg.name
+  route_table_name       = azurerm_route_table.hub1_jumphost.name
+  address_prefix         = each.key
+  next_hop_type          = "Internet"
+}
+
+
+resource "azurerm_subnet_route_table_association" "hub1_jumphost" {
+  subnet_id      = module.vnet_hub1_sec.subnets["mgmt"].id
+  route_table_id = azurerm_route_table.hub1_jumphost.id
+}
+#endregion
+
+
+
+#region spoke1 routing
 resource "azurerm_route_table" "hub1_spoke1" {
   name                = "${var.name}-hub1-spoke1"
   resource_group_name = azurerm_resource_group.rg.name
@@ -183,6 +223,7 @@ resource "azurerm_route_table" "hub1_spoke1" {
 resource "azurerm_route" "hub1_spoke1" {
   for_each = toset([
     "0.0.0.0/0",
+    module.vnet_hub1_spoke1.subnets["pe"].address_prefixes[0],
   ])
   name                   = format("r-%s", replace(each.key, "/", "_"))
   resource_group_name    = azurerm_resource_group.rg.name
@@ -201,7 +242,7 @@ resource "azurerm_subnet_route_table_association" "hub1_spoke1" {
 
 
 
-#region spoke2
+#region spoke2 routing
 resource "azurerm_route_table" "hub1_spoke2" {
   name                = "${var.name}-hub1-spoke2"
   resource_group_name = azurerm_resource_group.rg.name
