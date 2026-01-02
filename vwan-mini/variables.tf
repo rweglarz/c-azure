@@ -96,3 +96,11 @@ variable "workload_size" {
   # default = "Standard_DS1_v2"
   default = null
 }
+
+variable "private_dns_zone_name" {
+  type = string
+}
+
+variable "deploy_paas" {
+  default = false
+}

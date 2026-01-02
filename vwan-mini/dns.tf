@@ -8,6 +8,7 @@ resource "azurerm_dns_a_record" "this" {
     uvwan-hub2-spoke2 = module.linux_hub2_spoke2.public_ip
     uvwan-hub1-sdwan1 = module.linux_hub1_sdwan[0].public_ip
     uvwan-hub1-sdwan2 = module.linux_hub1_sdwan[1].public_ip
+    uvwan-pl          = module.vm_pl_app.public_ip
   }
   name = each.key
   resource_group_name = var.dns_zone_rg

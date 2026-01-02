@@ -123,4 +123,39 @@ locals {
       ]
     }
   }
+
+  vnets_with_private_dns = {
+    hub1_sec    = module.vnet_hub1_sec.id,
+    hub1_spoke1 = module.vnet_hub1_spoke1.id,
+    hub1_spoke2 = module.vnet_hub1_spoke2.id,
+    hub2_spoke1 = module.vnet_hub2_spoke1.id,
+    hub2_spoke2 = module.vnet_hub2_spoke2.id,
+    onprem      = module.vnet_onprem.id,
+  }
+
+  pe_subnets = {
+    hub1-spoke1 = {
+      subnet_id = module.vnet_hub1_spoke1.subnets["pe"].id
+    }
+    hub2-spoke1 = {
+      subnet_id = module.vnet_hub2_spoke1.subnets["pe"].id
+    }
+  }
+
+  paas = var.deploy_paas ? local.pe_subnets : {}
+
+  private_link_services = {
+    appsvc = {
+      dns_zone = "privatelink.azurewebsites.net"
+    }
+    blob = {
+      dns_zone = "privatelink.blob.core.windows.net"
+    }
+    kv = {
+      dns_zone = "privatelink.vaultcore.azure.net"
+    }
+    sql = {
+      dns_zone = "privatelink.database.windows.net"
+    }
+  }
 }
