@@ -143,4 +143,7 @@ module "hub1_vmss" {
   depends_on = [
     google_compute_firewall.pan
   ]
+  tags = {
+    disableSnatOnPL = true
+  }
 }
