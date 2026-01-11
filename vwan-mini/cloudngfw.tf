@@ -17,7 +17,7 @@ resource "azurerm_palo_alto_virtual_network_appliance" "hub2" {
 resource "azurerm_palo_alto_next_generation_firewall_virtual_hub_panorama" "hub2" {
   count = var.cloud_ngfw_panorama_config==null ? 0 : 1
 
-  name                = "${local.dname}-hub2-fw-2"
+  name                = "${local.dname}-hub2-fw"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
