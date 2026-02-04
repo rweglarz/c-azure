@@ -49,6 +49,11 @@ variable "network_plugin_mode" {
   description = "or set to overlay"
 }
 
+variable "network_data_plane" {
+  default = null
+  description = "or set to cilium"
+}
+
 variable "node_count" {
   default = 2
 }

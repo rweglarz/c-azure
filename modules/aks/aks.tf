@@ -16,6 +16,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   network_profile {
     network_plugin      = var.network_plugin
     network_plugin_mode = var.network_plugin_mode
+    network_data_plane  = var.network_data_plane
     outbound_type       = var.outbound_type
   }
 
