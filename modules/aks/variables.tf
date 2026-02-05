@@ -12,7 +12,7 @@ variable "location" {
 
 variable "kubernetes_version" {
   type = string
-  default = "1.31.8"
+  default = "1.33"
 }
 
 variable "subnet_id" {
