@@ -5,3 +5,7 @@ output "identity" {
 output "ingress_application_gateway_identity" {
   value = try(azurerm_kubernetes_cluster.this.ingress_application_gateway[0].ingress_application_gateway_identity[0], null)
 }
+
+output "oidc_issuer_url" {
+  value = azurerm_kubernetes_cluster.this.oidc_issuer_url
+}
