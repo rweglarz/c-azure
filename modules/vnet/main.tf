@@ -64,6 +64,7 @@ resource "azurerm_virtual_network_peering" "on_local" {
   virtual_network_name      = azurerm_virtual_network.this.name
   remote_virtual_network_id = each.value.peer_vnet_id
   allow_forwarded_traffic   = try(each.value.allow_forwarded_traffic, false)
+  use_remote_gateways       = try(each.value.use_remote_gateways, false)
 }
 
 resource "azurerm_virtual_network_peering" "on_remote" {
@@ -73,4 +74,5 @@ resource "azurerm_virtual_network_peering" "on_remote" {
   resource_group_name       = var.resource_group_name
   virtual_network_name      = each.value.peer_vnet_name
   remote_virtual_network_id = azurerm_virtual_network.this.id
+  allow_gateway_transit     = try(each.value.use_remote_gateways, false)
 }
