@@ -3,6 +3,10 @@ variable "name" {
   type        = string
 }
 
+variable "subscription_id" {
+  type = string
+}
+
 variable "region" {
   type    = string
   default = "polandcentral"

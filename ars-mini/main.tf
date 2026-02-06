@@ -1,14 +1,13 @@
 provider "azurerm" {
   features {}
+  subscription_id = var.subscription_id
 }
 
 terraform {
   required_providers {
-    aws = {
-      version = "~>5.58"
-    }
     azurerm = {
-      version = "~>3.112"
+      version = "~>4.30"
+    }
     }
   }
 }
