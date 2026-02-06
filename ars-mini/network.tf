@@ -4,34 +4,88 @@ module "vnet_transit" {
   location            = azurerm_resource_group.rg.location
 
   name          = "${var.name}-transit"
-  address_space = [cidrsubnet(var.cidr, 1, 0)]
+  address_space = [local.cidrs.transit]
+  subnet_mask_length = local.subnet_prefix_length
 
   subnets = {
     "mgmt" = {
-      address_prefixes          = [cidrsubnet(var.cidr, 7, 0)]
+      idx                       = 0
       associate_nsg             = true
       network_security_group_id = module.basic.sg_id.mgmt
     },
     "data" = {
-      address_prefixes = [cidrsubnet(var.cidr, 7, 1)]
+      idx                       = 1
       associate_nsg             = true
       network_security_group_id = module.basic.sg_id.mgmt
     },
-    "RouteServerSubnet" = {
-      address_prefixes = [cidrsubnet(var.cidr, 7, 2)]
-    },
     "gwA" = {
-      address_prefixes          = [cidrsubnet(var.cidr, 4, 1)]
+      idx                       = 2
       associate_nsg             = true
       network_security_group_id = module.basic.sg_id.mgmt
     },
     "gwB" = {
-      address_prefixes          = [cidrsubnet(var.cidr, 4, 2)]
+      idx                       = 3
+      associate_nsg             = true
+      network_security_group_id = module.basic.sg_id.mgmt
+    },
+    "RouteServerSubnet" = {
+      address_prefixes = [cidrsubnet(local.cidrs.transit, 2, 3)]
+    },
+  }
+}
+
+
+module "vnet_spoke1" {
+  source              = "../modules/vnet"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  name          = "${var.name}-spoke1"
+  address_space = [local.cidrs.spoke1]
+
+  subnets = {
+    "s0" = {
+      idx                       = 0
       associate_nsg             = true
       network_security_group_id = module.basic.sg_id.mgmt
     },
   }
+  vnet_peering = {
+    transit = {
+      peer_vnet_name          = module.vnet_transit.vnet.name
+      peer_vnet_id            = module.vnet_transit.vnet.id
+      allow_forwarded_traffic = true
+      use_remote_gateways     = true
+    }
+  }
 }
+
+module "vnet_spoke2" {
+  source              = "../modules/vnet"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  name          = "${var.name}-spoke2"
+  address_space = [local.cidrs.spoke2]
+
+  subnets = {
+    "s0" = {
+      idx                       = 0
+      associate_nsg             = true
+      network_security_group_id = module.basic.sg_id.mgmt
+    },
+  }
+  vnet_peering = {
+    transit = {
+      peer_vnet_name          = module.vnet_transit.vnet.name
+      peer_vnet_id            = module.vnet_transit.vnet.id
+      allow_forwarded_traffic = true
+      use_remote_gateways     = true
+    }
+  }
+}
+
+
 
 resource "azurerm_public_ip" "ars_transit" {
   name                = "${var.name}-ars-transit"

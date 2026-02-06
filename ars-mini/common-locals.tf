@@ -1,5 +1,10 @@
 locals {
   subnet_prefix_length = 27
+  cidrs = {
+    transit = cidrsubnet(var.cidr, 4, 0)
+    spoke1  = cidrsubnet(var.cidr, 4, 1)
+    spoke2  = cidrsubnet(var.cidr, 4, 2)
+  }
   private_ips = {
     fw   = cidrhost(module.vnet_transit.subnets.data.address_prefixes[0], 5)
     ars1 = sort(azurerm_route_server.transit.virtual_router_ips)[0]
