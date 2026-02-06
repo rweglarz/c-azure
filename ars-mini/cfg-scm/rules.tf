@@ -7,7 +7,10 @@ resource "scm_security_rule" "rule1" {
   to          = ["any"]
   category    = ["any"]
   source_user = ["any"]
-  source      = ["172.16.0.0/12"]
+  source      = [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+  ]
   destination = ["0.0.0.0/0"]
 
   service     = ["any"]
