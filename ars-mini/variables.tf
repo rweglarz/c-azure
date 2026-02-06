@@ -39,5 +39,20 @@ variable "asn" {
     sdgw_A1 = "65011"
     sdgw_A2 = "65012"
     sdgw_B  = "65021"
+    ngfw    = "55031"
   }
+}
+
+variable "bootstrap_options" {
+}
+
+variable "panorama_managed" {
+  default = true
+}
+variable "scm_managed" {
+  default = false
+}
+
+variable "scm_auth_file" {
+  default = null
 }

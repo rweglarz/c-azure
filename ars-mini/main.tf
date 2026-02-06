@@ -8,9 +8,16 @@ terraform {
     azurerm = {
       version = "~>4.30"
     }
+    scm = {
+      source  = "PaloAltoNetworks/scm"
+      version = "~>1.0.7"
     }
   }
 }
+provider "scm" {
+  auth_file = var.scm_auth_file
+}
+
 
 resource "azurerm_resource_group" "rg" {
   name     = var.name
@@ -38,3 +45,15 @@ module "basic" {
     }
   }
 }
+
+module "cfg_scm" {
+  source = "./cfg-scm"
+  count  = var.scm_managed ? 1 : 0
+
+  auth_file            = var.scm_auth_file
+  scm_folder           = "azure-ars"
+  subnet_prefix_length = local.subnet_prefix_length
+  asn                  = var.asn
+  private_ips          = local.private_ips
+}
+
