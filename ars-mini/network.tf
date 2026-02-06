@@ -35,38 +35,18 @@ module "vnet_transit" {
 }
 
 
-module "vnet_spoke1" {
+module "vnet_spokes" {
+  for_each = {
+    spoke1 = local.cidrs.spoke1
+    spoke2 = local.cidrs.spoke2
+    spoke3 = local.cidrs.spoke3
+  }
   source              = "../modules/vnet"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
 
-  name          = "${var.name}-spoke1"
-  address_space = [local.cidrs.spoke1]
-
-  subnets = {
-    "s0" = {
-      idx                       = 0
-      associate_nsg             = true
-      network_security_group_id = module.basic.sg_id.mgmt
-    },
-  }
-  vnet_peering = {
-    transit = {
-      peer_vnet_name          = module.vnet_transit.vnet.name
-      peer_vnet_id            = module.vnet_transit.vnet.id
-      allow_forwarded_traffic = true
-      use_remote_gateways     = true
-    }
-  }
-}
-
-module "vnet_spoke2" {
-  source              = "../modules/vnet"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-
-  name          = "${var.name}-spoke2"
-  address_space = [local.cidrs.spoke2]
+  name          = "${var.name}-${each.key}"
+  address_space = [each.value]
 
   subnets = {
     "s0" = {
