@@ -1,34 +1,34 @@
 #region variables
 resource "scm_variable" "private_ipm" {
-  folder      = var.scm_folder
-  name        = "$fw-private-ipm"
+  folder = var.scm_folder
+  name   = "$fw-private-ipm"
 
-  type        = "ip-netmask"
-  value       = "${var.private_ips.ngfw}/${var.subnet_prefix_length}"
+  type  = "ip-netmask"
+  value = "${var.private_ips.ngfw}/${var.subnet_prefix_length}"
 }
 
 resource "scm_variable" "private_ip" {
-  folder      = var.scm_folder
-  name        = "$fw-private-ip"
+  folder = var.scm_folder
+  name   = "$fw-private-ip"
 
-  type        = "ip-netmask"
-  value       = var.private_ips.ngfw
+  type  = "ip-netmask"
+  value = var.private_ips.ngfw
 }
 
 resource "scm_variable" "fw_asn" {
-  folder      = var.scm_folder
+  folder = var.scm_folder
 
-  name        = "$fw-asn"
-  type        = "as-number"
-  value       = var.asn.ngfw
+  name  = "$fw-asn"
+  type  = "as-number"
+  value = var.asn.ngfw
 }
 
 resource "scm_variable" "ars_asn" {
-  folder      = var.scm_folder
+  folder = var.scm_folder
 
-  name        = "$ars-asn"
-  type        = "as-number"
-  value       = var.asn.ars
+  name  = "$ars-asn"
+  type  = "as-number"
+  value = var.asn.ars
 }
 #endregion
 
@@ -87,45 +87,45 @@ resource "scm_logical_router" "default" {
     }
 
     bgp = {
-      router_id = scm_variable.private_ip.name
-      local_as  = scm_variable.fw_asn.name
-      enable    = true
+      router_id     = scm_variable.private_ip.name
+      local_as      = scm_variable.fw_asn.name
+      enable        = true
       install_route = true
 
       peer_group = [
-          {
-            name = "ars"
-            enable = true
-            address_family = {
-              ipv4 = "default"
-            }
-            peer = [
-              {
-                name    = "ars_i0"
-                enable  = true
-                peer_as = scm_variable.ars_asn.name
-                peer_address = {
-                  ip = var.private_ips.ars1
-                }
-                local_address = {
-                  interface = scm_ethernet_interface.eth1_1.name
-                }
-              },
-              {
-                name    = "ars_i1"
-                enable  = true
-                peer_as = scm_variable.ars_asn.name
-                peer_address = {
-                  ip = var.private_ips.ars2
-                }
-                local_address = {
-                  interface = scm_ethernet_interface.eth1_1.name
-                }
-              }
-            ]
+        {
+          name   = "ars"
+          enable = true
+          address_family = {
+            ipv4 = "default"
           }
+          peer = [
+            {
+              name    = "ars_i0"
+              enable  = true
+              peer_as = scm_variable.ars_asn.name
+              peer_address = {
+                ip = var.private_ips.ars1
+              }
+              local_address = {
+                interface = scm_ethernet_interface.eth1_1.name
+              }
+            },
+            {
+              name    = "ars_i1"
+              enable  = true
+              peer_as = scm_variable.ars_asn.name
+              peer_address = {
+                ip = var.private_ips.ars2
+              }
+              local_address = {
+                interface = scm_ethernet_interface.eth1_1.name
+              }
+            }
+          ]
+        }
       ]
-    } 
+    }
   }]
   # depends_on = [ scm_ethernet_interface.eth1_1 ]
 }
