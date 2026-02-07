@@ -33,3 +33,7 @@ variable "bgp_community" {
 variable "vnet_peering" {
   default = {}
 }
+
+variable "tags" {
+  default = null
+}

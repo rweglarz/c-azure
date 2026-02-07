@@ -4,6 +4,7 @@ resource "azurerm_virtual_network" "this" {
   location            = var.location
   address_space       = var.address_space
   bgp_community       = var.bgp_community
+  tags                = var.tags
 }
 
 resource "azurerm_virtual_network_dns_servers" "this" {
