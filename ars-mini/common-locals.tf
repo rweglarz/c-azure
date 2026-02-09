@@ -16,6 +16,8 @@ locals {
     ars2 = sort(azurerm_route_server.transit.virtual_router_ips)[1]
     ngfw = cidrhost(module.vnet_transit.subnets.data.address_prefixes[0], 6)
 
+    third_party = cidrhost(module.vnet_transit.subnets.third_party.address_prefixes[0], 6)
+
     transit_data_gw = cidrhost(module.vnet_transit.subnets.data.address_prefixes[0], 1)
   }
 }

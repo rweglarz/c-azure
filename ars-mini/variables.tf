@@ -40,6 +40,8 @@ variable "asn" {
     sdgw_A2 = "65012"
     sdgw_B  = "65021"
     ngfw    = "55031"
+
+    third_party = "65333"
   }
 }
 
