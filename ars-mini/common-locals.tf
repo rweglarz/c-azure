@@ -5,6 +5,10 @@ locals {
     spoke1  = cidrsubnet(var.cidr, 4, 1)
     spoke2  = cidrsubnet(var.cidr, 4, 2)
     spoke3  = cidrsubnet(var.cidr, 4, 3)
+    spoke4a = cidrsubnet(var.cidr, 5, 4*2+0)
+    spoke4b = cidrsubnet(var.cidr, 5, 4*2+1)
+    spoke5a = cidrsubnet(var.cidr, 5, 5*2+0)
+    spoke5b = cidrsubnet(var.cidr, 5, 5*2+1)
   }
   private_ips = {
     fw   = cidrhost(module.vnet_transit.subnets.data.address_prefixes[0], 5)

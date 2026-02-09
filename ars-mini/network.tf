@@ -37,9 +37,13 @@ module "vnet_transit" {
 
 module "vnet_spokes" {
   for_each = {
-    spoke1 = local.cidrs.spoke1
-    spoke2 = local.cidrs.spoke2
-    spoke3 = local.cidrs.spoke3
+    spoke1  = local.cidrs.spoke1
+    spoke2  = local.cidrs.spoke2
+    spoke3  = local.cidrs.spoke3
+    spoke4a = local.cidrs.spoke4a
+    spoke4b = local.cidrs.spoke4b
+    spoke5a = local.cidrs.spoke5a
+    spoke5b = local.cidrs.spoke5b
   }
   source              = "../modules/vnet"
   resource_group_name = azurerm_resource_group.rg.name
