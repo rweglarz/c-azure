@@ -105,3 +105,20 @@ resource "azurerm_subnet_route_table_association" "sdgw" {
   subnet_id      = each.value
   route_table_id = module.basic.route_table_id.mgmt-via-igw-dg-via-nh.fw
 }
+
+resource "azurerm_route_table" "no_bgp" {
+  name = "${var.name}-no-bgp-routes"
+
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  bgp_route_propagation_enabled = false
+}
+
+resource "azurerm_subnet_route_table_association" "no_bgp" {
+  for_each = {
+    mgmt        = module.vnet_transit.subnets.mgmt.id,
+  }
+  subnet_id      = each.value
+  route_table_id = azurerm_route_table.no_bgp.id
+}
