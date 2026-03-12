@@ -22,11 +22,11 @@ resource "azurerm_linux_virtual_machine_scale_set" "byol" {
     ip_configuration {
       name      = "pri"
       primary   = true
-      subnet_id = azurerm_subnet.sec_mgmt.id
+      subnet_id = module.vnet_sec.subnets.mgmt.id
     }
   }
   dynamic "network_interface" {
-    for_each = ["internet", "internal", "dmz"]
+    for_each = ["public", "private", "dmz"]
     content {
       name                          = "eth-${network_interface.value}"
       primary                       = false
@@ -36,7 +36,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "byol" {
       ip_configuration {
         name      = "pri"
         primary   = true
-        subnet_id = local.lbsp[network_interface.value]["subnet"]
+        subnet_id = local.lbsp[network_interface.value]["subnet"].id
 
         load_balancer_backend_address_pool_ids = local.lbsp[network_interface.value]["backends"]
       }

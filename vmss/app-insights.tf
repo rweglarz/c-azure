@@ -18,7 +18,6 @@ output "application_insights_instrumentation_key" {
   sensitive = true
 
   value = {
-    cn   = azurerm_application_insights.cn.instrumentation_key
     vmss = azurerm_application_insights.vmss.instrumentation_key
   }
 }

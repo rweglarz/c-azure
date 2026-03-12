@@ -1,9 +1,13 @@
+variable "subscription_id" {
+   type    = string
+}
+
 variable "name" {
   description = "Name/Prefix of the deployment"
   type        = string
 }
-variable "vnet_cidr" {
-  description = "vpc cidr"
+variable "cidr" {
+  description = "cidr to split"
   type        = string
   default     = "172.29.32.0/19"
 }
@@ -20,7 +24,7 @@ variable "tmp_ips" {
 
 variable "fw_version" {
   type    = string
-  default = "10.1.9"
+  default = "11.2.5"
 }
 
 variable "fw_instances_bnd" {
@@ -59,15 +63,6 @@ variable "password" {
 }
 
 
-variable "panorama1_ip" {
-  type    = string
-  default = ""
-}
-variable "panorama2_ip" {
-  type    = string
-  default = ""
-}
-
 variable "dns_zone_rg" {
   type = string
 }
@@ -75,6 +70,9 @@ variable "dns_zone_name" {
   type = string
 }
 
-variable "pl-mgmt-csp_nat_ips" {
-  type = string
+variable "gcp_project" {
+  default = null
+}
+variable "gcp_panorama_vpc_id" {
+  default = null
 }
