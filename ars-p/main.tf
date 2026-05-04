@@ -52,3 +52,7 @@ module "basic" {
 resource "random_bytes" "psk" {
   length = 8
 }
+
+resource "panos_vm_auth_key" "this" {
+  hours = 24*30*6
+}

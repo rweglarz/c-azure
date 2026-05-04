@@ -2,12 +2,14 @@ locals {
   bootstrap_options = merge(
     { 
       for k,v in local.transit_fws: "transit_${k}" => {
-        tplname = panos_panorama_template_stack.transit_fw[k].name
+        tplname     = panos_panorama_template_stack.transit_fw[k].name
+        vm-auth-key = panos_vm_auth_key.this.auth_key
       }
     },
     {
       onprem_fw = {
-        tplname = panos_panorama_template_stack.onprem_fw.name
+        tplname     = panos_panorama_template_stack.onprem_fw.name
+        vm-auth-key = panos_vm_auth_key.this.auth_key
       }
     }
 
