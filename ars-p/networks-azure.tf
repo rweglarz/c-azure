@@ -116,6 +116,7 @@ resource "azurerm_public_ip" "vng" {
   location            = azurerm_resource_group.rg1.location
   allocation_method   = "Static"
   sku                 = "Standard"
+  zones               = [1,2,3]
 }
 
 
@@ -129,8 +130,8 @@ resource "azurerm_virtual_network_gateway" "transit" {
   vpn_type = "RouteBased"
 
   active_active = true
-  enable_bgp    = true
-  sku           = "VpnGw1"
+  bgp_enabled   = true
+  sku           = "VpnGw1AZ"
 
   ip_configuration {
     name                 = "c1"
@@ -181,7 +182,7 @@ resource "azurerm_virtual_network_gateway_connection" "onprem" {
   virtual_network_gateway_id = azurerm_virtual_network_gateway.transit.id
   local_network_gateway_id   = azurerm_local_network_gateway.onprem[each.key].id
 
-  enable_bgp = true
+  bgp_enabled = true
   custom_bgp_addresses {
     primary   = each.key=="isp1" ? local.peering_addresses["vng"]["c1"][0] : local.peering_addresses["vng"]["c1"][1]
     secondary = each.key=="isp1" ? local.peering_addresses["vng"]["c2"][0] : local.peering_addresses["vng"]["c2"][1]
