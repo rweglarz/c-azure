@@ -20,7 +20,7 @@ module "cfg_fw" {
     "ethernet1/1" = {
       static_ips         = ["$eth1_1_ipm"]
       zone               = "public"
-      management_profile = "hc-azure"
+      management_profile = "ping"
     }
     "ethernet1/2" = {
       static_ips         = ["$eth1_2_ipm"]
@@ -32,11 +32,14 @@ module "cfg_fw" {
       zone               = "public"
     }
     "loopback.999" = {
-      static_ips         = ["192.0.2.1"]
+      static_ips         = ["192.0.2.254"]
       zone               = "healthcheck"
       management_profile = "hc-azure"
     }
     "tunnel.10" = {
+      zone               = "vpn"
+    }
+    "tunnel.11" = {
       zone               = "vpn"
     }
   }
@@ -170,11 +173,11 @@ resource "panos_security_rule_group" "azure_fha" {
 resource "panos_panorama_nat_rule_group" "this" {
   device_group = "azure-ha-fast"
   rule {
-    name = "inbound private hc dnat"
+    name = "inbound public hc dnat"
     original_packet {
-      source_zones          = ["private"]
-      destination_zone      = "private"
-      source_addresses      = ["azure health probe"]
+      source_zones          = ["public"]
+      destination_zone      = "public"
+      source_addresses      = ["azure health check"]
       destination_addresses = ["any"]
       service               = "tcp-health-check-54321"
     }
@@ -183,9 +186,48 @@ resource "panos_panorama_nat_rule_group" "this" {
       }
       destination {
         dynamic_translation {
-          address = "192.0.2.1"
+          address = "192.0.2.254"
           port    = 80
         }
+      }
+    }
+  }
+  rule {
+    name = "inbound private hc dnat"
+    original_packet {
+      source_zones          = ["private"]
+      destination_zone      = "private"
+      source_addresses      = ["azure health check"]
+      destination_addresses = ["any"]
+      service               = "tcp-health-check-54321"
+    }
+    translated_packet {
+      source {
+      }
+      destination {
+        dynamic_translation {
+          address = "192.0.2.254"
+          port    = 80
+        }
+      }
+    }
+  }
+  rule {
+    name = "ipsec static nat"
+    original_packet {
+      source_zones          = ["public"]
+      destination_zone      = "public"
+      source_addresses      = ["192.0.2.2"]
+      destination_addresses = ["any"]
+    }
+    translated_packet {
+      source {
+        static_ip {
+          translated_address = module.slb_fw_ext.frontend_ip_configs.ext-fw
+          bi_directional = true
+        }
+      }
+      destination {
       }
     }
   }
@@ -238,7 +280,7 @@ module "tunnel-linux" {
   peers = {
     left = {
       name = "fw"
-      ip   = module.slb_fw_ext.frontend_ip_configs.ext-fw
+      ip   = "192.0.2.2"
       interface = {
         phys   = "loopback.1"
         tunnel = "tunnel.10"

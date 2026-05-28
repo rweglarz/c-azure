@@ -28,7 +28,7 @@ variable "tmp_ips" {
 
 variable "fw_version" {
   type    = string
-  default = "11.1.4"
+  default = "11.2.11"
 }
 
 variable "instance_type" {
@@ -44,10 +44,6 @@ variable "username" {
   type = string
 }
 variable "password" {
-  type = string
-}
-
-variable "pl-mgmt-csp_nat_ips" {
   type = string
 }
 
@@ -71,4 +67,11 @@ variable "vmseries" {
 
 variable "vpn_psk" {
   type = string
+}
+
+variable "gcp_project" {
+  default = null
+}
+variable "gcp_panorama_vpc_id" {
+  default = null
 }

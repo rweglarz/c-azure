@@ -1,7 +1,7 @@
 resource "azurerm_dns_a_record" "this" {
   for_each = {
-    fw0   = module.fw.fw0.mgmt_ip_address
-    fw1   = module.fw.fw1.mgmt_ip_address
+    fw0   = module.fw.fw0.mgmt_ip_address.primary.public_ip
+    fw1   = module.fw.fw1.mgmt_ip_address.primary.public_ip
     srv0  = module.spoke0_h.public_ip
     srv1  = module.spoke1_h.public_ip
     vpn   = module.vpn_h.public_ip

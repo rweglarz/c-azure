@@ -22,7 +22,7 @@ locals {
 
 module "fw" {
   for_each = var.vmseries
-  source   = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/vmseries?ref=v3.0.3"
+  source   = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/vmseries?ref=v3.5.1"
 
   name                = "${var.name}-${each.key}"
   resource_group_name = azurerm_resource_group.this.name
@@ -55,32 +55,45 @@ module "fw" {
     {
       name               = "${var.name}-${each.key}-mgmt"
       subnet_id          = module.vnet_transit.subnets.mgmt.id
-      create_public_ip   = true
-      public_ip_name     = "${var.name}-${each.key}-mgmt"
-      private_ip_address = local.private_ips[each.key].mgmt
+      ip_configurations = {
+        primary = {
+          private_ip_address = local.private_ips[each.key].mgmt
+          public_ip_name     = "${var.name}-${each.key}-mgmt"
+          create_public_ip   = true
+        }
+      }
     },
     {
-      name                 = "${var.name}-${each.key}-public"
-      subnet_id            = module.vnet_transit.subnets.public.id
-      private_ip_address   = local.private_ips[each.key].public
-      enable_ip_forwarding = true
-      create_public_ip     = false
-      lb_backend_pool_id   = module.slb_fw_ext.backend_pool_id
+      name                      = "${var.name}-${each.key}-public"
+      subnet_id                 = module.vnet_transit.subnets.public.id
+      lb_backend_pool_id        = module.slb_fw_ext.backend_pool_id
       attach_to_lb_backend_pool = true
+      ip_configurations = {
+        primary = {
+          private_ip_address   = local.private_ips[each.key].public
+          create_public_ip     = false
+        }
+      }
     },
     {
-      name                 = "${var.name}-${each.key}-private"
-      private_ip_address   = local.private_ips[each.key].private
-      subnet_id            = module.vnet_transit.subnets.private.id
-      enable_ip_forwarding = true
-      lb_backend_pool_id   = module.slb_fw_int.backend_pool_id
+      name                      = "${var.name}-${each.key}-private"
+      subnet_id                 = module.vnet_transit.subnets.private.id
+      lb_backend_pool_id        = module.slb_fw_int.backend_pool_id
       attach_to_lb_backend_pool = true
+      ip_configurations = {
+        primary = {
+          private_ip_address   = local.private_ips[each.key].private
+        }
+      }
     },
     {
       name                 = "${var.name}-${each.key}-ha2"
       subnet_id            = module.vnet_transit.subnets.ha2.id
-      private_ip_address   = local.private_ips[each.key].ha2
-      enable_ip_forwarding = true
+      ip_configurations = {
+        primary = {
+          private_ip_address   = local.private_ips[each.key].ha2
+        }
+      }
     },
   ]
 

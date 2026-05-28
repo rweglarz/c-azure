@@ -10,7 +10,7 @@ resource "azurerm_public_ip" "fw_ext_snat_1" {
 
 
 module "slb_fw_ext" {
-  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/loadbalancer?ref=v3.0.2"
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/loadbalancer?ref=v3.5.1"
 
   name                = "${var.name}-fw-ext"
   resource_group_name = azurerm_resource_group.this.name
@@ -70,7 +70,7 @@ module "slb_fw_ext" {
     mdefault = {
       name     = "mdefault"
       protocol = "Http"
-      port     = 80
+      port     = 54321
 
       request_path        = "/unauth/php/health.php"
       probe_threshold     = 2
@@ -86,7 +86,7 @@ module "slb_fw_ext" {
 
 
 module "slb_fw_int" {
-  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/loadbalancer?ref=v3.0.2"
+  source = "github.com/PaloAltoNetworks/terraform-azurerm-swfw-modules//modules/loadbalancer?ref=v3.5.1"
 
   name                = "${var.name}-fw-int"
   resource_group_name = azurerm_resource_group.this.name
@@ -121,4 +121,8 @@ module "slb_fw_int" {
       interval_in_seconds = 5
     }
   }
+}
+
+output ext_lb {
+  value = module.slb_fw_ext.frontend_ip_configs
 }
