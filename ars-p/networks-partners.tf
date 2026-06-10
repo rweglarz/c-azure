@@ -12,6 +12,11 @@ module "vnet_partner1" {
       associate_nsg             = true
       network_security_group_id = module.basic.sg_id.mgmt
     },
+    sdgw = {
+      idx                       = 1
+      associate_nsg             = true
+      network_security_group_id = module.basic.sg_id.vpn
+    }
   }
 }
 
@@ -29,5 +34,10 @@ module "vnet_partner2" {
       associate_nsg             = true
       network_security_group_id = module.basic.sg_id.mgmt
     },
+    sdgw = {
+      idx                       = 1
+      associate_nsg             = true
+      network_security_group_id = module.basic.sg_id.vpn
+    }
   }
 }

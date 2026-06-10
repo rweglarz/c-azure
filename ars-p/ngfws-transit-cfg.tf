@@ -150,6 +150,9 @@ resource "panos_panorama_bgp_peer" "transit_fw-p_ars" {
   max_prefixes            = "unlimited"
   multi_hop               = 1
 
+  keep_alive_interval = 1
+  hold_time           = 4
+
   enable_sender_side_loop_detection = false
 }
 
@@ -203,7 +206,9 @@ resource "panos_panorama_bgp_export_rule_group" "transit_fw-p_ars" {
     }
     match_route_table   = "unicast"
     action              = "allow"
-    next_hop            = local.transit_ilb
+    # next_hop            = local.transit_ilb
+    next_hop            = each.value.eth1_2_ip
+    med = each.key=="fw1" ? 11 : 22
     used_by = [
       panos_panorama_bgp_peer_group.transit_fw-p_ars[each.key].name
     ]

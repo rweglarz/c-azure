@@ -9,6 +9,9 @@ resource "azurerm_dns_a_record" "this" {
     { 
       for k,v in module.linux_srv: "srv_${k}" => v.public_ip 
     },
+    { 
+      for k,v in module.linux_sdgw: "sdgw_${k}" => v.public_ip 
+    },
   )
   name                = format("ars-p-%s", replace(each.key, "_", "-"))
   resource_group_name = var.dns_zone_rg

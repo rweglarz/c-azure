@@ -1,0 +1,18 @@
+#!/bin/bash
+set -o xtrace
+
+# Assign the BGP APIPA source IP directly to the standard loopback interface (lo)
+# which is always UP and active, ensuring bird can bind and peer successfully.
+ip addr add ${bgp_source_ip}/32 dev lo 2>/dev/null || true
+
+%{ for name, v in tunnels ~}
+# Recreate XFRM interface to ensure it starts in a clean state
+ip link del dev xfrm${v.if_id} 2>/dev/null || true
+ip link add xfrm${v.if_id} type xfrm dev eth0 if_id ${v.if_id}
+ip link set xfrm${v.if_id} up
+%{ endfor ~}
+
+# Route the peer BGP IPs through their respective XFRM interfaces
+%{ for peer, v in peers ~}
+ip route replace ${v.peer_ip}/32 dev xfrm${v.if_id}
+%{ endfor ~}

@@ -89,12 +89,21 @@ resource "azurerm_route_table" "transit_vng" {
   location                      = azurerm_resource_group.rg1.location
 }
 
-resource "azurerm_route" "transit_vng-app" {
-  for_each = module.vnet_app
-  name                   = each.key
+# resource "azurerm_route" "transit_vng-app" {
+#   for_each = module.vnet_app
+#   name                   = each.key
+#   resource_group_name    = azurerm_resource_group.rg1.name
+#   route_table_name       = azurerm_route_table.transit_vng.name
+#   address_prefix         = tolist(each.value.vnet.address_space)[0]
+#   next_hop_type          = "VirtualAppliance"
+#   next_hop_in_ip_address = local.transit_ilb
+# }
+
+resource "azurerm_route" "transit_vng-172" {
+  name                   = "r172"
   resource_group_name    = azurerm_resource_group.rg1.name
   route_table_name       = azurerm_route_table.transit_vng.name
-  address_prefix         = tolist(each.value.vnet.address_space)[0]
+  address_prefix         = "172.16.0.0/12"
   next_hop_type          = "VirtualAppliance"
   next_hop_in_ip_address = local.transit_ilb
 }
@@ -209,7 +218,7 @@ resource "azurerm_route_server" "transit" {
   sku                              = "Standard"
   public_ip_address_id             = azurerm_public_ip.ars_transit.id
   subnet_id                        = module.vnet_transit.subnets["RouteServerSubnet"].id
-  branch_to_branch_traffic_enabled = true
+  branch_to_branch_traffic_enabled = false
 }
 
 
